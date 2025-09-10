@@ -16,12 +16,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Camera, MapPin, Loader2 } from "lucide-react";
+import { Camera, MapPin, Loader2, Video } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { suggestReportTitles } from "@/ai/flows/suggest-report-titles";
 import { autoRouteIssueReport } from "@/ai/flows/auto-route-issue-reports";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 const formSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters.").max(100),
@@ -41,6 +42,9 @@ export function ReportIssueForm() {
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [isSuggesting, setIsSuggesting] = useState(false);
   const { toast } = useToast();
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,6 +56,33 @@ export function ReportIssueForm() {
 
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
+  
+  useEffect(() => {
+    const getCameraPermission = async () => {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setHasCameraPermission(false);
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({video: true});
+        setHasCameraPermission(true);
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+        toast({
+          variant: 'destructive',
+          title: 'Camera Access Denied',
+          description: 'Please enable camera permissions in your browser settings to use this app.',
+        });
+      }
+    };
+
+    getCameraPermission();
+  }, [toast]);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -69,7 +100,8 @@ export function ReportIssueForm() {
         () => {
           toast({ variant: "destructive", title: "Error", description: "Could not get your location. Please enable location services." });
           setIsLocating(false);
-        }
+        },
+        { enableHighAccuracy: true }
       );
     } else {
       toast({ variant: "destructive", title: "Error", description: "Geolocation is not supported by this browser." });
@@ -88,6 +120,24 @@ export function ReportIssueForm() {
         }
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCapture = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext('2d');
+      if(context){
+        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+        const dataUrl = canvas.toDataURL('image/png');
+        setMediaPreview(dataUrl);
+        if (descriptionRef.current?.value) {
+          handleTitleSuggestion(descriptionRef.current.value, dataUrl);
+        }
+      }
     }
   };
   
@@ -116,9 +166,11 @@ export function ReportIssueForm() {
     }
     
     if (!mediaPreview) {
-        toast({ variant: "destructive", title: "Media required", description: "Please upload a photo, video, or audio of the issue." });
+        toast({ variant: "destructive", title: "Photo required", description: "Please take a photo of the issue." });
         return;
     }
+
+    form.control.register('media', { value: mediaPreview });
 
     try {
         const routingInfo = await autoRouteIssueReport({
@@ -163,21 +215,60 @@ export function ReportIssueForm() {
                 render={({ field }) => (
                     <FormItem className="text-center">
                         <FormControl>
-                            <label htmlFor="media-upload" className="cursor-pointer">
-                                <Card className={`p-6 border-dashed hover:border-primary transition-colors ${mediaPreview ? 'flex justify-center items-center' : ''}`}>
-                                {mediaPreview ? (
-                                    <Image src={mediaPreview} alt="Media preview" width={400} height={250} className="rounded-md object-cover max-h-[250px] w-auto"/>
-                                ) : (
-                                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                                        <Camera className="w-12 h-12"/>
-                                        <span className="font-semibold">Tap to upload Photo/Video/Audio*</span>
-                                        <span className="text-xs">Help us see what you see.</span>
+                            <div className="space-y-4">
+                               <Card className="p-2 border-dashed hover:border-primary transition-colors aspect-video flex justify-center items-center">
+                                  {mediaPreview ? (
+                                      <Image src={mediaPreview} alt="Media preview" width={400} height={225} className="rounded-md object-contain max-h-[250px] w-auto"/>
+                                  ) : (
+                                    <div className="relative w-full aspect-video">
+                                      <video ref={videoRef} className="w-full aspect-video rounded-md bg-secondary" autoPlay muted playsInline />
+                                      {hasCameraPermission === false && (
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white p-4 rounded-md">
+                                            <Video className="w-12 h-12 mb-2"/>
+                                            <p className="font-semibold">Camera Not Available</p>
+                                            <p className="text-xs text-center">Please grant camera permissions to continue.</p>
+                                        </div>
+                                      )}
                                     </div>
-                                )}
+                                  )}
                                 </Card>
-                                <Input id="media-upload" type="file" accept="image/*,video/*,audio/*" className="sr-only" onChange={handleMediaChange} />
-                            </label>
+
+                                {!mediaPreview ? (
+                                  <Button type="button" onClick={handleCapture} disabled={!hasCameraPermission} className="w-full">
+                                      <Camera className="mr-2"/> Capture Photo
+                                  </Button>
+                                ) : (
+                                  <Button type="button" variant="outline" onClick={() => setMediaPreview(null)} className="w-full">
+                                      Retake Photo
+                                  </Button>
+                                )}
+                                <canvas ref={canvasRef} className="hidden" />
+
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center">
+                                        <span className="w-full border-t" />
+                                    </div>
+                                    <div className="relative flex justify-center text-xs uppercase">
+                                        <span className="bg-background px-2 text-muted-foreground">
+                                        Or
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <label htmlFor="media-upload" className="cursor-pointer text-sm font-medium text-primary hover:underline">
+                                    upload a file from your device
+                                    <Input id="media-upload" type="file" accept="image/*,video/*,audio/*" className="sr-only" onChange={handleMediaChange} />
+                                </label>
+                            </div>
                         </FormControl>
+                         {hasCameraPermission === false && (
+                            <Alert variant="destructive" className="mt-4">
+                                <AlertTitle>Camera Access Required</AlertTitle>
+                                <AlertDescription>
+                                Please allow camera access in your browser settings to use the live photo feature. You can still upload a file.
+                                </AlertDescription>
+                            </Alert>
+                         )}
                         <FormMessage />
                     </FormItem>
                 )}
@@ -189,6 +280,14 @@ export function ReportIssueForm() {
                         <MapPin className="h-5 w-5"/>
                         {isLocating ? <span className="text-sm">Getting your location...</span> : <span className="text-sm">{geolocation?.address || "Location not available"}</span>}
                     </div>
+                     {!isLocating && !geolocation && (
+                        <Alert variant="destructive">
+                            <AlertTitle>Location Error</AlertTitle>
+                            <AlertDescription>
+                            Could not fetch your location. Please ensure location services are enabled in your browser and for this site.
+                            </AlertDescription>
+                        </Alert>
+                    )}
                 </FormItem>
 
                 <FormField

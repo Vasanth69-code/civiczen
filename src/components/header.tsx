@@ -30,6 +30,9 @@ export function Header({ title }: HeaderProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="en">English</SelectItem>
+            <SelectItem value="es">Español</SelectItem>
+            <SelectItem value="fr">Français</SelectItem>
+            <SelectItem value="de">Deutsch</SelectItem>
             <SelectItem value="hi">हिन्दी (Hindi)</SelectItem>
             <SelectItem value="ta">தமிழ் (Tamil)</SelectItem>
           </SelectContent>
