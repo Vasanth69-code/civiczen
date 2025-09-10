@@ -33,13 +33,13 @@ const formSchema = z.object({
 type Geolocation = {
   latitude: number;
   longitude: number;
-  address: string;
 }
 
 export function ReportIssueForm() {
   const [geolocation, setGeolocation] = useState<Geolocation | null>(null);
   const [isLocating, setIsLocating] = useState(true);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [mediaType, setMediaType] = useState<'image' | 'video' | null>(null);
   const [isSuggesting, setIsSuggesting] = useState(false);
   const { toast } = useToast();
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
@@ -88,12 +88,9 @@ export function ReportIssueForm() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // Placeholder for reverse geocoding
-          const mockAddress = "123 Civic Center, Metropolis";
           setGeolocation({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-            address: mockAddress,
           });
           setIsLocating(false);
         },
@@ -115,6 +112,7 @@ export function ReportIssueForm() {
       const reader = new FileReader();
       reader.onloadend = () => {
         setMediaPreview(reader.result as string);
+        setMediaType(file.type.startsWith('video') ? 'video' : 'image');
         if (descriptionRef.current?.value) {
             handleTitleSuggestion(descriptionRef.current.value, reader.result as string);
         }
@@ -134,6 +132,7 @@ export function ReportIssueForm() {
         context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
         const dataUrl = canvas.toDataURL('image/png');
         setMediaPreview(dataUrl);
+        setMediaType('image');
         if (descriptionRef.current?.value) {
           handleTitleSuggestion(descriptionRef.current.value, dataUrl);
         }
@@ -166,7 +165,7 @@ export function ReportIssueForm() {
     }
     
     if (!mediaPreview) {
-        toast({ variant: "destructive", title: "Photo required", description: "Please take a photo of the issue." });
+        toast({ variant: "destructive", title: "Photo or Video required", description: "Please provide media for the issue." });
         return;
     }
 
@@ -193,6 +192,7 @@ export function ReportIssueForm() {
         });
         form.reset();
         setMediaPreview(null);
+        setMediaType(null);
     } catch (error) {
         console.error("AI Routing Error:", error);
         toast({ variant: "destructive", title: "Submission Failed", description: "Could not auto-route the issue. Please try again." });
@@ -218,7 +218,10 @@ export function ReportIssueForm() {
                             <div className="space-y-4">
                                <Card className="p-2 border-dashed hover:border-primary transition-colors aspect-video flex justify-center items-center">
                                   {mediaPreview ? (
-                                      <Image src={mediaPreview} alt="Media preview" width={400} height={225} className="rounded-md object-contain max-h-[250px] w-auto"/>
+                                    <>
+                                      {mediaType === 'image' && <Image src={mediaPreview} alt="Media preview" width={400} height={225} className="rounded-md object-contain max-h-[250px] w-auto"/>}
+                                      {mediaType === 'video' && <video src={mediaPreview} controls className="rounded-md object-contain max-h-[250px] w-auto" />}
+                                    </>
                                   ) : (
                                     <div className="relative w-full aspect-video">
                                       <video ref={videoRef} className="w-full aspect-video rounded-md bg-secondary" autoPlay muted playsInline />
@@ -238,8 +241,8 @@ export function ReportIssueForm() {
                                       <Camera className="mr-2"/> Capture Photo
                                   </Button>
                                 ) : (
-                                  <Button type="button" variant="outline" onClick={() => setMediaPreview(null)} className="w-full">
-                                      Retake Photo
+                                  <Button type="button" variant="outline" onClick={() => {setMediaPreview(null); setMediaType(null);}} className="w-full">
+                                      Retake or Upload New
                                   </Button>
                                 )}
                                 <canvas ref={canvasRef} className="hidden" />
@@ -257,11 +260,11 @@ export function ReportIssueForm() {
 
                                 <label htmlFor="media-upload" className="cursor-pointer text-sm font-medium text-primary hover:underline">
                                     upload a file from your device
-                                    <Input id="media-upload" type="file" accept="image/*,video/*,audio/*" className="sr-only" onChange={handleMediaChange} />
+                                    <Input id="media-upload" type="file" accept="image/*,video/*" className="sr-only" onChange={handleMediaChange} />
                                 </label>
                             </div>
                         </FormControl>
-                         {hasCameraPermission === false && (
+                         {hasCameraPermission === false && !mediaPreview && (
                             <Alert variant="destructive" className="mt-4">
                                 <AlertTitle>Camera Access Required</AlertTitle>
                                 <AlertDescription>
@@ -278,7 +281,7 @@ export function ReportIssueForm() {
                     <FormLabel>Location*</FormLabel>
                     <div className="flex items-center gap-2 p-3 rounded-md bg-secondary text-secondary-foreground">
                         <MapPin className="h-5 w-5"/>
-                        {isLocating ? <span className="text-sm">Getting your location...</span> : <span className="text-sm">{geolocation?.address || "Location not available"}</span>}
+                        {isLocating ? <span className="text-sm">Getting your location...</span> : <span className="text-sm">{geolocation ? `Lat: ${geolocation.latitude.toFixed(4)}, Lng: ${geolocation.longitude.toFixed(4)}` : "Location not available"}</span>}
                     </div>
                      {!isLocating && !geolocation && (
                         <Alert variant="destructive">
@@ -338,3 +341,5 @@ export function ReportIssueForm() {
     </Card>
   );
 }
+
+    
