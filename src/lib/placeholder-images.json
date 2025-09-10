@@ -1,3 +1,58 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "user-1",
+      "description": "User avatar 1",
+      "imageUrl": "https://picsum.photos/seed/user1/100/100",
+      "imageHint": "person face"
+    },
+    {
+      "id": "user-2",
+      "description": "User avatar 2",
+      "imageUrl": "https://picsum.photos/seed/user2/100/100",
+      "imageHint": "woman smiling"
+    },
+    {
+      "id": "user-3",
+      "description": "User avatar 3",
+      "imageUrl": "https://picsum.photos/seed/user3/100/100",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "user-4",
+      "description": "User avatar 4",
+      "imageUrl": "https://picsum.photos/seed/user4/100/100",
+      "imageHint": "person glasses"
+    },
+    {
+      "id": "user-5",
+      "description": "User avatar 5",
+      "imageUrl": "https://picsum.photos/seed/user5/100/100",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "issue-pothole",
+      "description": "A pothole in a road",
+      "imageUrl": "https://picsum.photos/seed/pothole/600/400",
+      "imageHint": "pothole road"
+    },
+    {
+      "id": "issue-trash",
+      "description": "Overflowing trash can on a street",
+      "imageUrl": "https://picsum.photos/seed/trash/600/400",
+      "imageHint": "trash can"
+    },
+    {
+      "id": "issue-streetlight",
+      "description": "A broken streetlight",
+      "imageUrl": "https://picsum.photos/seed/streetlight/600/400",
+      "imageHint": "streetlight broken"
+    },
+    {
+      "id": "issue-graffiti",
+      "description": "Graffiti on a wall",
+      "imageUrl": "https://picsum.photos/seed/graffiti/600/400",
+      "imageHint": "graffiti wall"
+    }
+  ]
 }
