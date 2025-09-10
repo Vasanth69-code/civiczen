@@ -38,7 +38,7 @@ export default function LoginPage() {
                     </Link>
                 </Button>
                 <Button asChild size="lg" variant="secondary">
-                    <Link href="/admin/dashboard">
+                    <Link href="/admin">
                         <Shield className="mr-2 h-5 w-5" />
                         Sign in as Admin
                     </Link>

@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Camera, MapPin, Loader2, Video, Wand2, Check, X } from "lucide-react";
+import { Camera, MapPin, Loader2, Video, Wand2, Check, X, ExternalLink } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
@@ -24,6 +24,7 @@ import { suggestReportTitles } from "@/ai/flows/suggest-report-titles";
 import { autoRouteIssueReport, AutoRouteIssueReportOutput } from "@/ai/flows/auto-route-issue-reports";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "./ui/badge";
+import Link from "next/link";
 
 const formSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters.").max(100),
@@ -396,7 +397,20 @@ export function ReportIssueForm() {
                     <FormLabel>Location*</FormLabel>
                     <div className="flex items-center gap-2 p-3 rounded-md bg-secondary text-secondary-foreground">
                         <MapPin className="h-5 w-5"/>
-                        {isLocating ? <span className="text-sm">Getting your location...</span> : <span className="text-sm">{geolocation ? `Lat: ${geolocation.latitude.toFixed(4)}, Lng: ${geolocation.longitude.toFixed(4)}` : "Location not available"}</span>}
+                        {isLocating ? (
+                            <span className="text-sm">Getting your location...</span>
+                        ) : geolocation ? (
+                            <div className="flex justify-between items-center w-full">
+                                <span className="text-sm">{`Lat: ${geolocation.latitude.toFixed(4)}, Lng: ${geolocation.longitude.toFixed(4)}`}</span>
+                                <Button asChild variant="ghost" size="sm">
+                                    <Link href={`https://www.openstreetmap.org/?mlat=${geolocation.latitude}&mlon=${geolocation.longitude}#map=16/${geolocation.latitude}/${geolocation.longitude}`} target="_blank">
+                                        View on Map <ExternalLink className="ml-2 h-4 w-4" />
+                                    </Link>
+                                </Button>
+                            </div>
+                        ) : (
+                            <span className="text-sm">Location not available</span>
+                        )}
                     </div>
                      {!isLocating && !geolocation && (
                         <Alert variant="destructive">
