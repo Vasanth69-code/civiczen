@@ -35,6 +35,12 @@ export function Header({ title }: HeaderProps) {
             <SelectItem value="de">Deutsch</SelectItem>
             <SelectItem value="hi">हिन्दी (Hindi)</SelectItem>
             <SelectItem value="ta">தமிழ் (Tamil)</SelectItem>
+            <SelectItem value="ar">العربية (Arabic)</SelectItem>
+            <SelectItem value="bn">বাংলা (Bengali)</SelectItem>
+            <SelectItem value="zh">中文 (Chinese)</SelectItem>
+            <SelectItem value="ja">日本語 (Japanese)</SelectItem>
+            <SelectItem value="pt">Português</SelectItem>
+            <SelectItem value="ru">Русский (Russian)</SelectItem>
           </SelectContent>
         </Select>
         <Button variant="ghost" size="icon" className="rounded-full">

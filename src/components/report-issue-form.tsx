@@ -395,21 +395,33 @@ export function ReportIssueForm() {
 
                 <FormItem>
                     <FormLabel>Location*</FormLabel>
-                    <div className="flex items-center gap-2 p-3 rounded-md bg-secondary text-secondary-foreground">
-                        <MapPin className="h-5 w-5"/>
-                        {isLocating ? (
-                            <span className="text-sm">Getting your location...</span>
-                        ) : geolocation ? (
-                            <div className="flex justify-between items-center w-full">
-                                <span className="text-sm">{`Lat: ${geolocation.latitude.toFixed(4)}, Lng: ${geolocation.longitude.toFixed(4)}`}</span>
+                    <div className="flex flex-col items-center gap-2 p-3 rounded-md bg-secondary text-secondary-foreground">
+                        <div className="flex items-center justify-between w-full">
+                            <div className="flex items-center gap-2">
+                                <MapPin className="h-5 w-5"/>
+                                {isLocating ? (
+                                    <span className="text-sm">Getting your location...</span>
+                                ) : geolocation ? (
+                                    <span className="text-sm">{`Lat: ${geolocation.latitude.toFixed(4)}, Lng: ${geolocation.longitude.toFixed(4)}`}</span>
+                                ) : (
+                                    <span className="text-sm">Location not available</span>
+                                )}
+                            </div>
+                            {geolocation && (
                                 <Button asChild variant="ghost" size="sm">
                                     <Link href={`https://www.openstreetmap.org/?mlat=${geolocation.latitude}&mlon=${geolocation.longitude}#map=16/${geolocation.latitude}/${geolocation.longitude}`} target="_blank">
                                         View on Map <ExternalLink className="ml-2 h-4 w-4" />
                                     </Link>
                                 </Button>
-                            </div>
-                        ) : (
-                            <span className="text-sm">Location not available</span>
+                            )}
+                        </div>
+                        {geolocation && (
+                            <iframe
+                                className="w-full h-48 rounded-md mt-2"
+                                src={`https://www.openstreetmap.org/export/embed.html?bbox=${geolocation.longitude-0.01},${geolocation.latitude-0.01},${geolocation.longitude+0.01},${geolocation.latitude+0.01}&layer=mapnik&marker=${geolocation.latitude},${geolocation.longitude}`}
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                            ></iframe>
                         )}
                     </div>
                      {!isLocating && !geolocation && (

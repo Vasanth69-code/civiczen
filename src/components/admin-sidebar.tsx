@@ -58,7 +58,7 @@ export function AdminSidebar() {
                 isActive={isActive("/admin/issues")}
                 tooltip={{ children: "All Issues" }}
               >
-                <Link href="#">
+                <Link href="/admin/issues">
                   <FileText />
                   <span>All Issues</span>
                 </Link>
