@@ -16,13 +16,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Camera, MapPin, Loader2, Video } from "lucide-react";
+import { Camera, MapPin, Loader2, Video, Wand2, Check, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { suggestReportTitles } from "@/ai/flows/suggest-report-titles";
-import { autoRouteIssueReport } from "@/ai/flows/auto-route-issue-reports";
+import { autoRouteIssueReport, AutoRouteIssueReportOutput } from "@/ai/flows/auto-route-issue-reports";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "./ui/badge";
 
 const formSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters.").max(100),
@@ -45,6 +46,8 @@ export function ReportIssueForm() {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isRouting, setIsRouting] = useState(false);
+  const [routingResult, setRoutingResult] = useState<AutoRouteIssueReportOutput | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -105,16 +108,46 @@ export function ReportIssueForm() {
       setIsLocating(false);
     }
   }, [toast]);
+  
+  const handleAutoRouting = async (mediaData: string, description: string) => {
+    if (!geolocation || !mediaData || !description) return;
+    setIsRouting(true);
+    setRoutingResult(null);
+    try {
+      const result = await autoRouteIssueReport({
+        photoDataUri: mediaData,
+        description: description,
+        location: `${geolocation.latitude}, ${geolocation.longitude}`,
+      });
+      setRoutingResult(result);
+    } catch (error) {
+      console.error("AI Routing Error:", error);
+      toast({ variant: "destructive", title: "AI Analysis Failed", description: "Could not automatically categorize the issue." });
+    } finally {
+      setIsRouting(false);
+    }
+  };
+  
+  const triggerAIRoutinAndTitle = (description: string, mediaData: string) => {
+    handleTitleSuggestion(description, mediaData);
+    if(mediaType === 'image') {
+        handleAutoRouting(mediaData, description);
+    } else {
+        setRoutingResult(null);
+    }
+  }
 
   const handleMediaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setMediaPreview(reader.result as string);
-        setMediaType(file.type.startsWith('video') ? 'video' : 'image');
+        const result = reader.result as string;
+        setMediaPreview(result);
+        const newMediaType = file.type.startsWith('video') ? 'video' : 'image';
+        setMediaType(newMediaType);
         if (descriptionRef.current?.value) {
-            handleTitleSuggestion(descriptionRef.current.value, reader.result as string);
+            triggerAIRoutinAndTitle(descriptionRef.current.value, result);
         }
       };
       reader.readAsDataURL(file);
@@ -134,7 +167,7 @@ export function ReportIssueForm() {
         setMediaPreview(dataUrl);
         setMediaType('image');
         if (descriptionRef.current?.value) {
-          handleTitleSuggestion(descriptionRef.current.value, dataUrl);
+            triggerAIRoutinAndTitle(descriptionRef.current.value, dataUrl);
         }
       }
     }
@@ -168,42 +201,49 @@ export function ReportIssueForm() {
         toast({ variant: "destructive", title: "Photo or Video required", description: "Please provide media for the issue." });
         return;
     }
+    
+    let finalRoutingInfo = routingResult;
 
-    form.control.register('media', { value: mediaPreview });
-
-    try {
-        const routingInfo = await autoRouteIssueReport({
-            photoDataUri: mediaPreview,
-            description: values.description,
-            location: `${geolocation.latitude}, ${geolocation.longitude}`,
+    if (!finalRoutingInfo) {
+      setIsRouting(true);
+      try {
+        finalRoutingInfo = await autoRouteIssueReport({
+          photoDataUri: mediaPreview,
+          description: values.description,
+          location: `${geolocation.latitude}, ${geolocation.longitude}`,
         });
-
-        console.log("AI Routing Info:", routingInfo);
-
-        toast({
-            title: "Report Submitted Successfully!",
-            description: (
-              <div>
-                <p>Your issue has been routed to the <strong>{routingInfo.department}</strong> department.</p>
-                <p>Priority: <strong>{routingInfo.priority}</strong>. Tracking ID: #CITY{Math.floor(1000 + Math.random() * 9000)}</p>
-                <p className="text-xs mt-2">An SMS with tracking details has been sent to your registered number.</p>
-              </div>
-            ),
-        });
-        form.reset();
-        setMediaPreview(null);
-        setMediaType(null);
-    } catch (error) {
-        console.error("AI Routing Error:", error);
+      } catch (error) {
+        console.error("Final AI Routing Error:", error);
         toast({ variant: "destructive", title: "Submission Failed", description: "Could not auto-route the issue. Please try again." });
+        setIsRouting(false);
+        return;
+      }
+      setIsRouting(false);
     }
+
+    console.log("AI Routing Info:", finalRoutingInfo);
+
+    toast({
+        title: "Report Submitted Successfully!",
+        description: (
+          <div>
+            <p>Your issue has been routed to the <strong>{finalRoutingInfo.department}</strong> department.</p>
+            <p>Priority: <strong>{finalRoutingInfo.priority}</strong>. Tracking ID: #CITY{Math.floor(1000 + Math.random() * 9000)}</p>
+            <p className="text-xs mt-2">An SMS with tracking details has been sent to your registered number.</p>
+          </div>
+        ),
+    });
+    form.reset();
+    setMediaPreview(null);
+    setMediaType(null);
+    setRoutingResult(null);
   }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="font-headline">New Issue Report</CardTitle>
-        <CardDescription>Fill in the details below. Fields marked with * are required.</CardDescription>
+        <CardDescription>Fill in the details below. Our AI will help categorize and prioritize your report.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -241,7 +281,7 @@ export function ReportIssueForm() {
                                       <Camera className="mr-2"/> Capture Photo
                                   </Button>
                                 ) : (
-                                  <Button type="button" variant="outline" onClick={() => {setMediaPreview(null); setMediaType(null);}} className="w-full">
+                                  <Button type="button" variant="outline" onClick={() => {setMediaPreview(null); setMediaType(null); setRoutingResult(null);}} className="w-full">
                                       Retake or Upload New
                                   </Button>
                                 )}
@@ -276,23 +316,7 @@ export function ReportIssueForm() {
                     </FormItem>
                 )}
                 />
-
-                <FormItem>
-                    <FormLabel>Location*</FormLabel>
-                    <div className="flex items-center gap-2 p-3 rounded-md bg-secondary text-secondary-foreground">
-                        <MapPin className="h-5 w-5"/>
-                        {isLocating ? <span className="text-sm">Getting your location...</span> : <span className="text-sm">{geolocation ? `Lat: ${geolocation.latitude.toFixed(4)}, Lng: ${geolocation.longitude.toFixed(4)}` : "Location not available"}</span>}
-                    </div>
-                     {!isLocating && !geolocation && (
-                        <Alert variant="destructive">
-                            <AlertTitle>Location Error</AlertTitle>
-                            <AlertDescription>
-                            Could not fetch your location. Please ensure location services are enabled in your browser and for this site.
-                            </AlertDescription>
-                        </Alert>
-                    )}
-                </FormItem>
-
+                
                 <FormField
                     control={form.control}
                     name="description"
@@ -305,14 +329,51 @@ export function ReportIssueForm() {
                                 {...field}
                                 rows={5}
                                 ref={descriptionRef}
-                                onBlur={(e) => handleTitleSuggestion(e.target.value, mediaPreview || undefined)}
+                                onBlur={(e) => { if(mediaPreview) { triggerAIRoutinAndTitle(e.target.value, mediaPreview) }}}
                             />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
                     )}
                 />
-                
+
+                {(isRouting || routingResult) && (
+                  <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <Wand2 className="text-primary"/> AI Analysis
+                      </FormLabel>
+                      <Card className="bg-secondary/50">
+                        <CardContent className="p-4">
+                          {isRouting ? (
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Loader2 className="h-4 w-4 animate-spin"/> Analyzing image...
+                            </div>
+                          ) : routingResult ? (
+                            <div className="space-y-3">
+                              <div className="flex justify-between items-center">
+                                <span className="font-medium">Suggested Category</span>
+                                <Badge variant="outline">{routingResult.issueType}</Badge>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="font-medium">Assigned Department</span>
+                                <Badge variant="outline">{routingResult.department}</Badge>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="font-medium">Recommended Priority</span>
+                                <Badge variant={routingResult.priority === 'High' ? "destructive" : "outline"}>{routingResult.priority}</Badge>
+                              </div>
+                              <div className="flex justify-end gap-2 pt-2">
+                                <Button size="sm" variant="ghost" onClick={() => setRoutingResult(null)}><X className="mr-1 h-4 w-4" /> Incorrect</Button>
+                                <Button size="sm" disabled><Check className="mr-1 h-4 w-4" /> Looks good</Button>
+                              </div>
+                            </div>
+                          ) : null}
+                        </CardContent>
+                      </Card>
+                      <FormDescription>Our AI has analyzed your report. If this looks wrong, you can discard the suggestion.</FormDescription>
+                  </FormItem>
+                )}
+
                 <FormField
                     control={form.control}
                     name="title"
@@ -330,10 +391,26 @@ export function ReportIssueForm() {
                         </FormItem>
                     )}
                 />
+
+                <FormItem>
+                    <FormLabel>Location*</FormLabel>
+                    <div className="flex items-center gap-2 p-3 rounded-md bg-secondary text-secondary-foreground">
+                        <MapPin className="h-5 w-5"/>
+                        {isLocating ? <span className="text-sm">Getting your location...</span> : <span className="text-sm">{geolocation ? `Lat: ${geolocation.latitude.toFixed(4)}, Lng: ${geolocation.longitude.toFixed(4)}` : "Location not available"}</span>}
+                    </div>
+                     {!isLocating && !geolocation && (
+                        <Alert variant="destructive">
+                            <AlertTitle>Location Error</AlertTitle>
+                            <AlertDescription>
+                            Could not fetch your location. Please ensure location services are enabled in your browser and for this site.
+                            </AlertDescription>
+                        </Alert>
+                    )}
+                </FormItem>
             </div>
             
-            <Button type="submit" size="lg" className="w-full" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</> : "Submit Report"}
+            <Button type="submit" size="lg" className="w-full" disabled={form.formState.isSubmitting || isRouting}>
+              {(form.formState.isSubmitting || isRouting) ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</> : "Submit Report"}
             </Button>
           </form>
         </Form>
@@ -341,5 +418,3 @@ export function ReportIssueForm() {
     </Card>
   );
 }
-
-    
