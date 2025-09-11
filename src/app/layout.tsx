@@ -1,9 +1,9 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import './globals.css';
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
-export default function AppLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -17,10 +17,10 @@ export default function AppLayout({
       </head>
       <body className="font-body antialiased">
         <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset>
-            {children}
-          </SidebarInset>
+            <AppSidebar />
+            <SidebarInset>
+                {children}
+            </SidebarInset>
         </SidebarProvider>
         <Toaster />
       </body>
