@@ -44,6 +44,9 @@ export default function LoginPage() {
                     </Link>
                 </Button>
             </div>
+             <div className="text-center text-sm text-muted-foreground pt-4">
+                Admin Demo: <code className="font-code text-xs">demo@example.com</code> / <code className="font-code text-xs">password</code>
+            </div>
             <div className="text-center text-sm text-muted-foreground pt-4">
                 Don't have an account? <Link href="#" className="text-primary underline">Sign Up</Link>
             </div>
