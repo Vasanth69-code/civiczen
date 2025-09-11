@@ -6,6 +6,7 @@ import {
   VenetianMask,
   Award,
   Settings,
+  List,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -63,6 +64,18 @@ export function AppSidebar() {
                 <Link href="/issues">
                   <FileText />
                   <span>{t('my_submitted_issues')}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={isActive("/all-reports")}
+                tooltip={{ children: t('all_issue_reports') }}
+              >
+                <Link href="/all-reports">
+                  <List />
+                  <span>{t('all_issue_reports')}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
