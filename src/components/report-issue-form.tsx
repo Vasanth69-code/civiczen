@@ -25,6 +25,7 @@ import { autoRouteIssueReport, AutoRouteIssueReportOutput } from "@/ai/flows/aut
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "./ui/badge";
 import Link from "next/link";
+import { useLanguage } from "@/context/language-context";
 
 const formSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters.").max(100),
@@ -49,6 +50,7 @@ export function ReportIssueForm() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isRouting, setIsRouting] = useState(false);
   const [routingResult, setRoutingResult] = useState<AutoRouteIssueReportOutput | null>(null);
+  const { t } = useLanguage();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -79,14 +81,14 @@ export function ReportIssueForm() {
         setHasCameraPermission(false);
         toast({
           variant: 'destructive',
-          title: 'Camera Access Denied',
-          description: 'Please enable camera permissions in your browser settings to use this app.',
+          title: t('camera_access_denied'),
+          description: t('camera_permission_description'),
         });
       }
     };
 
     getCameraPermission();
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -99,16 +101,16 @@ export function ReportIssueForm() {
           setIsLocating(false);
         },
         () => {
-          toast({ variant: "destructive", title: "Error", description: "Could not get your location. Please enable location services." });
+          toast({ variant: "destructive", title: t('error'), description: t('location_error_description') });
           setIsLocating(false);
         },
         { enableHighAccuracy: true }
       );
     } else {
-      toast({ variant: "destructive", title: "Error", description: "Geolocation is not supported by this browser." });
+      toast({ variant: "destructive", title: t('error'), description: t('geolocation_not_supported') });
       setIsLocating(false);
     }
-  }, [toast]);
+  }, [toast, t]);
   
   const handleAutoRouting = async (mediaData: string, description: string) => {
     if (!geolocation || !mediaData || !description) return;
@@ -123,7 +125,7 @@ export function ReportIssueForm() {
       setRoutingResult(result);
     } catch (error) {
       console.error("AI Routing Error:", error);
-      toast({ variant: "destructive", title: "AI Analysis Failed", description: "Could not automatically categorize the issue." });
+      toast({ variant: "destructive", title: t('ai_analysis_failed'), description: t('ai_analysis_failed_description') });
     } finally {
       setIsRouting(false);
     }
@@ -194,12 +196,12 @@ export function ReportIssueForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!geolocation) {
-      toast({ variant: "destructive", title: "Location required", description: "We need your location to submit the report." });
+      toast({ variant: "destructive", title: t('location_required'), description: t('location_required_description') });
       return;
     }
     
     if (!mediaPreview) {
-        toast({ variant: "destructive", title: "Photo or Video required", description: "Please provide media for the issue." });
+        toast({ variant: "destructive", title: t('media_required'), description: t('media_required_description') });
         return;
     }
     
@@ -215,7 +217,7 @@ export function ReportIssueForm() {
         });
       } catch (error) {
         console.error("Final AI Routing Error:", error);
-        toast({ variant: "destructive", title: "Submission Failed", description: "Could not auto-route the issue. Please try again." });
+        toast({ variant: "destructive", title: t('submission_failed'), description: t('submission_failed_description') });
         setIsRouting(false);
         return;
       }
@@ -225,12 +227,12 @@ export function ReportIssueForm() {
     console.log("AI Routing Info:", finalRoutingInfo);
 
     toast({
-        title: "Report Submitted Successfully!",
+        title: t('report_submitted_successfully'),
         description: (
           <div>
-            <p>Your issue has been routed to the <strong>{finalRoutingInfo.department}</strong> department.</p>
-            <p>Priority: <strong>{finalRoutingInfo.priority}</strong>. Tracking ID: #CITY{Math.floor(1000 + Math.random() * 9000)}</p>
-            <p className="text-xs mt-2">An SMS with tracking details has been sent to your registered number.</p>
+            <p>{t('report_submitted_description', { department: finalRoutingInfo.department })}</p>
+            <p>{t('priority')}: <strong>{t(finalRoutingInfo.priority.toLowerCase() as any)}</strong>. {t('tracking_id')}: #CITY{Math.floor(1000 + Math.random() * 9000)}</p>
+            <p className="text-xs mt-2">{t('sms_notification')}</p>
           </div>
         ),
     });
@@ -243,8 +245,8 @@ export function ReportIssueForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-headline">New Issue Report</CardTitle>
-        <CardDescription>Fill in the details below. Our AI will help categorize and prioritize your report.</CardDescription>
+        <CardTitle className="font-headline">{t('new_issue_report')}</CardTitle>
+        <CardDescription>{t('new_issue_report_description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -269,8 +271,8 @@ export function ReportIssueForm() {
                                       {hasCameraPermission === false && (
                                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white p-4 rounded-md">
                                             <Video className="w-12 h-12 mb-2"/>
-                                            <p className="font-semibold">Camera Not Available</p>
-                                            <p className="text-xs text-center">Please grant camera permissions to continue.</p>
+                                            <p className="font-semibold">{t('camera_not_available')}</p>
+                                            <p className="text-xs text-center">{t('camera_permission_prompt')}</p>
                                         </div>
                                       )}
                                     </div>
@@ -279,11 +281,11 @@ export function ReportIssueForm() {
 
                                 {!mediaPreview ? (
                                   <Button type="button" onClick={handleCapture} disabled={!hasCameraPermission} className="w-full">
-                                      <Camera className="mr-2"/> Capture Photo
+                                      <Camera className="mr-2"/> {t('capture_photo')}
                                   </Button>
                                 ) : (
                                   <Button type="button" variant="outline" onClick={() => {setMediaPreview(null); setMediaType(null); setRoutingResult(null);}} className="w-full">
-                                      Retake or Upload New
+                                      {t('retake_or_upload_new')}
                                   </Button>
                                 )}
                                 <canvas ref={canvasRef} className="hidden" />
@@ -294,22 +296,22 @@ export function ReportIssueForm() {
                                     </div>
                                     <div className="relative flex justify-center text-xs uppercase">
                                         <span className="bg-background px-2 text-muted-foreground">
-                                        Or
+                                        {t('or')}
                                         </span>
                                     </div>
                                 </div>
 
                                 <label htmlFor="media-upload" className="cursor-pointer text-sm font-medium text-primary hover:underline">
-                                    upload a file from your device
+                                    {t('upload_from_device')}
                                     <Input id="media-upload" type="file" accept="image/*,video/*" className="sr-only" onChange={handleMediaChange} />
                                 </label>
                             </div>
                         </FormControl>
                          {hasCameraPermission === false && !mediaPreview && (
                             <Alert variant="destructive" className="mt-4">
-                                <AlertTitle>Camera Access Required</AlertTitle>
+                                <AlertTitle>{t('camera_access_required')}</AlertTitle>
                                 <AlertDescription>
-                                Please allow camera access in your browser settings to use the live photo feature. You can still upload a file.
+                                {t('camera_access_required_description')}
                                 </AlertDescription>
                             </Alert>
                          )}
@@ -323,10 +325,10 @@ export function ReportIssueForm() {
                     name="description"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Description*</FormLabel>
+                        <FormLabel>{t('description_label')}</FormLabel>
                         <FormControl>
                             <Textarea
-                                placeholder="Describe the issue in detail. What is it? Where is it? Why is it a problem?"
+                                placeholder={t('description_placeholder')}
                                 {...field}
                                 rows={5}
                                 ref={descriptionRef}
@@ -341,37 +343,37 @@ export function ReportIssueForm() {
                 {(isRouting || routingResult) && (
                   <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        <Wand2 className="text-primary"/> AI Analysis
+                        <Wand2 className="text-primary"/> {t('ai_analysis')}
                       </FormLabel>
                       <Card className="bg-secondary/50">
                         <CardContent className="p-4">
                           {isRouting ? (
                             <div className="flex items-center gap-2 text-muted-foreground">
-                              <Loader2 className="h-4 w-4 animate-spin"/> Analyzing image...
+                              <Loader2 className="h-4 w-4 animate-spin"/> {t('analyzing_image')}
                             </div>
                           ) : routingResult ? (
                             <div className="space-y-3">
                               <div className="flex justify-between items-center">
-                                <span className="font-medium">Suggested Category</span>
+                                <span className="font-medium">{t('suggested_category')}</span>
                                 <Badge variant="outline">{routingResult.issueType}</Badge>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="font-medium">Assigned Department</span>
+                                <span className="font-medium">{t('assigned_department')}</span>
                                 <Badge variant="outline">{routingResult.department}</Badge>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="font-medium">Recommended Priority</span>
-                                <Badge variant={routingResult.priority === 'High' ? "destructive" : "outline"}>{routingResult.priority}</Badge>
+                                <span className="font-medium">{t('recommended_priority')}</span>
+                                <Badge variant={routingResult.priority === 'High' ? "destructive" : "outline"}>{t(routingResult.priority.toLowerCase() as any)}</Badge>
                               </div>
                               <div className="flex justify-end gap-2 pt-2">
-                                <Button size="sm" variant="ghost" onClick={() => setRoutingResult(null)}><X className="mr-1 h-4 w-4" /> Incorrect</Button>
-                                <Button size="sm" disabled><Check className="mr-1 h-4 w-4" /> Looks good</Button>
+                                <Button size="sm" variant="ghost" onClick={() => setRoutingResult(null)}><X className="mr-1 h-4 w-4" /> {t('incorrect')}</Button>
+                                <Button size="sm" disabled><Check className="mr-1 h-4 w-4" /> {t('looks_good')}</Button>
                               </div>
                             </div>
                           ) : null}
                         </CardContent>
                       </Card>
-                      <FormDescription>Our AI has analyzed your report. If this looks wrong, you can discard the suggestion.</FormDescription>
+                      <FormDescription>{t('ai_analysis_description')}</FormDescription>
                   </FormItem>
                 )}
 
@@ -381,36 +383,36 @@ export function ReportIssueForm() {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel className="flex items-center gap-2">
-                                Title*
+                                {t('title_label')}
                                 {isSuggesting && <Loader2 className="h-4 w-4 animate-spin"/>}
                             </FormLabel>
                             <FormControl>
-                                <Input ref={titleRef} placeholder="e.g., Large pothole on Elm Street" {...field} />
+                                <Input ref={titleRef} placeholder={t('title_placeholder')} {...field} />
                             </FormControl>
-                            <FormDescription>A short, clear title for the issue. We can suggest one based on your description.</FormDescription>
+                            <FormDescription>{t('title_description')}</FormDescription>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
 
                 <FormItem>
-                    <FormLabel>Location*</FormLabel>
+                    <FormLabel>{t('location_label')}</FormLabel>
                     <div className="flex flex-col items-center gap-2 p-3 rounded-md bg-secondary text-secondary-foreground">
                         <div className="flex items-center justify-between w-full">
                             <div className="flex items-center gap-2">
                                 <MapPin className="h-5 w-5"/>
                                 {isLocating ? (
-                                    <span className="text-sm">Getting your location...</span>
+                                    <span className="text-sm">{t('getting_location')}</span>
                                 ) : geolocation ? (
                                     <span className="text-sm">{`Lat: ${geolocation.latitude.toFixed(4)}, Lng: ${geolocation.longitude.toFixed(4)}`}</span>
                                 ) : (
-                                    <span className="text-sm">Location not available</span>
+                                    <span className="text-sm">{t('location_not_available')}</span>
                                 )}
                             </div>
                             {geolocation && (
                                 <Button asChild variant="ghost" size="sm">
                                     <Link href={`https://www.openstreetmap.org/?mlat=${geolocation.latitude}&mlon=${geolocation.longitude}#map=16/${geolocation.latitude}/${geolocation.longitude}`} target="_blank">
-                                        View on Map <ExternalLink className="ml-2 h-4 w-4" />
+                                        {t('view_on_map')} <ExternalLink className="ml-2 h-4 w-4" />
                                     </Link>
                                 </Button>
                             )}
@@ -426,9 +428,9 @@ export function ReportIssueForm() {
                     </div>
                      {!isLocating && !geolocation && (
                         <Alert variant="destructive">
-                            <AlertTitle>Location Error</AlertTitle>
+                            <AlertTitle>{t('location_error')}</AlertTitle>
                             <AlertDescription>
-                            Could not fetch your location. Please ensure location services are enabled in your browser and for this site.
+                            {t('location_error_ fetching_description')}
                             </AlertDescription>
                         </Alert>
                     )}
@@ -436,7 +438,7 @@ export function ReportIssueForm() {
             </div>
             
             <Button type="submit" size="lg" className="w-full" disabled={form.formState.isSubmitting || isRouting}>
-              {(form.formState.isSubmitting || isRouting) ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</> : "Submit Report"}
+              {(form.formState.isSubmitting || isRouting) ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('submitting')}</> : t('submit_report')}
             </Button>
           </form>
         </Form>

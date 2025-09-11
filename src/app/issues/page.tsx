@@ -9,7 +9,7 @@ export default function IssuesPage() {
     <>
       <Header title="My Submitted Issues" />
       <main className="flex-1 p-4 md:p-6">
-        <IssuesTable issues={userIssues} />
+        <IssuesTable issues={userIssues} title="My Submitted Issues" />
       </main>
     </>
   );

@@ -56,7 +56,7 @@ export function AdminDashboard() {
         </Card>
       </div>
       <div>
-        <IssuesTable issues={mockIssues} />
+        <IssuesTable issues={mockIssues} title="Issue Reports"/>
       </div>
     </div>
   );

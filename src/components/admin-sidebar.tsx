@@ -21,9 +21,11 @@ import {
   SidebarGroup,
 } from "@/components/ui/sidebar";
 import { currentUser } from "@/lib/placeholder-data";
+import { useLanguage } from "@/context/language-context";
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const { t } = useLanguage();
 
   const isActive = (path: string) => {
     return pathname.startsWith(path);
@@ -44,11 +46,11 @@ export function AdminSidebar() {
               <SidebarMenuButton
                 asChild
                 isActive={isActive("/admin/dashboard")}
-                tooltip={{ children: "Dashboard" }}
+                tooltip={{ children: t('dashboard') }}
               >
                 <Link href="/admin/dashboard">
                   <LayoutDashboard />
-                  <span>Dashboard</span>
+                  <span>{t('dashboard')}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -56,11 +58,11 @@ export function AdminSidebar() {
               <SidebarMenuButton
                 asChild
                 isActive={isActive("/admin/issues")}
-                tooltip={{ children: "All Issues" }}
+                tooltip={{ children: t('all_issue_reports') }}
               >
                 <Link href="/admin/issues">
                   <FileText />
-                  <span>All Issues</span>
+                  <span>{t('all_issue_reports')}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -68,11 +70,11 @@ export function AdminSidebar() {
               <SidebarMenuButton
                 asChild
                 isActive={isActive("/admin/users")}
-                tooltip={{ children: "User Management" }}
+                tooltip={{ children: t('users') }}
               >
                 <Link href="#">
                   <Users />
-                  <span>Users</span>
+                  <span>{t('users')}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -83,10 +85,10 @@ export function AdminSidebar() {
         <SidebarGroup>
             <SidebarMenu>
                 <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin/settings')} tooltip={{children: 'Settings'}}>
+                    <SidebarMenuButton asChild isActive={isActive('/admin/settings')} tooltip={{children: t('settings')}}>
                         <Link href="#">
                             <Settings />
-                            <span>Settings</span>
+                            <span>{t('settings')}</span>
                         </Link>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -99,7 +101,7 @@ export function AdminSidebar() {
                             </Avatar>
                             <div className="flex flex-col">
                                 <span className="font-medium">{currentUser.name}</span>
-                                <span className="text-xs text-muted-foreground">Administrator</span>
+                                <span className="text-xs text-muted-foreground">{t('administrator')}</span>
                             </div>
                         </Link>
                     </SidebarMenuButton>

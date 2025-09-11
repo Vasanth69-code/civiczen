@@ -7,7 +7,7 @@ export default function AllIssuesPage() {
     <>
       <Header title="All Issue Reports" />
       <main className="flex-1 p-4 md:p-6">
-        <IssuesTable issues={mockIssues} />
+        <IssuesTable issues={mockIssues} title="All Issue Reports" />
       </main>
     </>
   );

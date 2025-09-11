@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User } from '@/lib/types';
 import { Crown, Trophy, Medal, Star } from 'lucide-react';
 import { currentUser } from '@/lib/placeholder-data';
+import { useLanguage } from '@/context/language-context';
 
 type LeaderboardClientProps = {
   users: User[];
@@ -17,6 +18,7 @@ const rankIcons = [
 ];
 
 export function LeaderboardClient({ users }: LeaderboardClientProps) {
+  const { t } = useLanguage();
   const sortedUsers = [...users].sort((a, b) => b.points - a.points);
   const topThree = sortedUsers.slice(0, 3);
   const restUsers = sortedUsers.slice(3);
@@ -25,8 +27,8 @@ export function LeaderboardClient({ users }: LeaderboardClientProps) {
     <div className="max-w-4xl mx-auto">
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle className="font-headline text-center">Top Citizens</CardTitle>
-          <CardDescription className="text-center">Recognizing our most active community members.</CardDescription>
+          <CardTitle className="font-headline text-center">{t('top_citizens')}</CardTitle>
+          <CardDescription className="text-center">{t('top_citizens_description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex justify-around items-end">
@@ -38,7 +40,7 @@ export function LeaderboardClient({ users }: LeaderboardClientProps) {
                   <AvatarFallback>{topThree[1].name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <p className="font-bold mt-2">{topThree[1].name}</p>
-                <p className="text-sm text-muted-foreground">{topThree[1].points} pts</p>
+                <p className="text-sm text-muted-foreground">{topThree[1].points} {t('pts')}</p>
               </div>
             )}
             {topThree[0] && (
@@ -49,7 +51,7 @@ export function LeaderboardClient({ users }: LeaderboardClientProps) {
                   <AvatarFallback>{topThree[0].name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <p className="font-bold text-lg mt-2">{topThree[0].name}</p>
-                <p className="text-sm text-muted-foreground">{topThree[0].points} pts</p>
+                <p className="text-sm text-muted-foreground">{topThree[0].points} {t('pts')}</p>
               </div>
             )}
             {topThree[2] && (
@@ -60,7 +62,7 @@ export function LeaderboardClient({ users }: LeaderboardClientProps) {
                   <AvatarFallback>{topThree[2].name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <p className="font-bold mt-2">{topThree[2].name}</p>
-                <p className="text-sm text-muted-foreground">{topThree[2].points} pts</p>
+                <p className="text-sm text-muted-foreground">{topThree[2].points} {t('pts')}</p>
               </div>
             )}
           </div>
@@ -77,7 +79,7 @@ export function LeaderboardClient({ users }: LeaderboardClientProps) {
                   <AvatarImage src={user.avatarUrl} data-ai-hint={user.imageHint} />
                   <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <div className="flex-grow font-medium">{user.name} {user.id === currentUser.id && <span className="text-xs font-normal text-primary">(You)</span>}</div>
+                <div className="flex-grow font-medium">{user.name} {user.id === currentUser.id && <span className="text-xs font-normal text-primary">({t('you')})</span>}</div>
                 <div className="flex items-center gap-1 font-bold">
                   <Star className="h-4 w-4 text-yellow-500" />
                   {user.points.toLocaleString()}

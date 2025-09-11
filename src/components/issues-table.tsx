@@ -17,9 +17,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { useLanguage } from "@/context/language-context";
 
 type IssuesTableProps = {
   issues: Issue[];
+  title: string;
 };
 
 const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } = {
@@ -29,21 +31,22 @@ const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } 
   Rejected: "destructive",
 };
 
-export function IssuesTable({ issues }: IssuesTableProps) {
+export function IssuesTable({ issues, title }: IssuesTableProps) {
+  const { t } = useLanguage();
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-headline">Issue Reports</CardTitle>
+        <CardTitle className="font-headline">{t(title as any)}</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead className="hidden md:table-cell">Department</TableHead>
-              <TableHead className="hidden sm:table-cell">Priority</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t('title')}</TableHead>
+              <TableHead className="hidden md:table-cell">{t('department')}</TableHead>
+              <TableHead className="hidden sm:table-cell">{t('priority')}</TableHead>
+              <TableHead>{t('status')}</TableHead>
+              <TableHead className="text-right">{t('actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -58,12 +61,12 @@ export function IssuesTable({ issues }: IssuesTableProps) {
                 <TableCell className="hidden md:table-cell">{issue.department}</TableCell>
                 <TableCell className="hidden sm:table-cell">
                   <Badge variant={issue.priority === "High" ? "destructive" : "outline"}>
-                    {issue.priority}
+                    {t(issue.priority.toLowerCase() as any)}
                   </Badge>
                 </TableCell>
                 <TableCell>
                   <Badge variant={statusVariant[issue.status] || "secondary"}>
-                    {issue.status}
+                    {t(issue.status.replace(" ", "_").toLowerCase() as any)}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
@@ -74,8 +77,8 @@ export function IssuesTable({ issues }: IssuesTableProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>View Details</DropdownMenuItem>
-                      <DropdownMenuItem>Share</DropdownMenuItem>
+                      <DropdownMenuItem>{t('view_details')}</DropdownMenuItem>
+                      <DropdownMenuItem>{t('share')}</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
