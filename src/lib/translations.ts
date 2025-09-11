@@ -1,3 +1,4 @@
+
 export const languages = {
   en: {
     name: 'English',
@@ -93,6 +94,13 @@ export const languages = {
       top_citizens_description: "Recognizing our most active community members.",
       pts: "pts",
       you: "You",
+      total_reports: "Total Reports",
+      total_reports_last_week: "+2 since last week",
+      resolution_rate: "resolution rate",
+      currently_actioned: "Currently being actioned",
+      pending_action: "Pending Action",
+      awaiting_assignment: "Awaiting assignment",
+      "Issue Reports": "Issue Reports"
     },
   },
   hi: {
@@ -189,6 +197,13 @@ export const languages = {
       top_citizens_description: "हमारे सबसे सक्रिय समुदाय के सदस्यों को पहचानना।",
       pts: "अंक",
       you: "आप",
+      total_reports: "कुल रिपोर्ट",
+      total_reports_last_week: "पिछले सप्ताह से +2",
+      resolution_rate: "समाधान दर",
+      currently_actioned: "वर्तमान में कार्रवाई की जा रही है",
+      pending_action: "कार्रवाई लंबित",
+      awaiting_assignment: "असाइनमेंट की प्रतीक्षा है",
+      "Issue Reports": "समस्या रिपोर्ट"
     },
   },
   bn: {
@@ -196,7 +211,7 @@ export const languages = {
     dictionary: {
       sign_in: 'সাইন ইন করুন',
       app_greeting: 'একটি উন্নত শহরের জন্য আপনার কণ্ঠ।',
-      sign_in_description: 'আপনার পোর্টালে প্রবেশ করতে আপনার ઓળખপত্র লিখুন।',
+      sign_in_description: 'আপনার পোর্টালে প্রবেশ করতে আপনার ઓળখপত্র লিখুন।',
       // ... and so on
     }
   },
