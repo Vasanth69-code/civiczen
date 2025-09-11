@@ -24,23 +24,24 @@ export function Header({ title }: HeaderProps) {
       </div>
       <div className="flex items-center gap-4">
         <Select defaultValue="en">
-          <SelectTrigger className="w-[140px] hidden sm:flex">
+          <SelectTrigger className="w-[180px] hidden sm:flex">
             <Languages className="mr-2 h-4 w-4" />
             <SelectValue placeholder="Language" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="en">English</SelectItem>
-            <SelectItem value="es">Español</SelectItem>
-            <SelectItem value="fr">Français</SelectItem>
-            <SelectItem value="de">Deutsch</SelectItem>
             <SelectItem value="hi">हिन्दी (Hindi)</SelectItem>
-            <SelectItem value="ta">தமிழ் (Tamil)</SelectItem>
-            <SelectItem value="ar">العربية (Arabic)</SelectItem>
             <SelectItem value="bn">বাংলা (Bengali)</SelectItem>
-            <SelectItem value="zh">中文 (Chinese)</SelectItem>
-            <SelectItem value="ja">日本語 (Japanese)</SelectItem>
-            <SelectItem value="pt">Português</SelectItem>
-            <SelectItem value="ru">Русский (Russian)</SelectItem>
+            <SelectItem value="te">తెలుగు (Telugu)</SelectItem>
+            <SelectItem value="mr">मराठी (Marathi)</SelectItem>
+            <SelectItem value="ta">தமிழ் (Tamil)</SelectItem>
+            <SelectItem value="gu">ગુજરાતી (Gujarati)</SelectItem>
+            <SelectItem value="ur">اردو (Urdu)</SelectItem>
+            <SelectItem value="kn">ಕನ್ನಡ (Kannada)</SelectItem>
+            <SelectItem value="or">ଓଡ଼ିଆ (Odia)</SelectItem>
+            <SelectItem value="ml">മലയാളം (Malayalam)</SelectItem>
+            <SelectItem value="pa">ਪੰਜਾਬੀ (Punjabi)</SelectItem>
+            <SelectItem value="as">অসমীয়া (Assamese)</SelectItem>
           </SelectContent>
         </Select>
         <Button variant="ghost" size="icon" className="rounded-full">
