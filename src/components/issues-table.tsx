@@ -11,7 +11,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Issue } from "@/lib/types";
-import { MoreHorizontal } from "lucide-react";
+import { ArrowUp, MoreHorizontal, Share } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -21,6 +21,8 @@ import {
 } from "./ui/dropdown-menu";
 import { useLanguage } from "@/context/language-context";
 import { TranslationKey } from "@/lib/translations";
+import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 type IssuesTableProps = {
   issues: Issue[];
@@ -36,6 +38,25 @@ const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } 
 
 export function IssuesTable({ issues, title }: IssuesTableProps) {
   const { t } = useLanguage();
+  const { toast } = useToast();
+
+  const handleShare = (issueId: string) => {
+    const url = `${window.location.origin}/issues/${issueId}`;
+    if (navigator.share) {
+      navigator.share({
+        title: t('share_issue_title'),
+        text: t('share_issue_text'),
+        url: url,
+      }).catch(err => console.error("Share failed", err));
+    } else {
+      navigator.clipboard.writeText(url);
+      toast({
+        title: t('link_copied'),
+        description: t('link_copied_description'),
+      });
+    }
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -57,7 +78,9 @@ export function IssuesTable({ issues, title }: IssuesTableProps) {
               <TableRow key={issue.id}>
                 <TableCell className="font-medium">
                   <div className="flex flex-col">
-                    <span>{issue.title}</span>
+                    <Link href={`/issues/${issue.id}`} className="hover:underline">
+                      {issue.title}
+                    </Link>
                     <span className="text-sm text-muted-foreground md:hidden">{issue.department}</span>
                   </div>
                 </TableCell>
@@ -72,7 +95,11 @@ export function IssuesTable({ issues, title }: IssuesTableProps) {
                     {t(issue.status.replace(" ", "_").toLowerCase() as TranslationKey)}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right flex items-center justify-end gap-2">
+                  <Button variant="outline" size="sm" className="flex items-center gap-1">
+                    <ArrowUp className="h-4 w-4" />
+                    <span>{Math.floor(Math.random() * 200)}</span>
+                  </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon">
@@ -80,8 +107,13 @@ export function IssuesTable({ issues, title }: IssuesTableProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>{t('view_details')}</DropdownMenuItem>
-                      <DropdownMenuItem>{t('share')}</DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/issues/${issue.id}`}>{t('view_details')}</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleShare(issue.id)}>
+                        <Share className="mr-2 h-4 w-4" />
+                        {t('share')}
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

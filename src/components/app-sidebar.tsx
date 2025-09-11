@@ -99,7 +99,7 @@ export function AppSidebar() {
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton asChild isActive={isActive('/settings')} tooltip={{children: t('settings')}}>
-                        <Link href="#">
+                        <Link href="/settings">
                             <Settings />
                             <span>{t('settings')}</span>
                         </Link>
@@ -107,7 +107,7 @@ export function AppSidebar() {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                     <SidebarMenuButton asChild size="lg" className="h-auto py-2">
-                        <Link href="#">
+                        <Link href="/settings">
                             <Avatar className="size-8">
                                 <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} data-ai-hint={currentUser.imageHint} />
                                 <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
