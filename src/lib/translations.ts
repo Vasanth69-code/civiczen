@@ -1,4 +1,3 @@
-
 export const languages = {
   en: {
     name: 'English',
@@ -8,6 +7,7 @@ export const languages = {
       sign_in_as_admin: 'Sign in as Admin',
       admin_demo_credentials: 'Admin Demo:',
       username_or_phone: 'Username or Phone Number',
+      username_placeholder: 'e.g., user@example.com or 1234567890',
       password: 'Password',
       dont_have_account: "Don't have an account?",
       sign_up: 'Sign Up',
@@ -77,6 +77,7 @@ export const languages = {
       "All Issue Reports": "All Issue Reports",
       "My Submitted Issues": "My Submitted Issues",
       "Community Leaderboard": "Community Leaderboard",
+      "Report an Issue": "Report an Issue",
       title: "Title",
       department: "Department",
       status: "Status",
@@ -111,6 +112,7 @@ export const languages = {
       sign_in_as_admin: 'एडमिन के रूप में साइन इन करें',
       admin_demo_credentials: 'एडमिन डेमो:',
       username_or_phone: 'उपयोगकर्ता नाम या फ़ोन नंबर',
+      username_placeholder: 'उदा., user@example.com या 1234567890',
       password: 'पासवर्ड',
       dont_have_account: 'खाता नहीं है?',
       sign_up: 'साइन अप करें',
@@ -180,6 +182,7 @@ export const languages = {
       "All Issue Reports": "सभी समस्या रिपोर्ट",
       "My Submitted Issues": "मेरे द्वारा सबमिट किए गए मुद्दे",
       "Community Leaderboard": "सामुदायिक लीडरबोर्ड",
+      "Report an Issue": "समस्या की रिपोर्ट करें",
       title: "शीर्षक",
       department: "विभाग",
       status: "status",
@@ -212,7 +215,6 @@ export const languages = {
       sign_in: 'সাইন ইন করুন',
       app_greeting: 'একটি উন্নত শহরের জন্য আপনার কণ্ঠ।',
       sign_in_description: 'আপনার পোর্টালে প্রবেশ করতে আপনার ઓળখপত্র লিখুন।',
-      // ... and so on
     }
   },
   te: {
@@ -221,7 +223,6 @@ export const languages = {
       sign_in: 'సైన్ ఇన్ చేయండి',
       app_greeting: 'మెరుగైన నగరం కోసం మీ స్వరం.',
       sign_in_description: 'మీ పోర్టల్‌ను యాక్సెస్ చేయడానికి మీ ఆధారాలను నమోదు చేయండి.',
-      // ... and so on
     }
   },
   mr: {
@@ -230,16 +231,111 @@ export const languages = {
       sign_in: 'সাইন इन करा',
       app_greeting: 'उत्तम शहरासाठी तुमचा आवाज.',
       sign_in_description: 'तुमच्या पोर्टलवर प्रवेश करण्यासाठी तुमचे क्रेडेन्शियल एंटर करा.',
-      // ... and so on
     }
   },
   ta: {
     name: 'தமிழ்',
     dictionary: {
       sign_in: 'உள்நுழைக',
-      app_greeting: 'சிறந்த நகரத்திற்கான உங்கள் குரல்.',
-      sign_in_description: 'உங்கள் போர்ட்டலை அணுக உங்கள் ఆధారங்களை உள்ளிடவும்.',
-      // ... and so on
+      sign_in_as_citizen: 'குடிமகனாக உள்நுழையவும்',
+      sign_in_as_admin: 'நிர்வாகியாக உள்நுழையவும்',
+      admin_demo_credentials: 'நிர்வாகி டெமோ:',
+      username_or_phone: 'பயனர்பெயர் அல்லது தொலைபேசி எண்',
+      username_placeholder: 'எ.கா., user@example.com அல்லது 1234567890',
+      password: 'கடவுச்சொல்',
+      dont_have_account: 'கணக்கு இல்லையா?',
+      sign_up: 'பதிவு செய்க',
+      app_greeting: 'ஒரு சிறந்த நகரத்திற்கான உங்கள் குரல்.',
+      sign_in_description: 'உங்கள் పోర్టల్‌ను యాక్సెస్ చేయడానికి మీ ఆధారాలను నమోదు చేయండి.',
+      report_an_issue: 'சிக்கலைப் புகாரளி',
+      my_submitted_issues: 'நான் சமர்ப்பித்த சிக்கல்கள்',
+      community_leaderboard: 'சமூகத் தலைவர் குழு',
+      settings: 'அமைப்புகள்',
+      citizen: 'குடிமகன்',
+      administrator: 'நிர்வாகி',
+      dashboard: 'แดชบอร์ด',
+      all_issue_reports: 'அனைத்து சிக்கல் அறிக்கைகளும்',
+      users: 'பயனர்கள்',
+      new_issue_report: 'புதிய சிக்கல் அறிக்கை',
+      new_issue_report_description: 'கீழே உள்ள விவரங்களை நிரப்பவும். எங்கள் AI உங்கள் அறிக்கையை வகைப்படுத்தவும் முன்னுரிமைப்படுத்தவும் உதவும்.',
+      capture_photo: 'புகைப்படம் எடுக்கவும்',
+      retake_or_upload_new: 'மீண்டும் எடுக்கவும் அல்லது புதியதைப் பதிவேற்றவும்',
+      or: 'அல்லது',
+      upload_from_device: 'உங்கள் சாதனத்திலிருந்து ஒரு கோப்பைப் பதிவேற்றவும்',
+      description_label: 'விவரம்*',
+      description_placeholder: 'சிக்கலை விரிவாக விவரிக்கவும். அது என்ன? அது எங்கே இருக்கிறது? அது ஏன் ஒரு சிக்கல்?',
+      ai_analysis: 'AI பகுப்பாய்வு',
+      analyzing_image: 'படத்தை பகுப்பாய்வு செய்கிறது...',
+      suggested_category: 'பரிந்துரைக்கப்பட்ட வகை',
+      assigned_department: 'ஒதுக்கப்பட்ட துறை',
+      recommended_priority: 'பரிந்துரைக்கப்பட்ட முன்னுரிமை',
+      incorrect: 'தவறானது',
+      looks_good: 'நன்றாக இருக்கிறது',
+      ai_analysis_description: 'எங்கள் AI உங்கள் அறிக்கையை பகுப்பாய்வு செய்துள்ளது. இது தவறாகத் தெரிந்தால், நீங்கள் பரிந்துரையை நிராகரிக்கலாம்.',
+      title_label: 'தலைப்பு*',
+      title_placeholder: 'எ.கா., எல்ம் தெருவில் பெரிய பள்ளம்',
+      title_description: 'சிக்கலுக்கான ஒரு குறுகிய, தெளிவான தலைப்பு. உங்கள் விவரத்தின் அடிப்படையில் நாங்கள் ஒன்றை பரிந்துரைக்கலாம்.',
+      location_label: 'இடம்*',
+      getting_location: 'உங்கள் இருப்பிடத்தைப் பெறுகிறது...',
+      location_not_available: 'இடம் கிடைக்கவில்லை',
+      view_on_map: 'வரைபடத்தில் காண்க',
+      submit_report: 'அறிக்கையைச் சமர்ப்பி',
+      submitting: 'சமர்ப்பிக்கிறது...',
+      camera_not_available: 'கேமரா கிடைக்கவில்லை',
+      camera_permission_prompt: 'தொடர கேமரா அனுமதிகளை வழங்கவும்.',
+      camera_access_required: 'கேமரா அணுகல் தேவை',
+      camera_access_required_description: 'நேரடி புகைப்பட அம்சத்தைப் பயன்படுத்த உங்கள் உலாவி அமைப்புகளில் கேமரா அணுகலை அனுமதிக்கவும். நீங்கள் ఇప్పటికీ ఒక ఫైల్‌ను అప్‌లోడ్ చేయవచ్చు.',
+      camera_access_denied: 'கேமரா அணுகல் மறுக்கப்பட்டது',
+      camera_permission_description: 'இந்த பயன்பாட்டைப் பயன்படுத்த உங்கள் உலாவி அமைப்புகளில் கேமரா அனுமதிகளை இயக்கவும்.',
+      error: 'பிழை',
+      location_error_description: 'உங்கள் இருப்பிடத்தைப் பெற முடியவில்லை. இருப்பிடச் சேவைகளை இயக்கவும்.',
+      geolocation_not_supported: 'இந்த உலாவி புவிஇருப்பிடத்தை ஆதரிக்கவில்லை.',
+      ai_analysis_failed: 'AI பகுப்பாய்வு தோல்வியடைந்தது',
+      ai_analysis_failed_description: 'சிக்கலை தானாக வகைப்படுத்த முடியவில்லை.',
+      location_required: 'இடம் தேவை',
+      location_required_description: 'அறிக்கையைச் சமர்ப்பிக்க எங்களுக்கு உங்கள் இருப்பிடம் தேவை.',
+      media_required: 'புகைப்படம் அல்லது வீடியோ தேவை',
+      media_required_description: 'சிக்கலுக்கான மீடியாவை வழங்கவும்.',
+      submission_failed: 'சமர்ப்பிப்பு தோல்வியடைந்தது',
+      submission_failed_description: 'சிக்கலை தானாக வழிநடத்த முடியவில்லை. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+      report_submitted_successfully: 'அறிக்கை வெற்றிகரமாகச் சமர்ப்பிக்கப்பட்டது!',
+      report_submitted_description: 'உங்கள் சிக்கல் {{department}} துறைக்கு அனுப்பப்பட்டது.',
+      priority: 'முன்னுரிமை',
+      tracking_id: 'கண்காணிப்பு ஐடி',
+      sms_notification: 'கண்காணிப்பு விவரங்களுடன் ஒரு SMS உங்கள் பதிவு செய்யப்பட்ட எண்ணுக்கு அனுப்பப்பட்டுள்ளது.',
+      location_error: 'இருப்பிடப் பிழை',
+      location_error_fetching_description: 'உங்கள் இருப்பிடத்தைப் பெற முடியவில்லை. మీ బ్రౌజర్ మరియు ఈ సైట్ కోసం స్థాన సేవలు ప్రారంభించబడ్డాయని నిర్ధారించుకోండి.',
+      language: 'மொழி',
+      toggle_notifications: 'அறிவிப்புகளை மாற்று',
+      "Admin Dashboard": "நிர்வாகி டாஷ்போர்டு",
+      "All Issue Reports": "அனைத்து சிக்கல் அறிக்கைகளும்",
+      "My Submitted Issues": "நான் சமர்ப்பித்த சிக்கல்கள்",
+      "Community Leaderboard": "சமூகத் தலைவர் குழு",
+      "Report an Issue": "சிக்கலைப் புகாரளி",
+      title: "தலைப்பு",
+      department: "துறை",
+      status: "நிலை",
+      actions: "செயல்கள்",
+      view_details: "விவரங்களைக் காண்க",
+      share: "பகிர்",
+      low: "குறைந்த",
+      medium: "நடுத்தர",
+      high: "உயர்",
+      pending: "நிலுவையில்",
+      in_progress: "செயலில்",
+      resolved: "தீர்வு காணப்பட்டது",
+      rejected: "நிராகரிக்கப்பட்டது",
+      top_citizens: "சிறந்த குடிமக்கள்",
+      top_citizens_description: "எங்கள் மிகவும் செயலில் உள்ள சமூக உறுப்பினர்களை அங்கீகரித்தல்.",
+      pts: "புள்ளிகள்",
+      you: "நீங்கள்",
+      total_reports: "மொத்த அறிக்கைகள்",
+      total_reports_last_week: "கடந்த வாரத்திலிருந்து +2",
+      resolution_rate: "தீர்வு விகிதம்",
+      currently_actioned: "தற்போது நடவடிக்கை எடுக்கப்படுகிறது",
+      pending_action: "நடவடிக்கை நிலுவையில்",
+      awaiting_assignment: "ஒதுக்கீட்டிற்காகக் காத்திருக்கிறது",
+      "Issue Reports": "சிக்கல் அறிக்கைகள்"
     }
   },
   gu: {
@@ -248,7 +344,6 @@ export const languages = {
       sign_in: 'સાઇન ઇન કરો',
       app_greeting: 'વધુ સારા શહેર માટે તમારો અવાજ.',
       sign_in_description: 'તમારા પોર્ટલને ઍક્સેસ કરવા માટે તમારા ઓળખપત્રો દાખલ કરો.',
-      // ... and so on
     }
   },
   ur: {
@@ -257,7 +352,6 @@ export const languages = {
       sign_in: 'سائن ان کریں',
       app_greeting: 'ایک بہتر شہر کے لیے آپ کی آواز۔',
       sign_in_description: 'اپنے پورٹل تک رسائی کے لیے اپنی اسناد درج کریں۔',
-      // ... and so on
     }
   },
   kn: {
@@ -266,7 +360,6 @@ export const languages = {
       sign_in: 'ಸೈನ್ ಇನ್ ಮಾಡಿ',
       app_greeting: 'ಉತ್ತಮ ನಗರಕ್ಕಾಗಿ ನಿಮ್ಮ ಧ್ವನಿ.',
       sign_in_description: 'ನಿಮ್ಮ ಪೋರ್ಟಲ್ ಅನ್ನು ಪ್ರವೇಶಿಸಲು ನಿಮ್ಮ ఆధారಗಳನ್ನು ನಮೂದಿಸಿ.',
-      // ... and so on
     }
   },
   or: {
@@ -275,7 +368,6 @@ export const languages = {
       sign_in: 'ସାଇନ୍ ଇନ୍ କରନ୍ତୁ',
       app_greeting: 'ଏକ ଭଲ ସହର ପାଇଁ ଆପଣଙ୍କ ସ୍ୱର |',
       sign_in_description: 'ଆପଣଙ୍କ ପୋର୍ଟାଲ୍ ଆക്ସెస్ କରିବାକୁ ଆପଣଙ୍କର vjerodajnice লিখুন |',
-      // ... and so on
     }
   },
   ml: {
@@ -284,7 +376,6 @@ export const languages = {
       sign_in: 'സൈൻ ഇൻ ചെയ്യുക',
       app_greeting: 'ഒരു മികച്ച നഗരത്തിനായി നിങ്ങളുടെ ശബ്ദം.',
       sign_in_description: 'നിങ്ങളുടെ പോർട്ടൽ ആക്സസ് ചെയ്യുന്നതിന് നിങ്ങളുടെ ക്രെഡൻഷ്യലുകൾ നൽകുക.',
-      // ... and so on
     }
   },
   pa: {
@@ -292,8 +383,7 @@ export const languages = {
     dictionary: {
       sign_in: 'ਸਾਈਨ ਇਨ ਕਰੋ',
       app_greeting: 'ਇੱਕ ਬਿਹਤਰ ਸ਼ਹਿਰ ਲਈ ਤੁਹਾਡੀ ਆਵਾਜ਼।',
-      sign_in_description: 'ਆਪਣੇ ਪੋਰਟਲ ਤੱਕ ਪਹੁੰchਣ ਲਈ ਆਪਣੇ ઓળખ ਪੱਤਰ ਦਰਜ ਕਰੋ।',
-      // ... and so on
+      sign_in_description: 'ਆਪਣੇ ਪੋਰਟਲ ਤੱਕ ਪਹੁੰchਣ ਲਈ ਆਪਣੇ ઓળਖ ਪੱਤਰ ਦਰਜ ਕਰੋ।',
     }
   },
   as: {
@@ -302,7 +392,6 @@ export const languages = {
       sign_in: 'ছাইন ইন কৰক',
       app_greeting: 'এখন উন্নত চহৰৰ বাবে আপোনাৰ কণ্ঠ।',
       sign_in_description: 'আপোনাৰ পৰ্টেলত ପ୍ରବେଶ কৰিবলৈ আপোনাৰ প্রমাণপত্রসমূহ দিয়ক।',
-      // ... and so on
     }
   },
 };

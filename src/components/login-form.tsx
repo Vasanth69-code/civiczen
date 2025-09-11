@@ -29,7 +29,7 @@ export function LoginForm() {
         <CardContent className="space-y-4">
             <div className="space-y-2">
                 <Label htmlFor="username">{t('username_or_phone')}</Label>
-                <Input id="username" placeholder="e.g., user@example.com or 1234567890" />
+                <Input id="username" placeholder={t('username_placeholder')} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="password">{t('password')}</Label>

@@ -6,6 +6,7 @@ import { TrendingUp, CheckCircle2, AlertTriangle, Clock } from "lucide-react";
 import { IssuesTable } from "./issues-table";
 import { mockIssues } from "@/lib/placeholder-data";
 import { useLanguage } from "@/context/language-context";
+import { TranslationKey } from "@/lib/translations";
 
 export function AdminDashboard() {
   const { t } = useLanguage();
@@ -61,7 +62,7 @@ export function AdminDashboard() {
         </Card>
       </div>
       <div>
-        <IssuesTable issues={mockIssues} title="Issue Reports"/>
+        <IssuesTable issues={mockIssues} title={t("Issue Reports" as TranslationKey)}/>
       </div>
     </div>
   );
