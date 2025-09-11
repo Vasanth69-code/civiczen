@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useLanguage } from "@/context/language-context";
-import { languages } from "@/lib/translations";
+import { languages, TranslationKey } from "@/lib/translations";
 
 type HeaderProps = {
   title: string;
@@ -20,15 +20,13 @@ type HeaderProps = {
 export function Header({ title }: HeaderProps) {
   const { language, setLanguage, t } = useLanguage();
   
-  const pageTitle = t(title as any);
-
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
       <div className="flex items-center gap-2">
         <SidebarTrigger className="md:hidden">
           <PanelLeft />
         </SidebarTrigger>
-        <h1 className="font-headline text-xl font-semibold">{pageTitle}</h1>
+        <h1 className="font-headline text-xl font-semibold">{t(title as TranslationKey)}</h1>
       </div>
       <div className="flex items-center gap-4">
         <Select value={language} onValueChange={(value) => setLanguage(value as keyof typeof languages)}>

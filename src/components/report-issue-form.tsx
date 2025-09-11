@@ -26,6 +26,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "./ui/badge";
 import Link from "next/link";
 import { useLanguage } from "@/context/language-context";
+import { TranslationKey } from "@/lib/translations";
 
 const formSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters.").max(100),
@@ -231,7 +232,7 @@ export function ReportIssueForm() {
         description: (
           <div>
             <p>{t('report_submitted_description', { department: finalRoutingInfo.department })}</p>
-            <p>{t('priority')}: <strong>{t(finalRoutingInfo.priority.toLowerCase() as any)}</strong>. {t('tracking_id')}: #CITY{Math.floor(1000 + Math.random() * 9000)}</p>
+            <p>{t('priority')}: <strong>{t(finalRoutingInfo.priority.toLowerCase() as TranslationKey)}</strong>. {t('tracking_id')}: #CITY{Math.floor(1000 + Math.random() * 9000)}</p>
             <p className="text-xs mt-2">{t('sms_notification')}</p>
           </div>
         ),
@@ -363,7 +364,7 @@ export function ReportIssueForm() {
                               </div>
                               <div className="flex justify-between items-center">
                                 <span className="font-medium">{t('recommended_priority')}</span>
-                                <Badge variant={routingResult.priority === 'High' ? "destructive" : "outline"}>{t(routingResult.priority.toLowerCase() as any)}</Badge>
+                                <Badge variant={routingResult.priority === 'High' ? "destructive" : "outline"}>{t(routingResult.priority.toLowerCase() as TranslationKey)}</Badge>
                               </div>
                               <div className="flex justify-end gap-2 pt-2">
                                 <Button size="sm" variant="ghost" onClick={() => setRoutingResult(null)}><X className="mr-1 h-4 w-4" /> {t('incorrect')}</Button>
@@ -430,7 +431,7 @@ export function ReportIssueForm() {
                         <Alert variant="destructive">
                             <AlertTitle>{t('location_error')}</AlertTitle>
                             <AlertDescription>
-                            {t('location_error_ fetching_description')}
+                            {t('location_error_fetching_description')}
                             </AlertDescription>
                         </Alert>
                     )}

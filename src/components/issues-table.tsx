@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Table,
   TableBody,
@@ -18,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useLanguage } from "@/context/language-context";
+import { TranslationKey } from "@/lib/translations";
 
 type IssuesTableProps = {
   issues: Issue[];
@@ -36,7 +39,7 @@ export function IssuesTable({ issues, title }: IssuesTableProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-headline">{t(title as any)}</CardTitle>
+        <CardTitle className="font-headline">{t(title as TranslationKey)}</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
@@ -61,12 +64,12 @@ export function IssuesTable({ issues, title }: IssuesTableProps) {
                 <TableCell className="hidden md:table-cell">{issue.department}</TableCell>
                 <TableCell className="hidden sm:table-cell">
                   <Badge variant={issue.priority === "High" ? "destructive" : "outline"}>
-                    {t(issue.priority.toLowerCase() as any)}
+                    {t(issue.priority.toLowerCase() as TranslationKey)}
                   </Badge>
                 </TableCell>
                 <TableCell>
                   <Badge variant={statusVariant[issue.status] || "secondary"}>
-                    {t(issue.status.replace(" ", "_").toLowerCase() as any)}
+                    {t(issue.status.replace(" ", "_").toLowerCase() as TranslationKey)}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
