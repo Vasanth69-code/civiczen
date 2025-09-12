@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,6 +6,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Crown, Trophy, Medal, Star } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { useUser } from '@/context/user-context';
+
+const rankIcons = [
+  <Trophy key="1" className="w-10 h-10 text-yellow-400" />,
+  <Medal key="2" className="w-8 h-8 text-gray-400" />,
+  <Star key="3" className="w-8 h-8 text-yellow-600" />
+];
 
 export function LeaderboardClient() {
   const { t } = useLanguage();
