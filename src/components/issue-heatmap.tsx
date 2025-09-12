@@ -1,16 +1,39 @@
 
 "use client";
 
+import { useMap } from 'react-leaflet';
+import { useEffect } from 'react';
+import 'leaflet.heat';
+import { LatLngExpression } from 'leaflet';
+import { Issue } from '@/lib/types';
 import { MapContainer, TileLayer } from 'react-leaflet';
-import { useIssues } from '@/context/issue-context';
-import { LatLngTuple } from 'leaflet';
-import HeatmapLayer from 'react-leaflet-heatmap';
 import 'leaflet/dist/leaflet.css';
-
-// This is a workaround for a known issue with react-leaflet and Next.js
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
 import "leaflet-defaulticon-compatibility";
-import { Issue } from '@/lib/types';
+import { LatLngTuple } from 'leaflet';
+
+
+// We have to create a custom component to use leaflet.heat, as it's a leaflet plugin
+const HeatmapLayer = ({ points }: { points: (LatLngExpression | number[])[] }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map || !points || points.length === 0) return;
+
+    // The type for leaflet.heat is not perfectly compatible with leaflet, so we cast to any
+    const heat = (L as any).heatLayer(points, { 
+        radius: 25,
+        blur: 20,
+        maxZoom: 18,
+    }).addTo(map);
+
+    return () => {
+      map.removeLayer(heat);
+    };
+  }, [map, points]);
+
+  return null;
+};
 
 
 interface IssueHeatmapProps {
@@ -30,19 +53,11 @@ export function IssueHeatmap({ issues }: IssueHeatmapProps) {
   return (
     <div className="h-[400px] w-full rounded-md overflow-hidden z-0">
         <MapContainer center={center} zoom={5} className="h-full w-full">
-        <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        <HeatmapLayer
-            points={points}
-            longitudeExtractor={(m: any) => m[1]}
-            latitudeExtractor={(m: any) => m[0]}
-            intensityExtractor={(m: any) => parseFloat(m[2])}
-            radius={20}
-            blur={20}
-            max={1.0}
-        />
+            <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            <HeatmapLayer points={points} />
         </MapContainer>
     </div>
   );
