@@ -7,6 +7,7 @@ import { Issue, IssueStatus } from '@/lib/types';
 
 type IssueContextType = {
   issues: Issue[];
+  addIssue: (issue: Issue) => void;
   updateIssueStatus: (issueId: string, newStatus: IssueStatus) => void;
 };
 
@@ -14,6 +15,10 @@ const IssueContext = createContext<IssueContextType | undefined>(undefined);
 
 export const IssueProvider = ({ children }: { children: ReactNode }) => {
   const [issues, setIssues] = useState<Issue[]>(mockIssues);
+
+  const addIssue = (issue: Issue) => {
+    setIssues(prevIssues => [issue, ...prevIssues]);
+  };
 
   const updateIssueStatus = (issueId: string, newStatus: IssueStatus) => {
     setIssues(prevIssues => 
@@ -24,7 +29,7 @@ export const IssueProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <IssueContext.Provider value={{ issues, updateIssueStatus }}>
+    <IssueContext.Provider value={{ issues, addIssue, updateIssueStatus }}>
       {children}
     </IssueContext.Provider>
   );
@@ -37,3 +42,5 @@ export const useIssues = () => {
   }
   return context;
 };
+
+    

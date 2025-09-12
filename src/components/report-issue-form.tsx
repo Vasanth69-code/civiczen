@@ -22,10 +22,12 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { suggestReportTitles } from "@/ai/flows/suggest-report-titles";
+import { autoRouteIssueReport } from "@/ai/flows/auto-route-issue-reports";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
 import { useLanguage } from "@/context/language-context";
-import { TranslationKey } from "@/lib/translations";
+import { useIssues } from "@/context/issue-context";
+import { useUser } from "@/context/user-context";
 
 const formSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters.").max(100),
@@ -49,6 +51,8 @@ export function ReportIssueForm() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { t } = useLanguage();
+  const { addIssue } = useIssues();
+  const { user } = useUser();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -178,22 +182,57 @@ export function ReportIssueForm() {
         toast({ variant: "destructive", title: t('media_required'), description: t('media_required_description') });
         return;
     }
-    
-    console.log("Form submitted with values:", values);
 
-    toast({
-        title: t('report_submitted_successfully'),
-        description: (
-          <div>
-            <p>Your report has been submitted to the relevant department.</p>
-            <p>{t('tracking_id')}: #CITY{Math.floor(1000 + Math.random() * 9000)}</p>
-            <p className="text-xs mt-2">{t('sms_notification')}</p>
-          </div>
-        ),
-    });
-    form.reset();
-    setMediaPreview(null);
-    setMediaType(null);
+    try {
+        const routingResult = await autoRouteIssueReport({
+            photoDataUri: mediaPreview,
+            description: values.description,
+            location: `${geolocation.latitude}, ${geolocation.longitude}`
+        });
+
+        const newIssueId = `IS${Date.now()}`;
+        
+        addIssue({
+            id: newIssueId,
+            title: values.title,
+            description: values.description,
+            status: 'Pending',
+            category: routingResult.issueType,
+            priority: routingResult.priority,
+            department: routingResult.department,
+            location: { lat: geolocation.latitude, lng: geolocation.longitude },
+            address: 'Fetching address...', // You could implement a reverse geocoding service here
+            imageUrl: mediaPreview,
+            reporter: {
+              id: user.id,
+              name: user.name,
+              avatarUrl: user.avatarUrl,
+            },
+            createdAt: new Date().toISOString(),
+        });
+        
+        toast({
+            title: t('report_submitted_successfully'),
+            description: (
+              <div>
+                <p>{t('report_submitted_description', { department: routingResult.department })}</p>
+                <p>{t('tracking_id')}: #{newIssueId}</p>
+              </div>
+            ),
+        });
+
+        form.reset();
+        setMediaPreview(null);
+        setMediaType(null);
+
+    } catch (error) {
+        console.error("Submission Error:", error);
+        toast({
+            variant: 'destructive',
+            title: t('submission_failed'),
+            description: t('submission_failed_description'),
+        })
+    }
   }
 
   return (
@@ -363,3 +402,5 @@ export function ReportIssueForm() {
     </Card>
   );
 }
+
+    
