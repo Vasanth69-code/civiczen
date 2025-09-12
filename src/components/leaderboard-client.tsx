@@ -2,27 +2,17 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User } from '@/lib/types';
 import { Crown, Trophy, Medal, Star } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { useUser } from '@/context/user-context';
 
-type LeaderboardClientProps = {
-  users: User[];
-};
-
-const rankIcons = [
-  <Crown key="1" className="h-6 w-6 text-yellow-400" />,
-  <Trophy key="2" className="h-6 w-6 text-gray-400" />,
-  <Medal key="3" className="h-6 w-6 text-yellow-600" />,
-];
-
-export function LeaderboardClient({ users }: LeaderboardClientProps) {
+export function LeaderboardClient() {
   const { t } = useLanguage();
-  const { user: currentUser } = useUser();
-  const sortedUsers = [...users].sort((a, b) => b.points - a.points);
-  const topThree = sortedUsers.slice(0, 3);
-  const restUsers = sortedUsers.slice(3);
+  const { user: currentUser, users } = useUser();
+  
+  // Users are pre-sorted by points from the context
+  const topThree = users.slice(0, 3);
+  const restUsers = users.slice(3);
 
   return (
     <div className="max-w-4xl mx-auto">

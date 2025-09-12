@@ -28,6 +28,7 @@ import Link from "next/link";
 import { useLanguage } from "@/context/language-context";
 import { useIssues } from "@/context/issue-context";
 import { useUser } from "@/context/user-context";
+import type { Issue } from "@/lib/types";
 
 const formSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters.").max(100),
@@ -183,27 +184,30 @@ export function ReportIssueForm() {
         return;
     }
 
-    const newIssueId = `IS${Date.now()}`;
-    const newIssue = {
-        id: newIssueId,
+    const newIssue: Omit<Issue, 'id' | 'createdAt'> = {
         title: values.title,
         description: values.description,
-        status: 'Pending' as const,
+        status: 'Pending',
         category: 'Uncategorized',
-        priority: 'Medium' as const,
+        priority: 'Medium',
         department: 'Pending Assignment',
         location: { lat: geolocation.latitude, lng: geolocation.longitude },
-        address: 'Fetching address...',
+        address: 'Fetching address...', // This could be resolved via a geocoding API
         imageUrl: mediaPreview,
         reporter: {
           id: user.id,
           name: user.name,
           avatarUrl: user.avatarUrl,
         },
-        createdAt: new Date().toISOString(),
     };
 
-    addIssue(newIssue);
+    // Add issue to firestore, get the new ID
+    const newIssueId = await addIssue(newIssue);
+
+    if (!newIssueId) {
+      // Error is handled in addIssue context function
+      return;
+    }
     
     toast({
         title: t('report_submitted_successfully'),
@@ -222,6 +226,7 @@ export function ReportIssueForm() {
             location: `${geolocation.latitude}, ${geolocation.longitude}`
         });
 
+        // Update the issue in firestore with the AI results
         updateIssue(newIssueId, {
             category: routingResult.issueType,
             priority: routingResult.priority,
@@ -410,7 +415,3 @@ export function ReportIssueForm() {
     </Card>
   );
 }
-
-    
-
-    

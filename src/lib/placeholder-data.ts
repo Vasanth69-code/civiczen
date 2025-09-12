@@ -1,4 +1,4 @@
-import type { Issue, User } from './types';
+import type { User } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 
 const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id);
@@ -9,82 +9,6 @@ export const mockUsers: User[] = [
   { id: 'u3', name: 'Vikram Singh', avatarUrl: getImage('user-3')?.imageUrl || '', imageHint: 'man portrait', points: 1980, rank: 3 },
   { id: 'u4', name: 'Diya Patel', avatarUrl: getImage('user-4')?.imageUrl || '', imageHint: 'person glasses', points: 1850, rank: 4 },
   { id: 'u5', name: 'Rohan Kumar', avatarUrl: getImage('user-5')?.imageUrl || '', imageHint: 'woman portrait', points: 1720, rank: 5 },
-];
-
-export const mockIssues: Issue[] = [
-  {
-    id: 'IS001',
-    title: 'Large Pothole on Main Street',
-    description: 'A deep and dangerous pothole has formed in the middle of Main Street near the intersection with 1st Ave. It poses a risk to vehicles.',
-    status: 'In Progress',
-    category: 'Roads',
-    priority: 'High',
-    department: 'Public Works',
-    location: { lat: 40.7128, lng: -74.0060 },
-    address: '123 Main St, New York, NY',
-    imageUrl: getImage('issue-pothole')?.imageUrl,
-    imageHint: getImage('issue-pothole')?.imageHint,
-    reporter: mockUsers[0],
-    createdAt: '2024-05-20T09:15:00Z',
-  },
-  {
-    id: 'IS002',
-    title: 'Overflowing Trash Can at City Park',
-    description: 'The main trash can near the park entrance has been overflowing for two days. It is attracting pests and creating a mess.',
-    status: 'Pending',
-    category: 'Sanitation',
-    priority: 'Medium',
-    department: 'Sanitation Dept.',
-    location: { lat: 40.7145, lng: -74.0081 },
-    address: '456 Park Ave, New York, NY',
-    imageUrl: getImage('issue-trash')?.imageUrl,
-    imageHint: getImage('issue-trash')?.imageHint,
-    reporter: mockUsers[1],
-    createdAt: '2024-05-19T14:30:00Z',
-  },
-  {
-    id: 'IS003',
-    title: 'Streetlight Out on Oak Street',
-    description: 'The streetlight at the corner of Oak Street and Maple Drive is not working, making the area very dark and unsafe at night.',
-    status: 'Resolved',
-    category: 'Electrical',
-    priority: 'High',
-    department: 'Public Works',
-    location: { lat: 40.7160, lng: -74.0095 },
-    address: '789 Oak St, New York, NY',
-    imageUrl: getImage('issue-streetlight')?.imageUrl,
-    imageHint: getImage('issue-streetlight')?.imageHint,
-    reporter: mockUsers[2],
-    createdAt: '2024-05-18T21:00:00Z',
-  },
-  {
-    id: 'IS004',
-    title: 'Graffiti on Library Wall',
-    description: 'A large amount of graffiti was painted on the west-facing wall of the public library overnight.',
-    status: 'Pending',
-    category: 'Vandalism',
-    priority: 'Low',
-    department: 'Parks & Recreation',
-    location: { lat: 40.7181, lng: -74.0042 },
-    address: '321 Library Ln, New York, NY',
-    imageUrl: getImage('issue-graffiti')?.imageUrl,
-    imageHint: getImage('issue-graffiti')?.imageHint,
-    reporter: mockUsers[3],
-    createdAt: '2024-05-20T11:00:00Z',
-  },
-  {
-    id: 'IS005',
-    title: 'Broken Swing at Playground',
-    description: 'One of the swings in the playground at Riverside Park has a broken chain and is dangerous for children.',
-    status: 'In Progress',
-    category: 'Park Maintenance',
-    priority: 'Medium',
-    department: 'Parks & Recreation',
-    location: { lat: 40.7200, lng: -74.0110 },
-    address: '555 Riverside Dr, New York, NY',
-    reporter: mockUsers[4],
-    createdAt: '2024-05-19T18:45:00Z',
-  },
 ];
 
 export const currentUser = mockUsers[0];

@@ -1,3 +1,4 @@
+import type { Timestamp } from "firebase/firestore";
 
 export type IssueStatus = 'Pending' | 'In Progress' | 'Resolved' | 'Rejected';
 
@@ -18,12 +19,12 @@ export type Issue = {
     name: string;
     avatarUrl: string;
   };
-  createdAt: string;
+  createdAt: Timestamp;
 };
 
 export type User = {
     id: string;
-    name: string;
+    name:string;
     avatarUrl: string;
     imageHint?: string;
     points: number;

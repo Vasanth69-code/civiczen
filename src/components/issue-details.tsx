@@ -33,7 +33,7 @@ const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } 
   Rejected: "destructive",
 };
 
-const availableStatuses: IssueStatus[] = ["Pending", "In Progress", "Resolved"];
+const availableStatuses: IssueStatus[] = ["Pending", "In Progress", "Resolved", "Rejected"];
 
 export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
     const { t } = useLanguage();
@@ -103,6 +103,10 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
             description: `Issue "${issue.title}" is now ${newStatus}.`,
         });
     };
+    
+    // Firestore Timestamps need to be converted to JS Dates
+    const createdAtDate = issue.createdAt?.toDate ? issue.createdAt.toDate() : new Date();
+
 
     return (
         <div className="max-w-4xl mx-auto space-y-6">
@@ -119,7 +123,7 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
                         </div>
                         <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4" />
-                            <span>{new Date(issue.createdAt).toLocaleDateString()}</span>
+                            <span>{createdAtDate.toLocaleDateString()}</span>
                         </div>
                     </div>
                 </CardHeader>
