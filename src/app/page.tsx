@@ -45,7 +45,7 @@ export default function HomePage() {
           </nav>
           <div className="flex items-center gap-2">
             <Button asChild>
-                <Link href="/all-reports">View All Reports <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                <Link href="/login">View All Reports <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
           </div>
         </div>
@@ -64,7 +64,7 @@ export default function HomePage() {
               <Link href="/login">Get Started <ArrowRight className="ml-2 h-5 w-5" /></Link>
             </Button>
             <Button size="lg" variant="secondary" asChild>
-                <Link href="/all-reports">View Reports</Link>
+                <Link href="/login">View Reports</Link>
             </Button>
           </div>
           {heroImage && (
