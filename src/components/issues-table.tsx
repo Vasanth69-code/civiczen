@@ -39,7 +39,7 @@ const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } 
 };
 
 const IssueRow = ({ issue, onShare }: { issue: Issue, onShare: (id: string) => void }) => {
-    const [votes, setVotes] = useState(Math.floor(Math.random() * 200));
+    const [votes, setVotes] = useState(0);
     const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
     const { t } = useLanguage();
 

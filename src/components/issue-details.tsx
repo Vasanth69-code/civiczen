@@ -27,7 +27,7 @@ const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } 
 export function IssueDetails({ issue }: IssueDetailsProps) {
     const { t } = useLanguage();
     const { toast } = useToast();
-    const [votes, setVotes] = useState(Math.floor(Math.random() * 200));
+    const [votes, setVotes] = useState(0);
     const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
 
     const handleShare = () => {
