@@ -53,6 +53,24 @@
       "description": "Graffiti on a wall",
       "imageUrl": "https://picsum.photos/seed/graffiti/600/400",
       "imageHint": "graffiti wall"
+    },
+    {
+        "id": "home-hero",
+        "description": "A vibrant city street with happy people",
+        "imageUrl": "https://picsum.photos/seed/homehero/1280/720",
+        "imageHint": "city street"
+    },
+    {
+        "id": "home-feature-1",
+        "description": "Abstract representation of AI and data",
+        "imageUrl": "https://picsum.photos/seed/feature1/600/600",
+        "imageHint": "abstract data"
+    },
+    {
+        "id": "home-feature-2",
+        "description": "A diverse group of people collaborating",
+        "imageUrl": "https://picsum.photos/seed/feature2/600/600",
+        "imageHint": "community collaboration"
     }
   ]
 }
