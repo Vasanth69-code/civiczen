@@ -42,10 +42,10 @@ export function AdminSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <div className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <VenetianMask className="size-8 text-primary" />
           <h1 className="font-headline text-2xl font-semibold">CityZen</h1>
-        </div>
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
