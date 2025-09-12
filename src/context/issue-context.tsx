@@ -53,13 +53,15 @@ export const IssueProvider = ({ children }: { children: ReactNode }) => {
   const addIssue = async (issue: Omit<Issue, 'id' | 'createdAt'>) => {
     try {
       const issuesCollection = collection(db, 'issues');
-      const newIssue = {
+      const newIssueWithTimestamp = {
         ...issue,
         createdAt: Timestamp.now(),
       }
-      const docRef = await addDoc(issuesCollection, newIssue);
+      const docRef = await addDoc(issuesCollection, newIssueWithTimestamp);
+      
       // Add new issue to local state to update UI immediately
-      setIssues(prevIssues => [{...newIssue, id: docRef.id}, ...prevIssues]);
+      setIssues(prevIssues => [{...newIssueWithTimestamp, id: docRef.id}, ...prevIssues]);
+      
       return docRef.id;
     } catch (error) {
         console.error("Error adding issue to Firestore: ", error);
