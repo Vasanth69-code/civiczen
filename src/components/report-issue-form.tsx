@@ -72,7 +72,7 @@ export function ReportIssueForm() {
         return;
       }
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } });
         setHasCameraPermission(true);
 
         if (videoRef.current) {
@@ -449,4 +449,5 @@ export function ReportIssueForm() {
   );
 }
 
+    
     
