@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Issue } from "@/lib/types";
@@ -27,6 +28,7 @@ export function IssueDetails({ issue }: IssueDetailsProps) {
     const { t } = useLanguage();
     const { toast } = useToast();
     const [votes, setVotes] = useState(Math.floor(Math.random() * 200));
+    const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
 
     const handleShare = () => {
         const url = window.location.href;
@@ -44,6 +46,38 @@ export function IssueDetails({ issue }: IssueDetailsProps) {
         });
         }
     }
+
+    const handleUpvote = () => {
+        if (userVote === "up") {
+          // If already upvoted, retract vote
+          setVotes(votes - 1);
+          setUserVote(null);
+        } else if (userVote === "down") {
+          // If was downvoted, switch to upvote
+          setVotes(votes + 2);
+          setUserVote("up");
+        } else {
+          // If no vote, upvote
+          setVotes(votes + 1);
+          setUserVote("up");
+        }
+      };
+    
+      const handleDownvote = () => {
+        if (userVote === "down") {
+          // If already downvoted, retract vote
+          setVotes(votes + 1);
+          setUserVote(null);
+        } else if (userVote === "up") {
+          // If was upvoted, switch to downvote
+          setVotes(votes - 2);
+          setUserVote("down");
+        } else {
+          // If no vote, downvote
+          setVotes(votes - 1);
+          setUserVote("down");
+        }
+      };
 
     return (
         <div className="max-w-4xl mx-auto space-y-6">
@@ -112,11 +146,11 @@ export function IssueDetails({ issue }: IssueDetailsProps) {
                 </CardContent>
                 <CardFooter className="flex justify-end gap-2">
                     <div className="flex items-center gap-1 rounded-md border bg-background">
-                        <Button variant="ghost" size="icon" onClick={() => setVotes(v => v + 1)}>
+                        <Button variant="ghost" size="icon" onClick={handleUpvote} aria-pressed={userVote === 'up'}>
                             <ArrowUp className="h-4 w-4" />
                         </Button>
                         <span className="font-medium text-sm tabular-nums">{votes}</span>
-                        <Button variant="ghost" size="icon" onClick={() => setVotes(v => v - 1)}>
+                        <Button variant="ghost" size="icon" onClick={handleDownvote} aria-pressed={userVote === 'down'}>
                             <ArrowDown className="h-4 w-4" />
                         </Button>
                     </div>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -39,7 +40,36 @@ const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } 
 
 const IssueRow = ({ issue, onShare }: { issue: Issue, onShare: (id: string) => void }) => {
     const [votes, setVotes] = useState(Math.floor(Math.random() * 200));
+    const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
     const { t } = useLanguage();
+
+    const handleUpvote = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (userVote === "up") {
+          setVotes(votes - 1);
+          setUserVote(null);
+        } else if (userVote === "down") {
+          setVotes(votes + 2);
+          setUserVote("up");
+        } else {
+          setVotes(votes + 1);
+          setUserVote("up");
+        }
+      };
+    
+      const handleDownvote = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (userVote === "down") {
+          setVotes(votes + 1);
+          setUserVote(null);
+        } else if (userVote === "up") {
+          setVotes(votes - 2);
+          setUserVote("down");
+        } else {
+          setVotes(votes - 1);
+          setUserVote("down");
+        }
+      };
 
     return (
         <TableRow>
@@ -64,11 +94,11 @@ const IssueRow = ({ issue, onShare }: { issue: Issue, onShare: (id: string) => v
         </TableCell>
         <TableCell className="text-right flex items-center justify-end gap-2">
             <div className="flex items-center gap-1 rounded-md border bg-background p-0.5">
-                <Button variant="ghost" size="icon" className="size-7" onClick={() => setVotes(v => v + 1)}>
+                <Button variant="ghost" size="icon" className="size-7" onClick={handleUpvote} aria-pressed={userVote === 'up'}>
                     <ArrowUp className="h-4 w-4" />
                 </Button>
                 <span className="font-medium text-sm tabular-nums min-w-[20px] text-center">{votes}</span>
-                <Button variant="ghost" size="icon" className="size-7" onClick={() => setVotes(v => v - 1)}>
+                <Button variant="ghost" size="icon" className="size-7" onClick={handleDownvote} aria-pressed={userVote === 'down'}>
                     <ArrowDown className="h-4 w-4" />
                 </Button>
             </div>
