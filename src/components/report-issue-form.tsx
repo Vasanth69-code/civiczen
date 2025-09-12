@@ -17,14 +17,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Camera, MapPin, Loader2, Video, Wand2, Check, X, ExternalLink } from "lucide-react";
+import { Camera, MapPin, Loader2, Video, Wand2, ExternalLink } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { suggestReportTitles } from "@/ai/flows/suggest-report-titles";
-import { autoRouteIssueReport, AutoRouteIssueReportOutput } from "@/ai/flows/auto-route-issue-reports";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "./ui/badge";
 import Link from "next/link";
 import { useLanguage } from "@/context/language-context";
 import { TranslationKey } from "@/lib/translations";
@@ -50,8 +48,6 @@ export function ReportIssueForm() {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isRouting, setIsRouting] = useState(false);
-  const [routingResult, setRoutingResult] = useState<AutoRouteIssueReportOutput | null>(null);
   const { t } = useLanguage();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -114,32 +110,8 @@ export function ReportIssueForm() {
     }
   }, [toast, t]);
   
-  const handleAutoRouting = async (mediaData: string, description: string) => {
-    if (!geolocation || !mediaData || !description) return;
-    setIsRouting(true);
-    setRoutingResult(null);
-    try {
-      const result = await autoRouteIssueReport({
-        photoDataUri: mediaData,
-        description: description,
-        location: `${geolocation.latitude}, ${geolocation.longitude}`,
-      });
-      setRoutingResult(result);
-    } catch (error) {
-      console.error("AI Routing Error:", error);
-      toast({ variant: "destructive", title: t('ai_analysis_failed'), description: t('ai_analysis_failed_description') });
-    } finally {
-      setIsRouting(false);
-    }
-  };
-  
-  const triggerAIRoutinAndTitle = (description: string, mediaData: string) => {
+  const triggerAITitle = (description: string, mediaData: string) => {
     handleTitleSuggestion(description, mediaData);
-    if(mediaType === 'image') {
-        handleAutoRouting(mediaData, description);
-    } else {
-        setRoutingResult(null);
-    }
   }
 
   const handleMediaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,7 +124,7 @@ export function ReportIssueForm() {
         const newMediaType = file.type.startsWith('video') ? 'video' : 'image';
         setMediaType(newMediaType);
         if (descriptionRef.current?.value) {
-            triggerAIRoutinAndTitle(descriptionRef.current.value, result);
+            triggerAITitle(descriptionRef.current.value, result);
         }
       };
       reader.readAsDataURL(file);
@@ -172,7 +144,7 @@ export function ReportIssueForm() {
         setMediaPreview(dataUrl);
         setMediaType('image');
         if (descriptionRef.current?.value) {
-            triggerAIRoutinAndTitle(descriptionRef.current.value, dataUrl);
+            triggerAITitle(descriptionRef.current.value, dataUrl);
         }
       }
     }
@@ -207,33 +179,14 @@ export function ReportIssueForm() {
         return;
     }
     
-    let finalRoutingInfo = routingResult;
-
-    if (!finalRoutingInfo) {
-      setIsRouting(true);
-      try {
-        finalRoutingInfo = await autoRouteIssueReport({
-          photoDataUri: mediaPreview,
-          description: values.description,
-          location: `${geolocation.latitude}, ${geolocation.longitude}`,
-        });
-      } catch (error) {
-        console.error("Final AI Routing Error:", error);
-        toast({ variant: "destructive", title: t('submission_failed'), description: t('submission_failed_description') });
-        setIsRouting(false);
-        return;
-      }
-      setIsRouting(false);
-    }
-
-    console.log("AI Routing Info:", finalRoutingInfo);
+    console.log("Form submitted with values:", values);
 
     toast({
         title: t('report_submitted_successfully'),
         description: (
           <div>
-            <p>{t('report_submitted_description', { department: finalRoutingInfo.department })}</p>
-            <p>{t('priority')}: <strong>{t(finalRoutingInfo.priority.toLowerCase() as TranslationKey)}</strong>. {t('tracking_id')}: #CITY{Math.floor(1000 + Math.random() * 9000)}</p>
+            <p>Your report has been submitted to the relevant department.</p>
+            <p>{t('tracking_id')}: #CITY{Math.floor(1000 + Math.random() * 9000)}</p>
             <p className="text-xs mt-2">{t('sms_notification')}</p>
           </div>
         ),
@@ -241,7 +194,6 @@ export function ReportIssueForm() {
     form.reset();
     setMediaPreview(null);
     setMediaType(null);
-    setRoutingResult(null);
   }
 
   return (
@@ -286,7 +238,7 @@ export function ReportIssueForm() {
                                       <Camera className="mr-2"/> {t('capture_photo')}
                                   </Button>
                                 ) : (
-                                  <Button type="button" variant="outline" onClick={() => {setMediaPreview(null); setMediaType(null); setRoutingResult(null);}} className="w-full">
+                                  <Button type="button" variant="outline" onClick={() => {setMediaPreview(null); setMediaType(null);}} className="w-full">
                                       {t('retake_or_upload_new')}
                                   </Button>
                                 )}
@@ -334,50 +286,13 @@ export function ReportIssueForm() {
                                 {...field}
                                 rows={5}
                                 ref={descriptionRef}
-                                onBlur={(e) => { if(mediaPreview) { triggerAIRoutinAndTitle(e.target.value, mediaPreview) }}}
+                                onBlur={(e) => { if(mediaPreview) { triggerAITitle(e.target.value, mediaPreview) }}}
                             />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
                     )}
                 />
-
-                {(isRouting || routingResult) && (
-                  <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Wand2 className="text-primary"/> {t('ai_analysis')}
-                      </FormLabel>
-                      <Card className="bg-secondary/50">
-                        <CardContent className="p-4">
-                          {isRouting ? (
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <Loader2 className="h-4 w-4 animate-spin"/> {t('analyzing_image')}
-                            </div>
-                          ) : routingResult ? (
-                            <div className="space-y-3">
-                              <div className="flex justify-between items-center">
-                                <span className="font-medium">{t('suggested_category')}</span>
-                                <Badge variant="outline">{routingResult.issueType}</Badge>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span className="font-medium">{t('assigned_department')}</span>
-                                <Badge variant="outline">{routingResult.department}</Badge>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span className="font-medium">{t('recommended_priority')}</span>
-                                <Badge variant={routingResult.priority === 'High' ? "destructive" : "outline"}>{t(routingResult.priority.toLowerCase() as TranslationKey)}</Badge>
-                              </div>
-                              <div className="flex justify-end gap-2 pt-2">
-                                <Button size="sm" variant="ghost" onClick={() => setRoutingResult(null)}><X className="mr-1 h-4 w-4" /> {t('incorrect')}</Button>
-                                <Button size="sm" disabled><Check className="mr-1 h-4 w-4" /> {t('looks_good')}</Button>
-                              </div>
-                            </div>
-                          ) : null}
-                        </CardContent>
-                      </Card>
-                      <FormDescription>{t('ai_analysis_description')}</FormDescription>
-                  </FormItem>
-                )}
 
                 <FormField
                     control={form.control}
@@ -439,8 +354,8 @@ export function ReportIssueForm() {
                 </FormItem>
             </div>
             
-            <Button type="submit" size="lg" className="w-full" disabled={form.formState.isSubmitting || isRouting}>
-              {(form.formState.isSubmitting || isRouting) ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('submitting')}</> : t('submit_report')}
+            <Button type="submit" size="lg" className="w-full" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('submitting')}</> : t('submit_report')}
             </Button>
           </form>
         </Form>
@@ -448,6 +363,3 @@ export function ReportIssueForm() {
     </Card>
   );
 }
-
-    
-    
