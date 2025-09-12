@@ -28,6 +28,11 @@ import { useIssues } from "@/context/issue-context";
 import { useUser } from "@/context/user-context";
 import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
+import "leaflet-defaulticon-compatibility";
+
 
 const issueTypes = [
     "Pothole",
@@ -402,13 +407,16 @@ export function ReportIssueForm() {
                                 </Button>
                             )}
                         </div>
-                        {geolocation && (
-                            <iframe
-                                className="w-full h-48 rounded-md mt-2"
-                                src={`https://www.openstreetmap.org/export/embed.html?bbox=${geolocation.longitude-0.01},${geolocation.latitude-0.01},${geolocation.longitude+0.01},${geolocation.latitude+0.01}&layer=mapnik&marker=${geolocation.latitude},${geolocation.longitude}`}
-                                loading="lazy"
-                                referrerPolicy="no-referrer-when-downgrade"
-                            ></iframe>
+                         {geolocation && (
+                             <div className="h-48 w-full rounded-md mt-2 overflow-hidden z-0">
+                                <MapContainer center={[geolocation.latitude, geolocation.longitude]} zoom={16} scrollWheelZoom={false} className="h-full w-full">
+                                    <TileLayer
+                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    />
+                                    <Marker position={[geolocation.latitude, geolocation.longitude]} />
+                                </MapContainer>
+                            </div>
                         )}
                     </div>
                      {!isLocating && !geolocation && (
@@ -431,5 +439,3 @@ export function ReportIssueForm() {
     </Card>
   );
 }
-
-    

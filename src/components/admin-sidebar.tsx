@@ -8,6 +8,7 @@ import {
   Users,
   Settings,
   Building,
+  LineChart,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -35,6 +36,7 @@ export function AdminSidebar() {
 
   const isActive = (path: string) => {
     if (path === "/admin/issues") return pathname === path;
+    if (path === "/admin/analytics") return pathname === path;
     return pathname.startsWith(path);
   };
 
@@ -60,6 +62,18 @@ export function AdminSidebar() {
                 <Link href="/admin/dashboard">
                   <LayoutDashboard />
                   <span>{t('dashboard')}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={isActive("/admin/analytics")}
+                tooltip={{ children: "Analytics" }}
+              >
+                <Link href="/analytics">
+                  <LineChart />
+                  <span>{"Analytics"}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

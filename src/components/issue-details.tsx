@@ -20,6 +20,10 @@ import {
 } from "./ui/dropdown-menu";
 import { useIssues } from "@/context/issue-context";
 import { usePathname } from "next/navigation";
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
+import "leaflet-defaulticon-compatibility";
 
 
 type IssueDetailsProps = {
@@ -176,13 +180,18 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
                             {t('location')}
                         </h3>
                         <p className="text-muted-foreground mb-4">{issue.address}</p>
-                        <div className="aspect-video w-full rounded-md overflow-hidden">
-                             <iframe
-                                className="w-full h-full"
-                                src={`https://www.openstreetmap.org/export/embed.html?bbox=${issue.location.lng-0.005},${issue.location.lat-0.005},${issue.location.lng+0.005},${issue.location.lat+0.005}&layer=mapnik&marker=${issue.location.lat},${issue.location.lng}`}
-                                loading="lazy"
-                                referrerPolicy="no-referrer-when-downgrade"
-                            ></iframe>
+                        <div className="h-80 w-full rounded-md overflow-hidden z-0">
+                           <MapContainer center={[issue.location.lat, issue.location.lng]} zoom={16} scrollWheelZoom={false} className="h-full w-full">
+                                <TileLayer
+                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                />
+                                <Marker position={[issue.location.lat, issue.location.lng]}>
+                                    <Popup>
+                                        {issue.title}
+                                    </Popup>
+                                </Marker>
+                            </MapContainer>
                         </div>
                     </div>
                 </CardContent>
