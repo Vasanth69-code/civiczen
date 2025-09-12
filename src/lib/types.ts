@@ -1,3 +1,6 @@
+
+import { Timestamp } from "firebase/firestore";
+
 export type Issue = {
   id: string;
   title: string;
@@ -26,3 +29,13 @@ export type User = {
     points: number;
     rank: number;
 };
+
+export type FirebaseUser = {
+    uid: string;
+    email: string | null;
+    role: 'citizen' | 'admin';
+    createdAt: Timestamp;
+    name?: string;
+    phone?: string;
+    avatarUrl?: string;
+}

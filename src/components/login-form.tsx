@@ -13,47 +13,64 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { FirebaseError } from 'firebase/app';
 
 export function LoginForm() {
   const { t } = useLanguage();
   const { login, loginAsAdmin } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('demo@example.com');
+  const [password, setPassword] = useState('password');
+  const [citizenLoading, setCitizenLoading] = useState(false);
   const [adminLoading, setAdminLoading] = useState(false);
 
-  const handleLogin = async (e: React.MouseEvent<HTMLButtonElement>, isAdmin: boolean) => {
-    e.preventDefault();
+  const handleLogin = async (isAdmin: boolean) => {
     if (isAdmin) {
       setAdminLoading(true);
     } else {
-      setLoading(true);
+      setCitizenLoading(true);
     }
 
     try {
       if (isAdmin) {
         await loginAsAdmin(email, password);
         toast({ title: t('sign_in_successful') });
-        router.push('/admin');
+        router.push('/admin/dashboard');
       } else {
         await login(email, password);
         toast({ title: t('sign_in_successful') });
         router.push('/report');
       }
     } catch (error: any) {
-      console.error(error);
+      let description = t('sign_in_failed_description');
+       if (error instanceof FirebaseError) {
+        switch(error.code) {
+          case 'auth/user-not-found':
+          case 'auth/wrong-password':
+          case 'auth/invalid-credential':
+            description = "Invalid email or password. Please try again.";
+            break;
+          case 'auth/invalid-email':
+            description = "Please enter a valid email address.";
+            break;
+          default:
+            description = error.message;
+        }
+      } else {
+        description = error.message;
+      }
+      
       toast({
         variant: 'destructive',
         title: t('sign_in_failed'),
-        description: error.message || t('sign_in_failed_description'),
+        description: description,
       });
     } finally {
       if (isAdmin) {
         setAdminLoading(false);
       } else {
-        setLoading(false);
+        setCitizenLoading(false);
       }
     }
   };
@@ -74,14 +91,14 @@ export function LoginForm() {
             <CardDescription>{t('sign_in_description')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
             <div className="space-y-2">
                 <Label htmlFor="email">{t('email_address')}</Label>
-                <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="password">{t('password')}</Label>
-                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
              <div className="text-right text-sm">
                 <Link href="/forgot-password" passHref>
@@ -89,22 +106,22 @@ export function LoginForm() {
                 </Link>
             </div>
             <div className="flex flex-col space-y-2 pt-4">
-                 <Button onClick={(e) => handleLogin(e, false)} disabled={loading || adminLoading}>
-                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Users className="mr-2 h-5 w-5" />}
+                 <Button onClick={() => handleLogin(false)} disabled={citizenLoading || adminLoading}>
+                    {citizenLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Users className="mr-2 h-5 w-5" />}
                     {t('sign_in_as_citizen')}
                 </Button>
-                <Button onClick={(e) => handleLogin(e, true)} variant="secondary" disabled={loading || adminLoading}>
+                <Button onClick={() => handleLogin(true)} variant="secondary" disabled={citizenLoading || adminLoading}>
                     {adminLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Shield className="mr-2 h-5 w-5" />}
                     {t('sign_in_as_admin')}
                 </Button>
             </div>
-             <div className="text-center text-sm text-muted-foreground pt-4">
+             <div className="text-center text-sm text-muted-foreground pt-4 border-t">
                 {t('admin_demo_credentials')} <code className="font-code text-xs">demo@example.com</code> / <code className="font-code text-xs">password</code>
             </div>
             <div className="text-center text-sm text-muted-foreground pt-4">
                 {t('dont_have_account')} <Link href="/signup" className="text-primary underline">{t('sign_up')}</Link>
             </div>
-          </div>
+          </form>
         </CardContent>
       </Card>
     </div>

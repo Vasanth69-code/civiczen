@@ -12,6 +12,7 @@ import { useAuth } from '@/context/auth-context';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { FirebaseError } from 'firebase/app';
 
 export function ForgotPasswordForm() {
   const { t } = useLanguage();
@@ -33,10 +34,18 @@ export function ForgotPasswordForm() {
       });
       setIsSubmitted(true);
     } catch (error: any) {
+      let description = "An unexpected error occurred. Please try again.";
+       if (error instanceof FirebaseError) {
+        if (error.code === 'auth/invalid-email') {
+          description = 'Please enter a valid email address.';
+        } else {
+          description = error.message;
+        }
+      }
       toast({
         variant: 'destructive',
         title: t('error'),
-        description: error.message,
+        description: description,
       });
     } finally {
       setLoading(false);
@@ -58,7 +67,7 @@ export function ForgotPasswordForm() {
         </CardHeader>
         <CardContent>
             {isSubmitted ? (
-                <div className="text-center text-sm text-muted-foreground">
+                <div className="text-center text-sm text-muted-foreground p-4 bg-secondary/50 rounded-md">
                     <p>{t('password_reset_sent_description')}</p>
                 </div>
             ) : (

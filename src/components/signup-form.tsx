@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { FirebaseError } from 'firebase/app';
 
 export function SignupForm() {
   const { t } = useLanguage();
@@ -30,6 +31,7 @@ export function SignupForm() {
       toast({
         variant: 'destructive',
         title: t('passwords_do_not_match'),
+        description: "Please make sure your passwords match.",
       });
       return;
     }
@@ -38,13 +40,30 @@ export function SignupForm() {
       await signup(email, password);
       toast({
         title: t('sign_up_successful'),
+        description: "You are now logged in.",
       });
       router.push('/report');
     } catch (error: any) {
+      let description = t('sign_up_failed_description');
+      if (error instanceof FirebaseError) {
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            description = 'This email address is already in use by another account.';
+            break;
+          case 'auth/invalid-email':
+            description = 'Please enter a valid email address.';
+            break;
+          case 'auth/weak-password':
+            description = 'The password is too weak. Please use at least 6 characters.';
+            break;
+          default:
+            description = error.message;
+        }
+      }
       toast({
         variant: 'destructive',
         title: t('sign_up_failed'),
-        description: error.message || t('sign_up_failed_description'),
+        description: description,
       });
     } finally {
       setLoading(false);
@@ -72,11 +91,11 @@ export function SignupForm() {
             </div>
             <div className="space-y-2">
                 <Label htmlFor="password">{t('password')}</Label>
-                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="confirm-password">{t('confirm_password')}</Label>
-                <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+                <Input id="confirm-password" type="password" placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
             </div>
             <div className="pt-4">
                  <Button type="submit" className="w-full" disabled={loading}>
@@ -84,7 +103,7 @@ export function SignupForm() {
                     {t('sign_up')}
                 </Button>
             </div>
-            <div className="text-center text-sm text-muted-foreground pt-4">
+            <div className="text-center text-sm text-muted-foreground pt-4 border-t">
                 {t('already_have_account')} <Link href="/login" className="text-primary underline">{t('sign_in')}</Link>
             </div>
           </form>

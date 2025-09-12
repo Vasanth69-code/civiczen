@@ -10,6 +10,7 @@ import {
   signOut,
   sendPasswordResetEmail
 } from 'firebase/auth';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { useFirebase } from './firebase-context';
 import { useRouter, usePathname } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
@@ -29,9 +30,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const adminRoutes = ['/admin'];
 const publicRoutes = ['/login', '/signup', '/forgot-password'];
+const citizenRoutes = ['/report', '/issues', '/all-reports', '/leaderboard', '/settings'];
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { auth } = useFirebase();
+  const { auth, db } = useFirebase();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -39,51 +41,61 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
 
   useEffect(() => {
+    if (!auth) {
+        setLoading(false);
+        return;
+    }
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
+      setLoading(true);
       if (user) {
-        try {
-            const token = await user.getIdTokenResult();
-            const isAdminClaim = !!token.claims.admin;
-            setIsAdmin(isAdminClaim);
-        } catch (error) {
-            console.error("Error getting user token:", error);
-            setIsAdmin(false);
+        setUser(user);
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists() && userDoc.data().role === 'admin') {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
         }
       } else {
+        setUser(null);
         setIsAdmin(false);
       }
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [auth]);
+  }, [auth, db]);
 
   useEffect(() => {
     if (loading) return;
 
-    const isPublic = publicRoutes.some(route => pathname.startsWith(route));
+    const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
     const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route));
-    
-    if (!user && !isPublic) {
-      router.push('/login');
-    } else if (user && isPublic) {
-        if (isAdmin) {
-            router.push('/admin');
-        } else {
-            router.push('/report');
-        }
-    } else if (user && isAdminRoute && !isAdmin) {
-        router.push('/report'); // Redirect non-admins from admin routes
-    } else if (user && !isAdminRoute && isAdmin) {
-        router.push('/admin'); // Redirect admins to dashboard if they land on user pages
-    }
 
+    if (!user && !isPublicRoute) {
+      router.push('/login');
+    } else if (user) {
+      if (isPublicRoute) {
+        router.push(isAdmin ? '/admin/dashboard' : '/report');
+      } else if (isAdmin && !isAdminRoute) {
+        router.push('/admin/dashboard');
+      } else if (!isAdmin && isAdminRoute) {
+        router.push('/report');
+      }
+    }
   }, [user, loading, isAdmin, pathname, router]);
 
-
-  const signup = (email: string, pass: string) => {
-    return createUserWithEmailAndPassword(auth, email, pass);
+  const signup = async (email: string, pass: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    const user = userCredential.user;
+    // Create a new user document in Firestore
+    await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        email: user.email,
+        role: 'citizen',
+        createdAt: serverTimestamp(),
+    });
+    return userCredential;
   };
   
   const login = (email: string, pass: string) => {
@@ -91,10 +103,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const loginAsAdmin = async (email: string, pass: string) => {
-    if (email !== 'demo@example.com' || pass !== 'password') {
-        throw new Error('Invalid admin credentials');
+    const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+    const user = userCredential.user;
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+    if (!userDoc.exists() || userDoc.data().role !== 'admin') {
+        await logout();
+        throw new Error("You are not authorized to access the admin panel.");
     }
-    return signInWithEmailAndPassword(auth, email, pass);
+    return userCredential;
   }
 
   const logout = () => {
@@ -106,16 +123,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const value = { user, loading, isAdmin, signup, login, loginAsAdmin, logout, resetPassword };
-
+  
   const isPublic = publicRoutes.some(route => pathname.startsWith(route));
   if (loading || (!user && !isPublic)) {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
+      <div className="flex h-screen w-full items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
-
 
   return (
     <AuthContext.Provider value={value}>
