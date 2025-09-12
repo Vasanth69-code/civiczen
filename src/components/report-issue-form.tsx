@@ -21,18 +21,34 @@ import { Camera, MapPin, Loader2, Video, ExternalLink } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
-import { autoRouteIssueReport } from "@/ai/flows/auto-route-issue-reports";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
 import { useLanguage } from "@/context/language-context";
 import { useIssues } from "@/context/issue-context";
 import { useUser } from "@/context/user-context";
 import type { Issue } from "@/lib/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+
+const issueTypes = [
+    "Pothole",
+    "Garbage Overflow",
+    "Streetlight Outage",
+    "Graffiti",
+    "Damaged Signage",
+    "Electrical Line Damage",
+    "Sewage Overflow",
+    "Tree Damage",
+    "Other"
+];
+
+const priorities = ["Low", "Medium", "High"];
 
 const formSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters.").max(100),
   description: z.string().min(10, "Description must be at least 10 characters.").max(1000),
-  media: z.any().optional(),
+  category: z.string({ required_error: "Please select a category." }),
+  priority: z.enum(["Low", "Medium", "High"]),
+  media: z.any().refine(file => file, "Please capture or upload a photo/video."),
 });
 
 type Geolocation = {
@@ -50,7 +66,7 @@ export function ReportIssueForm() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { t } = useLanguage();
-  const { addIssue, updateIssue } = useIssues();
+  const { addIssue } = useIssues();
   const { user } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -60,6 +76,7 @@ export function ReportIssueForm() {
     defaultValues: {
       title: "",
       description: "",
+      priority: "Medium"
     },
   });
   
@@ -112,7 +129,6 @@ export function ReportIssueForm() {
     }
   }, [toast, t]);
   
-
   const handleMediaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -144,56 +160,11 @@ export function ReportIssueForm() {
       }
     }
   };
-  
-  const processAIInBackground = (newIssueId: string, values: z.infer<typeof formSchema>) => {
-    if (!mediaPreview || !geolocation) {
-        console.error("Cannot process AI without media and geolocation.");
-        return;
-    }
-    
-    // This runs in the background and does not block the UI
-    const runAITask = async () => {
-      try {
-        const routingResult = await autoRouteIssueReport({
-          photoDataUri: mediaPreview,
-          description: values.description,
-          location: `${geolocation.latitude}, ${geolocation.longitude}`
-        });
-
-        await updateIssue(newIssueId, {
-          category: routingResult.issueType,
-          priority: routingResult.priority,
-          department: routingResult.department,
-        });
-
-        toast({
-          title: "Report Analysis Complete",
-          description: `Issue #${newIssueId.substring(0,5)} routed to ${routingResult.department}.`,
-        });
-
-      } catch (error) {
-        console.error("Background AI Submission Error:", error);
-        toast({
-          variant: 'destructive',
-          title: "AI Routing Failed",
-          description: `Could not auto-route issue #${newIssueId.substring(0,5)}. It will be manually reviewed.`,
-        });
-      }
-    };
-    
-    // Fire and forget
-    runAITask();
-  }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!geolocation) {
       toast({ variant: "destructive", title: t('location_required'), description: t('location_required_description') });
       return;
-    }
-    
-    if (!mediaPreview) {
-        toast({ variant: "destructive", title: t('media_required'), description: t('media_required_description') });
-        return;
     }
     
     setIsSubmitting(true);
@@ -202,12 +173,12 @@ export function ReportIssueForm() {
         title: values.title,
         description: values.description,
         status: 'Pending',
-        category: 'Uncategorized',
-        priority: 'Medium',
+        category: values.category,
+        priority: values.priority,
         department: 'Pending Assignment',
         location: { lat: geolocation.latitude, lng: geolocation.longitude },
         address: 'Fetching address...',
-        imageUrl: mediaPreview,
+        imageUrl: mediaPreview as string,
         imageHint: "reported issue",
         reporter: {
           id: user.id,
@@ -219,14 +190,10 @@ export function ReportIssueForm() {
     try {
         const newIssueId = await addIssue(newIssue);
         
-        // This is the success path: give instant feedback
         toast({
             title: t('report_submitted_successfully'),
-            description: `${t('tracking_id')}: #${newIssueId.substring(0,5)}. AI analysis is running in the background.`,
+            description: `${t('tracking_id')}: #${newIssueId.substring(0,5)}.`,
         });
-        
-        // Start the slow AI process in the background. DO NOT await it.
-        processAIInBackground(newIssueId, values);
         
         form.reset();
         setMediaPreview(null);
@@ -236,14 +203,12 @@ export function ReportIssueForm() {
         }
 
     } catch (error) {
-        // Handle cases where the initial submission fails
         toast({
             variant: "destructive",
             title: "Submission Failed",
             description: "There was an error submitting your report. Please try again."
         });
     } finally {
-        // Stop the loading indicator immediately
         setIsSubmitting(false);
     }
   }
@@ -263,6 +228,7 @@ export function ReportIssueForm() {
                 name="media"
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel>{t('media_label')}</FormLabel>
                     <FormControl>
                       <div className="space-y-4 text-center">
                         <Card className="p-2 border-dashed hover:border-primary transition-colors aspect-video flex justify-center items-center">
@@ -318,7 +284,6 @@ export function ReportIssueForm() {
                             ref={fileInputRef}
                             onChange={handleMediaChange}
                         />
-
                       </div>
                     </FormControl>
                       {hasCameraPermission === false && !mediaPreview && (
@@ -336,6 +301,23 @@ export function ReportIssueForm() {
                 
                 <FormField
                     control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="flex items-center gap-2">
+                                {t('title_label')}
+                            </FormLabel>
+                            <FormControl>
+                                <Input placeholder={t('title_placeholder')} {...field} />
+                            </FormControl>
+                            <FormDescription>{t('title_description')}</FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
                     name="description"
                     render={({ field }) => (
                         <FormItem>
@@ -351,20 +333,49 @@ export function ReportIssueForm() {
                         </FormItem>
                     )}
                 />
-
+                
                 <FormField
                     control={form.control}
-                    name="title"
+                    name="category"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="flex items-center gap-2">
-                                {t('title_label')}
-                            </FormLabel>
+                        <FormLabel>{t('category')}</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                                <Input placeholder={t('title_placeholder')} {...field} />
+                            <SelectTrigger>
+                                <SelectValue placeholder={t('select_category_placeholder')} />
+                            </SelectTrigger>
                             </FormControl>
-                            <FormDescription>{t('title_description')}</FormDescription>
-                            <FormMessage />
+                            <SelectContent>
+                            {issueTypes.map(type => (
+                                <SelectItem key={type} value={type}>{type}</SelectItem>
+                            ))}
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                
+                <FormField
+                    control={form.control}
+                    name="priority"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>{t('priority')}</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder={t('select_priority_placeholder')} />
+                            </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                            {priorities.map(p => (
+                                <SelectItem key={p} value={p}>{t(p.toLowerCase() as any)}</SelectItem>
+                            ))}
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
                         </FormItem>
                     )}
                 />
