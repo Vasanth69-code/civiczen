@@ -10,8 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -20,22 +18,25 @@ import { Loader2 } from "lucide-react";
 export function LoginForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isCitizenLoading, setIsCitizenLoading] = useState(false);
+  const [isAdminLoading, setIsAdminLoading] = useState(false);
+
 
   const handleCitizenLogin = () => {
-    setIsLoading(true);
+    setIsCitizenLoading(true);
     // Simulate API call
     setTimeout(() => {
       router.push("/report");
-      setIsLoading(false);
+      setIsCitizenLoading(false);
     }, 1500);
   };
 
   const handleAdminLogin = () => {
-    setIsLoading(true);
+    setIsAdminLoading(true);
     // Simulate API call
     setTimeout(() => {
       router.push("/admin/dashboard");
-      setIsLoading(false);
+      setIsAdminLoading(false);
     }, 1500);
   };
 
@@ -50,24 +51,16 @@ export function LoginForm() {
           <CardHeader>
             <CardTitle>Citizen Portal</CardTitle>
             <CardDescription>
-              Sign in with your phone number to report issues and track their status.
+              This is a simulated login for demonstration purposes.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="citizen-phone">Phone Number</Label>
-              <Input
-                id="citizen-phone"
-                type="tel"
-                placeholder="+1 (555) 000-0000"
-              />
-            </div>
-            {/* We can add OTP field later */}
+             <p className="text-sm text-muted-foreground">Click the button below to proceed as a demo citizen user.</p>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" onClick={handleCitizenLogin} disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Send OTP & Login
+            <Button className="w-full" onClick={handleCitizenLogin} disabled={isCitizenLoading}>
+              {isCitizenLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Login as Demo Citizen
             </Button>
           </CardFooter>
         </Card>
@@ -77,24 +70,16 @@ export function LoginForm() {
           <CardHeader>
             <CardTitle>Department & Admin Portal</CardTitle>
             <CardDescription>
-              Official use only. Sign in to manage and resolve reported issues.
+              This is a simulated login for demonstration purposes.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="admin-phone">Phone Number</Label>
-              <Input
-                id="admin-phone"
-                type="tel"
-                placeholder="+1 (555) 000-0000"
-              />
-            </div>
-             {/* We can add OTP field later */}
+            <p className="text-sm text-muted-foreground">Click the button below to proceed as a demo admin user.</p>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" onClick={handleAdminLogin} disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Send OTP & Login
+            <Button className="w-full" onClick={handleAdminLogin} disabled={isAdminLoading}>
+              {isAdminLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Login as Demo Admin
             </Button>
           </CardFooter>
         </Card>
