@@ -18,10 +18,26 @@ interface Message {
   sender: 'user' | 'bot';
 }
 
+const initialMessages: Message[] = [
+  {
+    sender: 'bot',
+    text: "Welcome to the CityZen community chat! I'm the CityZen Assistant, powered by Gemini. How can I help you be a better citizen today?",
+  },
+  {
+    sender: 'user',
+    text: "How do I get points on the leaderboard?",
+  },
+  {
+    sender: 'bot',
+    text: "Great question! You earn points for every issue you report. You can also complete the Daily Challenge on the 'Report an Issue' page for bonus points. The more you contribute, the higher you'll climb the leaderboard!",
+  },
+];
+
+
 export function ChatClient() {
   const { user } = useUser();
   const { t } = useLanguage();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
