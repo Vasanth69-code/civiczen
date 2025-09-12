@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,16 +48,12 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<any>(null);
   const [isDemoFlow, setIsDemoFlow] = useState(false);
+  const [otp, setOtp] = useState("");
   const { toast } = useToast();
 
   const phoneForm = useForm<z.infer<typeof phoneSchema>>({
     resolver: zodResolver(phoneSchema),
     defaultValues: { phoneNumber: "" },
-  });
-
-  const otpForm = useForm<z.infer<typeof otpSchema>>({
-    resolver: zodResolver(otpSchema),
-    defaultValues: { otp: "" },
   });
   
   useEffect(() => {
@@ -111,17 +107,27 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
     }
   };
 
-  const onOtpSubmit = async (values: z.infer<typeof otpSchema>) => {
+  const onOtpSubmit = async (e: FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     setError(null);
     
+    // Validate OTP
+    const otpValidation = otpSchema.safeParse({ otp });
+    if (!otpValidation.success) {
+      setError({ message: otpValidation.error.errors[0].message });
+      setLoading(false);
+      return;
+    }
+    
+    const submittedOtp = otpValidation.data.otp;
+
     if (isDemoFlow) {
-        if (values.otp === DEMO_OTP) {
+        if (submittedOtp === DEMO_OTP) {
             toast({ title: "Demo Login Successful!", description: "Redirecting..." });
             onLoginSuccess(userType);
         } else {
-            setError({ message: "Invalid demo OTP." });
-            otpForm.setError("otp", { type: "manual", message: "Invalid demo OTP. Please try again." });
+            setError({ message: "Invalid demo OTP. Please try again." });
             toast({ variant: "destructive", title: "Login Failed", description: "The demo OTP you entered was incorrect." });
         }
         setLoading(false);
@@ -130,7 +136,7 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
 
     if (!confirmationResult) return;
     try {
-      const credential = await confirmationResult.confirm(values.otp);
+      const credential = await confirmationResult.confirm(submittedOtp);
       if (credential.user) {
         toast({ title: "Login Successful!", description: "Redirecting..." });
         onLoginSuccess(userType);
@@ -138,7 +144,6 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
     } catch (err: any) {
       console.error("OTP confirmation error:", err);
       setError(err);
-      otpForm.setError("otp", { type: "manual", message: "Invalid OTP. Please try again." });
       toast({ variant: "destructive", title: "Login Failed", description: "The OTP you entered was incorrect." });
     } finally {
       setLoading(false);
@@ -149,8 +154,8 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
     setIsOtpSent(false);
     setIsDemoFlow(false);
     setError(null);
+    setOtp("");
     phoneForm.reset();
-    otpForm.reset();
   }
 
   if (!isOtpSent) {
@@ -186,36 +191,29 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
   }
 
   return (
-    <Form {...otpForm}>
-      <form onSubmit={otpForm.handleSubmit(onOtpSubmit)} className="space-y-4">
-        <FormField
-          control={otpForm.control}
-          name="otp"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Verification Code</FormLabel>
-              <FormControl>
-                <Input type="text" placeholder={isDemoFlow ? `Enter demo OTP: ${DEMO_OTP}` : "Enter 6-digit code"} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+    <form onSubmit={onOtpSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="otp">Verification Code</Label>
+        <Input
+          id="otp"
+          type="text"
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+          placeholder={isDemoFlow ? `Enter demo OTP: ${DEMO_OTP}` : "Enter 6-digit code"}
         />
         {error && (
-            <Alert variant="destructive">
-                <AlertTitle>Login Error</AlertTitle>
-                <AlertDescription>{error.message}</AlertDescription>
-            </Alert>
+          <p className="text-sm font-medium text-destructive">{error.message}</p>
         )}
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Verify & Login
-        </Button>
-         <Button variant="link" size="sm" className="w-full" onClick={resetLoginFlow}>
-            Use a different phone number
-        </Button>
-      </form>
-    </Form>
+      </div>
+
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        Verify & Login
+      </Button>
+       <Button variant="link" size="sm" className="w-full" onClick={resetLoginFlow}>
+          Use a different phone number
+      </Button>
+    </form>
   )
 
 }
@@ -278,3 +276,5 @@ declare global {
     grecaptcha: any;
   }
 }
+
+      
