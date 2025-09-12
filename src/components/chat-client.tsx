@@ -11,6 +11,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Loader2, Send, VenetianMask } from 'lucide-react';
 import { chat } from '@/ai/flows/chat-flow';
 import { ScrollArea } from './ui/scroll-area';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
   text: string;
@@ -23,6 +24,7 @@ export function ChatClient() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleSend = async () => {
     if (input.trim() === '') return;
@@ -40,11 +42,11 @@ export function ChatClient() {
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error('Error getting response from AI:', error);
-      const errorMessage: Message = {
-        text: 'Sorry, I encountered an error. Please try again.',
-        sender: 'bot',
-      };
-      setMessages(prev => [...prev, errorMessage]);
+       toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to get a response from the assistant. Please try again later.',
+      });
     } finally {
       setIsLoading(false);
     }
