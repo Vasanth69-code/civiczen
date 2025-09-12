@@ -6,10 +6,7 @@ import { TrendingUp, CheckCircle2, AlertTriangle, Clock, Building } from "lucide
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useIssues } from "@/context/issue-context";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-import { useMemo, useEffect } from "react";
-import { Skeleton } from "./ui/skeleton";
-import { IssueClusterMap } from "./issue-cluster-map";
+import { useMemo } from "react";
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
@@ -92,16 +89,6 @@ export function AnalyticsDashboard() {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-            <CardTitle className="font-headline">Issue Hotspots</CardTitle>
-            <CardDescription>A map of where issues are being reported across the city.</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <IssueClusterMap issues={issues} />
-        </CardContent>
-      </Card>
-
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
             <CardHeader>
@@ -178,5 +165,3 @@ export function AnalyticsDashboard() {
     </div>
   );
 }
-
-    
