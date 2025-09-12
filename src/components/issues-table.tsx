@@ -11,7 +11,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Issue } from "@/lib/types";
-import { ArrowUp, MoreHorizontal, Share } from "lucide-react";
+import { ArrowUp, MoreHorizontal, Share, ArrowDown } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -23,6 +23,7 @@ import { useLanguage } from "@/context/language-context";
 import { TranslationKey } from "@/lib/translations";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import React, { useState } from "react";
 
 type IssuesTableProps = {
   issues: Issue[];
@@ -35,6 +36,62 @@ const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } 
   Pending: "secondary",
   Rejected: "destructive",
 };
+
+const IssueRow = ({ issue, onShare }: { issue: Issue, onShare: (id: string) => void }) => {
+    const [votes, setVotes] = useState(Math.floor(Math.random() * 200));
+    const { t } = useLanguage();
+
+    return (
+        <TableRow>
+        <TableCell className="font-medium">
+          <div className="flex flex-col">
+            <Link href={`/issues/${issue.id}`} className="hover:underline">
+              {issue.title}
+            </Link>
+            <span className="text-sm text-muted-foreground md:hidden">{issue.department}</span>
+          </div>
+        </TableCell>
+        <TableCell className="hidden md:table-cell">{issue.department}</TableCell>
+        <TableCell className="hidden sm:table-cell">
+          <Badge variant={issue.priority === "High" ? "destructive" : "outline"}>
+            {t(issue.priority.toLowerCase() as TranslationKey)}
+          </Badge>
+        </TableCell>
+        <TableCell>
+          <Badge variant={statusVariant[issue.status] || "secondary"}>
+            {t(issue.status.replace(" ", "_").toLowerCase() as TranslationKey)}
+          </Badge>
+        </TableCell>
+        <TableCell className="text-right flex items-center justify-end gap-2">
+            <div className="flex items-center gap-1 rounded-md border bg-background p-0.5">
+                <Button variant="ghost" size="icon" className="size-7" onClick={() => setVotes(v => v + 1)}>
+                    <ArrowUp className="h-4 w-4" />
+                </Button>
+                <span className="font-medium text-sm tabular-nums min-w-[20px] text-center">{votes}</span>
+                <Button variant="ghost" size="icon" className="size-7" onClick={() => setVotes(v => v - 1)}>
+                    <ArrowDown className="h-4 w-4" />
+                </Button>
+            </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href={`/issues/${issue.id}`}>{t('view_details')}</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onShare(issue.id)}>
+                <Share className="mr-2 h-4 w-4" />
+                {t('share')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TableCell>
+      </TableRow>
+    )
+}
 
 export function IssuesTable({ issues, title }: IssuesTableProps) {
   const { t } = useLanguage();
@@ -75,49 +132,7 @@ export function IssuesTable({ issues, title }: IssuesTableProps) {
           </TableHeader>
           <TableBody>
             {issues.map((issue) => (
-              <TableRow key={issue.id}>
-                <TableCell className="font-medium">
-                  <div className="flex flex-col">
-                    <Link href={`/issues/${issue.id}`} className="hover:underline">
-                      {issue.title}
-                    </Link>
-                    <span className="text-sm text-muted-foreground md:hidden">{issue.department}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">{issue.department}</TableCell>
-                <TableCell className="hidden sm:table-cell">
-                  <Badge variant={issue.priority === "High" ? "destructive" : "outline"}>
-                    {t(issue.priority.toLowerCase() as TranslationKey)}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={statusVariant[issue.status] || "secondary"}>
-                    {t(issue.status.replace(" ", "_").toLowerCase() as TranslationKey)}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right flex items-center justify-end gap-2">
-                  <Button variant="outline" size="sm" className="flex items-center gap-1">
-                    <ArrowUp className="h-4 w-4" />
-                    <span>{Math.floor(Math.random() * 200)}</span>
-                  </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/issues/${issue.id}`}>{t('view_details')}</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleShare(issue.id)}>
-                        <Share className="mr-2 h-4 w-4" />
-                        {t('share')}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
+              <IssueRow key={issue.id} issue={issue} onShare={handleShare} />
             ))}
           </TableBody>
         </Table>

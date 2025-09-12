@@ -6,10 +6,11 @@ import { Badge } from "./ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Image from "next/image";
 import { Button } from "./ui/button";
-import { ArrowUp, Calendar, MapPin, Share } from "lucide-react";
+import { ArrowUp, ArrowDown, Calendar, MapPin, Share } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { TranslationKey } from "@/lib/translations";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 type IssueDetailsProps = {
     issue: Issue;
@@ -25,6 +26,7 @@ const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } 
 export function IssueDetails({ issue }: IssueDetailsProps) {
     const { t } = useLanguage();
     const { toast } = useToast();
+    const [votes, setVotes] = useState(Math.floor(Math.random() * 200));
 
     const handleShare = () => {
         const url = window.location.href;
@@ -109,10 +111,15 @@ export function IssueDetails({ issue }: IssueDetailsProps) {
                     </div>
                 </CardContent>
                 <CardFooter className="flex justify-end gap-2">
-                    <Button variant="outline" className="flex items-center gap-1">
-                        <ArrowUp className="h-4 w-4" />
-                        <span>{t('upvote')} ({Math.floor(Math.random() * 200)})</span>
-                    </Button>
+                    <div className="flex items-center gap-1 rounded-md border bg-background">
+                        <Button variant="ghost" size="icon" onClick={() => setVotes(v => v + 1)}>
+                            <ArrowUp className="h-4 w-4" />
+                        </Button>
+                        <span className="font-medium text-sm tabular-nums">{votes}</span>
+                        <Button variant="ghost" size="icon" onClick={() => setVotes(v => v - 1)}>
+                            <ArrowDown className="h-4 w-4" />
+                        </Button>
+                    </div>
                     <Button onClick={handleShare}>
                         <Share className="mr-2 h-4 w-4" />
                         {t('share')}
