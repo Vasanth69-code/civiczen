@@ -71,7 +71,7 @@ export function LoginForm() {
             </Button>
           </CardFooter>
         </Card>
-      </TapsContent>
+      </TabsContent>
       <TabsContent value="department">
         <Card>
           <CardHeader>
@@ -102,5 +102,3 @@ export function LoginForm() {
     </Tabs>
   );
 }
-
-    
