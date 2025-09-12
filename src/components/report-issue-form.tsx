@@ -173,6 +173,38 @@ export function ReportIssueForm() {
     }
   };
 
+  const processAIInBackground = async (newIssueId: string, values: z.infer<typeof formSchema>) => {
+    if (!mediaPreview || !geolocation) return;
+    
+    try {
+        const routingResult = await autoRouteIssueReport({
+            photoDataUri: mediaPreview,
+            description: values.description,
+            location: `${geolocation.latitude}, ${geolocation.longitude}`
+        });
+
+        // Update the issue in firestore with the AI results
+        updateIssue(newIssueId, {
+            category: routingResult.issueType,
+            priority: routingResult.priority,
+            department: routingResult.department,
+        });
+
+        toast({
+            title: "Report Analysis Complete",
+            description: `Issue #${newIssueId} has been routed to ${routingResult.department}.`,
+        });
+
+    } catch (error) {
+        console.error("Background Submission Error:", error);
+        toast({
+            variant: 'destructive',
+            title: "AI Routing Failed",
+            description: `Could not automatically route issue #${newIssueId}. It will be manually reviewed.`,
+        })
+    }
+  }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!geolocation) {
       toast({ variant: "destructive", title: t('location_required'), description: t('location_required_description') });
@@ -214,38 +246,13 @@ export function ReportIssueForm() {
         description: `${t('tracking_id')}: #${newIssueId}`,
     });
 
+    // Reset form immediately for a better user experience
     form.reset();
     setMediaPreview(null);
     setMediaType(null);
 
     // AI processing in the background
-    try {
-        const routingResult = await autoRouteIssueReport({
-            photoDataUri: mediaPreview,
-            description: values.description,
-            location: `${geolocation.latitude}, ${geolocation.longitude}`
-        });
-
-        // Update the issue in firestore with the AI results
-        updateIssue(newIssueId, {
-            category: routingResult.issueType,
-            priority: routingResult.priority,
-            department: routingResult.department,
-        });
-
-        toast({
-            title: "Report Analysis Complete",
-            description: `Issue #${newIssueId} has been routed to ${routingResult.department}.`,
-        });
-
-    } catch (error) {
-        console.error("Background Submission Error:", error);
-        toast({
-            variant: 'destructive',
-            title: "AI Routing Failed",
-            description: `Could not automatically route issue #${newIssueId}. It will be manually reviewed.`,
-        })
-    }
+    processAIInBackground(newIssueId, values);
   }
 
   return (
@@ -415,3 +422,5 @@ export function ReportIssueForm() {
     </Card>
   );
 }
+
+    
