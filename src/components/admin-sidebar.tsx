@@ -25,18 +25,19 @@ import {
   SidebarGroupLabel
 } from "@/components/ui/sidebar";
 import { useLanguage } from "@/context/language-context";
-import { mockIssues } from "@/lib/placeholder-data";
+import { useIssues } from "@/context/issue-context";
 
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const { t } = useLanguage();
+  const { issues } = useIssues();
 
   const isActive = (path: string) => {
     return pathname.startsWith(path);
   };
 
-  const departments = [...new Set(mockIssues.map(issue => issue.department))];
+  const departments = [...new Set(issues.map(issue => issue.department))];
 
   return (
     <Sidebar>

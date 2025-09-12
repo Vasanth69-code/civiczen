@@ -5,12 +5,13 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { Header } from "@/components/header";
 import { IssuesTable } from "@/components/issues-table";
 import { SidebarInset } from "@/components/ui/sidebar";
-import { mockIssues } from "@/lib/placeholder-data";
+import { useIssues } from "@/context/issue-context";
 import { useUser } from "@/context/user-context";
 
 export default function IssuesPage() {
   const { user } = useUser();
-  const userIssues = mockIssues.filter(issue => issue.reporter.id === user.id);
+  const { issues } = useIssues();
+  const userIssues = issues.filter(issue => issue.reporter.id === user.id);
 
   return (
     <>

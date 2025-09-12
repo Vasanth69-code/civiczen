@@ -4,21 +4,22 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { TrendingUp, CheckCircle2, AlertTriangle, Clock, Building } from "lucide-react";
 import { IssuesTable } from "./issues-table";
-import { mockIssues } from "@/lib/placeholder-data";
 import { useLanguage } from "@/context/language-context";
 import { TranslationKey } from "@/lib/translations";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Link from "next/link";
+import { useIssues } from "@/context/issue-context";
 
 
 export function AdminDashboard() {
   const { t } = useLanguage();
-  const totalReports = mockIssues.length;
-  const resolvedReports = mockIssues.filter(i => i.status === 'Resolved').length;
-  const pendingReports = mockIssues.filter(i => i.status === 'Pending').length;
-  const inProgressReports = mockIssues.filter(i => i.status === 'In Progress').length;
+  const { issues } = useIssues();
+  const totalReports = issues.length;
+  const resolvedReports = issues.filter(i => i.status === 'Resolved').length;
+  const pendingReports = issues.filter(i => i.status === 'Pending').length;
+  const inProgressReports = issues.filter(i => i.status === 'In Progress').length;
 
-  const issuesByDept = mockIssues.reduce((acc, issue) => {
+  const issuesByDept = issues.reduce((acc, issue) => {
     acc[issue.department] = (acc[issue.department] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -105,7 +106,7 @@ export function AdminDashboard() {
             </CardContent>
         </Card>
          <div className="md:col-span-2">
-            <IssuesTable issues={mockIssues} title={t("Issue Reports" as TranslationKey)}/>
+            <IssuesTable issues={issues} title={t("Issue Reports" as TranslationKey)}/>
         </div>
       </div>
     </div>

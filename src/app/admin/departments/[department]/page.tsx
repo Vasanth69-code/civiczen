@@ -1,15 +1,24 @@
 
+"use client";
+
 import { Header } from "@/components/header";
 import { IssuesTable } from "@/components/issues-table";
-import { mockIssues } from "@/lib/placeholder-data";
-import { notFound } from "next/navigation";
+import { useIssues } from "@/context/issue-context";
+import { notFound, useParams } from "next/navigation";
 
-export default function DepartmentIssuesPage({ params }: { params: { department: string } }) {
-  const departmentName = decodeURIComponent(params.department);
-  const departmentIssues = mockIssues.filter(
+export default function DepartmentIssuesPage() {
+  const params = useParams();
+  const { issues } = useIssues();
+  
+  // The param can be an array of strings, so we handle that case.
+  const departmentParam = Array.isArray(params.department) ? params.department[0] : params.department;
+  const departmentName = decodeURIComponent(departmentParam);
+
+  const departmentIssues = issues.filter(
     (issue) => issue.department === departmentName
   );
 
+  // We keep the notFound logic, but it's less likely to be hit with dynamic departments.
   if (departmentIssues.length === 0) {
     // Or you could show a "No issues for this department" message
     // notFound();
@@ -25,13 +34,4 @@ export default function DepartmentIssuesPage({ params }: { params: { department:
       </main>
     </>
   );
-}
-
-// Optional: Generate static paths for better performance
-export async function generateStaticParams() {
-  const departments = [...new Set(mockIssues.map(issue => issue.department))];
-
-  return departments.map(department => ({
-    department: encodeURIComponent(department),
-  }));
 }

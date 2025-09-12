@@ -3,6 +3,7 @@ import './globals.css';
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { LanguageProvider } from "@/context/language-context";
 import { UserProvider } from "@/context/user-context";
+import { IssueProvider } from "@/context/issue-context";
 
 export default function RootLayout({
   children,
@@ -19,9 +20,11 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <LanguageProvider>
           <UserProvider>
-            <SidebarProvider>
-                {children}
-            </SidebarProvider>
+            <IssueProvider>
+              <SidebarProvider>
+                  {children}
+              </SidebarProvider>
+            </IssueProvider>
           </UserProvider>
         </LanguageProvider>
         <Toaster />

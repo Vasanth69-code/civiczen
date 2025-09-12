@@ -1,17 +1,26 @@
 
 "use client";
 
-import { Issue } from "@/lib/types";
+import { Issue, IssueStatus } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Image from "next/image";
 import { Button } from "./ui/button";
-import { ArrowUp, ArrowDown, Calendar, MapPin, Share } from "lucide-react";
+import { ArrowUp, ArrowDown, Calendar, MapPin, Share, ChevronDown } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { TranslationKey } from "@/lib/translations";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { useIssues } from "@/context/issue-context";
+import { usePathname } from "next/navigation";
+
 
 type IssueDetailsProps = {
     issue: Issue;
@@ -24,11 +33,19 @@ const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } 
   Rejected: "destructive",
 };
 
-export function IssueDetails({ issue }: IssueDetailsProps) {
+const availableStatuses: IssueStatus[] = ["Pending", "In Progress", "Resolved", "Rejected"];
+
+export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
     const { t } = useLanguage();
     const { toast } = useToast();
     const [votes, setVotes] = useState(0);
     const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
+    const { issues, updateIssueStatus } = useIssues();
+    const pathname = usePathname();
+    const isAdmin = pathname.startsWith('/admin');
+
+    // This ensures we have the latest issue state from the context
+    const issue = issues.find(i => i.id === initialIssue.id) || initialIssue;
 
     const handleShare = () => {
         const url = window.location.href;
@@ -79,6 +96,14 @@ export function IssueDetails({ issue }: IssueDetailsProps) {
         }
       };
 
+    const handleStatusChange = (newStatus: IssueStatus) => {
+        updateIssueStatus(issue.id, newStatus);
+        toast({
+            title: "Status Updated",
+            description: `Issue "${issue.title}" is now ${newStatus}.`,
+        });
+    };
+
     return (
         <div className="max-w-4xl mx-auto space-y-6">
             <Card>
@@ -108,9 +133,29 @@ export function IssueDetails({ issue }: IssueDetailsProps) {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
                             <p className="font-medium text-muted-foreground">{t('status')}</p>
-                            <Badge variant={statusVariant[issue.status] || "secondary"}>
-                                {t(issue.status.replace(" ", "_").toLowerCase() as TranslationKey)}
-                            </Badge>
+                            {isAdmin ? (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" className="flex items-center gap-2">
+                                             <Badge variant={statusVariant[issue.status] || "secondary"}>
+                                                {t(issue.status.replace(" ", "_").toLowerCase() as TranslationKey)}
+                                            </Badge>
+                                            <ChevronDown className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        {availableStatuses.map(status => (
+                                            <DropdownMenuItem key={status} onSelect={() => handleStatusChange(status)}>
+                                                {t(status.replace(" ", "_").toLowerCase() as TranslationKey)}
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            ) : (
+                                <Badge variant={statusVariant[issue.status] || "secondary"}>
+                                    {t(issue.status.replace(" ", "_").toLowerCase() as TranslationKey)}
+                                </Badge>
+                            )}
                         </div>
                         <div>
                             <p className="font-medium text-muted-foreground">{t('priority')}</p>

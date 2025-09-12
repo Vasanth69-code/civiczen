@@ -1,9 +1,11 @@
 
+export type IssueStatus = 'Pending' | 'In Progress' | 'Resolved' | 'Rejected';
+
 export type Issue = {
   id: string;
   title: string;
   description: string;
-  status: 'Pending' | 'In Progress' | 'Resolved' | 'Rejected';
+  status: IssueStatus;
   category: string;
   priority: 'Low' | 'Medium' | 'High';
   department: string;
