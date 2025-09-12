@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -6,6 +7,7 @@ import {
   VenetianMask,
   Users,
   Settings,
+  Building,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -19,8 +21,11 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarGroup,
+  SidebarSeparator,
+  SidebarGroupLabel
 } from "@/components/ui/sidebar";
 import { useLanguage } from "@/context/language-context";
+import { mockIssues } from "@/lib/placeholder-data";
 
 
 export function AdminSidebar() {
@@ -30,6 +35,8 @@ export function AdminSidebar() {
   const isActive = (path: string) => {
     return pathname.startsWith(path);
   };
+
+  const departments = [...new Set(mockIssues.map(issue => issue.department))];
 
   return (
     <Sidebar>
@@ -78,6 +85,27 @@ export function AdminSidebar() {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+        <SidebarSeparator />
+        <SidebarGroup>
+          <SidebarGroupLabel>{t('departments')}</SidebarGroupLabel>
+          <SidebarMenu>
+            {departments.map(dept => (
+              <SidebarMenuItem key={dept}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={isActive(`/admin/departments/${encodeURIComponent(dept)}`)}
+                  tooltip={{ children: dept }}
+                  size="sm"
+                >
+                  <Link href={`/admin/departments/${encodeURIComponent(dept)}`}>
+                    <Building />
+                    <span>{dept}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>

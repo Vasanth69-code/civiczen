@@ -1,4 +1,5 @@
 
+
 export const languages = {
   en: {
     name: 'English',
@@ -70,6 +71,7 @@ export const languages = {
       "Report an Issue": "Report an Issue",
       title: "Title",
       department: "Department",
+      departments: "Departments",
       status: "Status",
       actions: "Actions",
       view_details: "View Details",
@@ -112,6 +114,8 @@ export const languages = {
       save_changes: "Save Changes",
       profile_updated_successfully: "Profile Updated!",
       profile_updated_description: "Your changes have been saved successfully.",
+      issues_by_department: "Issues by Department",
+      issues_by_department_description: "A breakdown of all reported issues by the assigned department.",
     },
   },
   hi: {
@@ -184,6 +188,7 @@ export const languages = {
       "Report an Issue": "समस्या की रिपोर्ट करें",
       title: "शीर्षक",
       department: "विभाग",
+      departments: "विभाग",
       status: "status",
       actions: "कार्रवाई",
       view_details: "विवरण देखें",
@@ -226,6 +231,8 @@ export const languages = {
       save_changes: "बदलाव सहेजें",
       profile_updated_successfully: "प्रोफ़ाइल अपडेट!",
       profile_updated_description: "आपके बदलाव सफलतापूर्वक सहेज लिए गए हैं।",
+      issues_by_department: "विभाग द्वारा मुद्दे",
+      issues_by_department_description: "सौंपे गए विभाग द्वारा सभी रिपोर्ट किए गए मुद्दों का एक ब्रेकडाउन।",
     },
   },
   bn: {
@@ -298,6 +305,7 @@ export const languages = {
       "Report an Issue": "সমস্যার रिपोर्ट করুন",
       title: "শিরোনাম",
       department: "বিভাগ",
+      departments: "বিভাগ",
       status: "অবস্থা",
       actions: "פעולות",
       view_details: "ವಿವರಗಳು দেখুন",
@@ -340,6 +348,8 @@ export const languages = {
       save_changes: "পরিবর্তনগুলি সংরক্ষণ করুন",
       profile_updated_successfully: "প্রোফাইল আপডেট হয়েছে!",
       profile_updated_description: "আপনার পরিবর্তনগুলি সফলভাবে সংরক্ষণ করা হয়েছে।",
+      issues_by_department: "বিভাগ দ্বারা সমস্যা",
+      issues_by_department_description: "বরাদ্দ বিভাগ দ্বারা সমস্ত রিপোর্ট করা সমস্যার একটি ব্রেকডাউন।",
     }
   },
   te: {
@@ -412,6 +422,7 @@ export const languages = {
       "Report an Issue": "సమస్యను నివేదించండి",
       title: "శీర్షిక",
       department: "విభాగం",
+      departments: "విభాగాలు",
       status: "స్థితి",
       actions: "చర్యలు",
       view_details: "వివరాలను చూడండి",
@@ -454,6 +465,8 @@ export const languages = {
       save_changes: "మార్పులను సేవ్ చేయండి",
       profile_updated_successfully: "ప్రొఫైల్ అప్‌డేట్ చేయబడింది!",
       profile_updated_description: "మీ మార్పులు విజయవంతంగా సేవ్ చేయబడ్డాయి.",
+      issues_by_department: "విభాగం వారిగా సమస్యలు",
+      issues_by_department_description: "కేటాయించిన విభాగం వారిగా నివేదించబడిన అన్ని సమస్యల విచ్ఛిన్నం.",
     }
   },
   mr: {
@@ -526,6 +539,7 @@ export const languages = {
       "Report an Issue": "समस्येची तक्रार करा",
       title: "शीर्षक",
       department: "विभाग",
+      departments: "विभाग",
       status: "स्थिती",
       actions: "क्रिया",
       view_details: "तपशील पहा",
@@ -568,6 +582,8 @@ export const languages = {
       save_changes: "बदल जतन करा",
       profile_updated_successfully: "प्रोफाइल अपडेट झाले!",
       profile_updated_description: "तुमचे बदल यशस्वीरित्या जतन केले आहेत.",
+      issues_by_department: "विभागानुसार समस्या",
+      issues_by_department_description: "नेमलेल्या विभागानुसार सर्व नोंदवलेल्या समस्यांचे विघटन.",
     }
   },
   ta: {
@@ -640,6 +656,7 @@ export const languages = {
       "Report an Issue": "சிக்கலைப் புகாரளி",
       title: "தலைப்பு",
       department: "துறை",
+      departments: "துறைகள்",
       status: "நிலை",
       actions: "செயல்கள்",
       view_details: "விவரங்களைக் காண்க",
@@ -682,6 +699,8 @@ export const languages = {
       save_changes: "மாற்றங்களைச் சேமி",
       profile_updated_successfully: "சுயவிவரம் புதுப்பிக்கப்பட்டது!",
       profile_updated_description: "உங்கள் மாற்றங்கள் வெற்றிகரமாக சேமிக்கப்பட்டன.",
+      issues_by_department: "துறை வாரியாக சிக்கல்கள்",
+      issues_by_department_description: "ஒதுக்கப்பட்ட துறை வாரியாக அறிவிக்கப்பட்ட அனைத்து சிக்கல்களின் முறிவு.",
     }
   },
   gu: {
@@ -754,6 +773,7 @@ export const languages = {
       "Report an Issue": 'સમસ્યાની જાણ કરો',
       title: "शीर्षक",
       department: "વિભાગ",
+      departments: "વિભાગો",
       status: "સ્થિતિ",
       actions: "ક્રિયાઓ",
       view_details: "વિગતો જુઓ",
@@ -796,6 +816,8 @@ export const languages = {
       save_changes: "ફેરફારો સાચવો",
       profile_updated_successfully: "પ્રોફાઇલ અપડેટ થયું!",
       profile_updated_description: "તમારા ફેરફારો સફળતાપૂર્વક સાચવવામાં આવ્યા છે.",
+      issues_by_department: "વિભાગ દ્વારા સમસ્યાઓ",
+      issues_by_department_description: "સોંપાયેલ વિભાગ દ્વારા તમામ નોંધાયેલ સમસ્યાઓનું વિરામ.",
     }
   },
   ur: {
@@ -819,15 +841,15 @@ export const languages = {
       description_label: 'تفصیل*',
       description_placeholder: 'مسئلے کو تفصیل سے بیان کریں۔ यह क्या है؟ यह कहाँ है؟ यह ایک مسئلہ کیوں ہے؟',
       ai_analysis: 'AI تجزیہ',
-      analyzing_image: 'تصویر کا تجزیہ کیا जा रहा ہے...',
+      analyzing_image: 'تصویر کا تجزیہ کیا जा रहा है...',
       suggested_category: 'تجویز کردہ زمرہ',
       assigned_department: 'تفویض کردہ محکمہ',
       recommended_priority: 'تجویز کردہ ترجیح',
       incorrect: 'गलत',
       looks_good: 'اچھا لگ रहा है',
-      ai_analysis_description: 'ہمارے AI نے آپ کی رپورٹ کا تجزیہ کیا ہے۔ अगर यह غلط लगता है, तो آپ सुझाव کو खारिज कर سکتے ہیں۔',
+      ai_analysis_description: 'ہمارے AI نے آپ کی رپورٹ کا تجزیہ کیا ہے۔ अगर यह غلط لگتا ہے, तो آپ सुझाव کو खारिज कर सकते ہیں۔',
       title_label: 'عنوان*',
-      title_placeholder: 'مثال کے तौर پر، ایلم اسٹریٹ پر بڑا گڑھا',
+      title_placeholder: 'مثال کے तौर पर، ایلم اسٹریٹ پر بڑا گڑھا',
       title_description: 'مسئلے کے لیے ایک مختصر، واضح عنوان۔ हम आपके विवरण के आधार पर एक सुझाव दे सकते ہیں۔',
       location_label: 'مقام*',
       getting_location: 'آپ کا مقام حاصل کیا जा रहा ہے...',
@@ -868,6 +890,7 @@ export const languages = {
       "Report an Issue": 'مسئلے کی اطلاع دیں',
       title: "عنوان",
       department: "محکمہ",
+      departments: "محکمے",
       status: "حیثیت",
       actions: "کارروائیاں",
       view_details: "تفصیلات دیکھیں",
@@ -910,6 +933,8 @@ export const languages = {
       save_changes: "تبدیلیاں محفوظ کریں",
       profile_updated_successfully: "پروفائل اپ ڈیٹ ہو گیا!",
       profile_updated_description: "آپ کی تبدیلیاں کامیابی سے محفوظ ہو گئی ہیں۔",
+      issues_by_department: "محکمہ کے لحاظ سے مسائل",
+      issues_by_department_description: "تفویض کردہ محکمہ کے ذریعہ تمام رپورٹ کردہ مسائل کا ایک خرابی۔",
     }
   },
   kn: {
@@ -917,7 +942,7 @@ export const languages = {
     dictionary: {
       report_an_issue: 'ಸಮస్యೆಯನ್ನು ವರದಿ ಮಾಡಿ',
       my_submitted_issues: 'ನನ್ನ ಸಲ್ಲಿಸಿದ సమస్యಗಳು',
-      community_leaderboard: 'ಸಮುದಾಯದ ಲീഡರ್‌ಬೋರ್ಡ್',
+      community_leaderboard: 'ಸಮುದಾಯದ ಲೀഡರ್‌ಬೋರ್ಡ್',
       settings: 'सेटिंग्स',
       citizen: 'ನಾಗರಿಕ',
       administrator: 'ನಿರ್ವಾಹಕ',
@@ -982,6 +1007,7 @@ export const languages = {
       "Report an Issue": 'ಸಮస్యೆಯನ್ನು ವರದಿ ಮಾಡಿ',
       title: "ಶೀರ್ಷಿಕೆ",
       department: "ವಿಭಾಗ",
+      departments: "ವಿಭಾಗಗಳು",
       status: "స్థితి",
       actions: "פעולות",
       view_details: "విವರಗಳನ್ನು ನೋಡಿ",
@@ -1024,13 +1050,15 @@ export const languages = {
       save_changes: "ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಿ",
       profile_updated_successfully: "ಪ್ರೊಫೈಲ್ ನವೀಕರಿಸಲಾಗಿದೆ!",
       profile_updated_description: "ನಿಮ್ಮ ಬದಲಾವಣೆಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಉಳಿಸಲಾಗಿದೆ.",
+      issues_by_department: "ವಿಭಾಗದ ಪ್ರಕಾರ సమస్యలు",
+      issues_by_department_description: "ನಿಯೋಜಿತ ವಿಭಾಗದಿಂದ ಎಲ್ಲಾ ವರದಿ ಮಾಡಲಾದ ಸಮಸ್ಯೆಗಳ ವಿಭಜನೆ.",
     }
   },
   or: {
     name: 'ଓଡ଼ିଆ',
     dictionary: {
       report_an_issue: 'ସମସ୍ୟା ରିପୋର୍ଟ କରନ୍ତୁ',
-      my_submitted_issues: 'ਮੇਰੇ ଦ୍ୱାରା ଦାଖਲ କରାଯାଇଥିବା ସମସ୍ୟାଗୁଡ଼ିକ',
+      my_submitted_issues: 'ମେਰੇ ଦ୍ୱାରା ଦାଖਲ କରାଯାଇଥିବା ସମସ୍ୟାଗୁଡ଼ିକ',
       community_leaderboard: 'ସମ୍ପ୍ରଦାୟ ଲିଡର୍‌ବୋର୍ଡ',
       settings: 'ସେଟିଂସ୍',
       citizen: 'नागरिक',
@@ -1096,6 +1124,7 @@ export const languages = {
       "Report an Issue": 'ସମସ୍ୟା ରିପୋର୍ଟ କରନ୍ତୁ',
       title: "ଶୀर्षକ",
       department: "ବିଭାଗ",
+      departments: "ବିଭାଗ",
       status: "ସ୍ଥିତି",
       actions: "କାର୍ଯ୍ୟ",
       view_details: "ବିବରଣୀ ଦେଖନ୍ତୁ",
@@ -1138,6 +1167,8 @@ export const languages = {
       save_changes: "ପରିବର୍ତ୍ତନଗୁଡ଼ିକୁ ସଂରକ୍ଷଣ କରନ୍ତୁ",
       profile_updated_successfully: "ପ୍ରୋଫାଇଲ୍ ଅପଡେଟ୍ ହେଲା!",
       profile_updated_description: "ଆପଣଙ୍କ ପରିବର୍ତ୍ତନଗୁଡ଼ିକ ସଫଳତାର ସହିତ ସଂରକ୍ଷଣ କରାଯାଇଛି।",
+      issues_by_department: "ବିଭାଗ ଅନୁଯାୟୀ ସମସ୍ୟା",
+      issues_by_department_description: "ନ୍ୟସ୍ତ ବିଭାଗ ଦ୍ୱାରା ସମସ୍ତ ରିପୋର୍ଟ ହୋଇଥିବା ସମସ୍ୟାର ବିଭାజନ।",
     }
   },
   ml: {
@@ -1148,7 +1179,7 @@ export const languages = {
       community_leaderboard: 'കമ്മ്യൂണിറ്റി ലീഡർബോർഡ്',
       settings: 'ക്രമീകരണങ്ങൾ',
       citizen: 'പൗരൻ',
-      administrator: 'అഡ്മിനിസ്ട്രേറ്റർ',
+      administrator: 'అడ్മിനിസ്ട്രേറ്റർ',
       dashboard: 'ഡാഷ്ബോർഡ്',
       all_issue_reports: 'എല്ലാ പ്രശ്ന റിപ്പോർട്ടുകളും',
       users: 'ഉപയോക്താക്കൾ',
@@ -1200,7 +1231,7 @@ export const languages = {
       tracking_id: 'ട്രാക്കിംഗ് ഐഡി',
       sms_notification: 'ട്രാക്കിംഗ് വിവരങ്ങളുള്ള ഒരു SMS உங்கள் பதிவுசெய்த നമ്പറിലേക്ക് അയച്ചിട്ടുണ്ട്.',
       location_error: 'స్థല പിശക്',
-      location_error_fetching_description: 'നിങ്ങളുടെ സ്ഥാനം பெறാൻ കഴിഞ്ഞില്ല. നിങ്ങളുടെ బ్రౌസർ-നും ഈ సైറ്റിനും വേണ്ടിയുള്ള స్థାନ సేవలు പ്രവർത്തനക്ഷമമാക്കിയിട്ടുണ്ടെന്ന് ഉറപ്പാക്കുക.',
+      location_error_fetching_description: 'നിങ്ങളുടെ സ്ഥാനം பெறാൻ കഴിഞ്ഞില്ല. നിങ്ങളുടെ బ్రౌజర్-നും ഈ సైറ്റിനും വേണ്ടിയുള്ള స్థാന సేవలు പ്രവർത്തനക്ഷമമാക്കിയിട്ടുണ്ടെന്ന് ഉറപ്പാക്കുക.',
       language: 'ഭാഷ',
       toggle_notifications: ' അറിയിപ്പുകൾ ടോഗിൾ ചെയ്യുക',
       "Admin Dashboard": "അഡ്മിൻ ഡാഷ്ബോർഡ്",
@@ -1210,6 +1241,7 @@ export const languages = {
       "Report an Issue": 'പ്രശ്നം റിപ്പോർട്ട് ചെയ്യുക',
       title: "தலைക്കെട്ട്",
       department: "ഡിപ്പാർട്ട്മെന്റ്",
+      departments: "ഡിപ്പാർട്ട്മെന്റുകൾ",
       status: "நிலை",
       actions: "പ്രവർത്തനങ്ങൾ",
       view_details: "വിവരങ്ങൾ കാണുക",
@@ -1252,6 +1284,8 @@ export const languages = {
       save_changes: "മാറ്റങ്ങൾ സംരക്ഷിക്കുക",
       profile_updated_successfully: "പ്രൊഫൈൽ അപ്ഡേറ്റുചെയ്തു!",
       profile_updated_description: "നിങ്ങളുടെ മാറ്റങ്ങൾ വിജയകരമായി സംരക്ഷിച്ചു.",
+      issues_by_department: "ഡിപ്പാർട്ട്മെന്റ് പ്രകാരമുള്ള പ്രശ്നങ്ങൾ",
+      issues_by_department_description: "ഏൽപ്പിച്ച ഡിപ്പാർട്ട്മെന്റ് പ്രകാരമുള്ള എല്ലാ റിപ്പോർട്ട് ചെയ്ത പ്രശ്നങ്ങളുടെയും ഒരു വിഭജനം.",
     }
   },
   pa: {
@@ -1261,7 +1295,7 @@ export const languages = {
       my_submitted_issues: 'ਮੇਰੇ ਦੁਆਰਾ ਜਮ੍ਹਾਂ ਕਰਵਾਈਆਂ ਗਈਆਂ ਸਮੱਸਿਆਵਾਂ',
       community_leaderboard: 'ਭਾਈਚਾਰਕ ਲੀਡਰਬੋਰਡ',
       settings: 'ਸੈਟਿੰਗਾਂ',
-      citizen: 'ਨਾગરਿਕ',
+      citizen: 'ਨਾगरਿਕ',
       administrator: 'ਪ੍ਰਸ਼ਾਸਕ',
       dashboard: 'ਡੈਸ਼ਬੋਰਡ',
       all_issue_reports: 'ਸਾਰੀਆਂ ਸਮੱਸਿਆਵਾਂ ਦੀਆਂ ਰਿਪੋਰਟਾਂ',
@@ -1324,6 +1358,7 @@ export const languages = {
       "Report an Issue": 'ਸਮੱਸਿਆ ਦੀ ਰਿポート ਕਰੋ',
       title: "ਸਿਰਲੇਖ",
       department: "ਵਿਭਾଗ",
+      departments: "ਵਿਭਾਗ",
       status: "ਸਥਿਤੀ",
       actions: "ਕਾਰਵਾਈਆਂ",
       view_details: "ਵੇਰਵੇ ਵੇਖੋ",
@@ -1366,6 +1401,8 @@ export const languages = {
       save_changes: "ਤਬਦੀਲੀਆਂ ਸੰਭਾਲੋ",
       profile_updated_successfully: "ਪ੍ਰੋਫਾਈਲ ਅੱਪਡੇਟ ਹੋ ਗਿਆ!",
       profile_updated_description: "ਤੁਹਾਡੀਆਂ ਤਬਦੀਲੀਆਂ ਸਫਲਤਾਪੂਰਵਕ ਸੁਰੱਖਿਅਤ ਕੀਤੀਆਂ ਗਈਆਂ ਹਨ।",
+      issues_by_department: "ਵਿਭਾਗ ਅਨੁਸਾਰ ਸਮੱਸਿਆਵਾਂ",
+      issues_by_department_description: "ਨਿਯੁਕਤ ਵਿਭਾਗ ਦੁਆਰਾ ਸਾਰੀਆਂ ਰਿਪੋਰਟ ਕੀਤੀਆਂ ਸਮੱਸਿਆਵਾਂ ਦਾ ਇੱਕ ਵਿਭਾਜਨ।",
     }
   },
   as: {
@@ -1398,7 +1435,7 @@ export const languages = {
       ai_analysis_description: 'আমাৰ AIএ আপোনাৰ প্রতিবেদন বিশ্লেষণ কৰিছে। যদি এইটো ভুল যেন লাগে, আপুনি প্রস্তاवটো বাতিল কৰিব পাৰে।',
       title_label: 'शीर्षक*',
       title_placeholder: 'उदा., এলম ষ্ট্ৰীটত ডাঙৰ ખાડો',
-      title_description: 'সমस्याটোৰ বাবে এটা σύντομο, स्पष्ट शीर्षक। আমি আপোনাৰ விவரणৰ ওপৰত ভিত্তি কৰি এটা প্রস্তاव দিব পাৰোঁ।',
+      title_description: 'সমस्याটোৰ বাবে এটা σύντομο, स्पष्ट शीर्षक। আমি আপোনাৰ விவரणৰ ওপৰত ভিত্তি কৰি এটা প্রস্তاв দিব পাৰোঁ।',
       location_label: 'स्थान*',
       getting_location: 'আপোনাৰ स्थान प्राप्त কৰি আছে...',
       location_not_available: 'स्थान उपलब्ध নহয়',
@@ -1438,6 +1475,7 @@ export const languages = {
       "Report an Issue": 'সমস্যাৰ বিষয়ে প্রতিবেদন দিয়k',
       title: "शीर्षक",
       department: "വിഭാഗ",
+      departments: "বিভাগ",
       status: "स्थिति",
       actions: "פעולות",
       view_details: "বিవరবোৰ চাওক",
@@ -1480,6 +1518,8 @@ export const languages = {
       save_changes: "পৰিৱৰ্তন সংৰক্ষণ কৰক",
       profile_updated_successfully: "প্ৰফাইল আপডেট কৰা হ'ল!",
       profile_updated_description: "আপোনাৰ পৰিৱৰ্তনসমূহ সফলতাৰে সংৰক্ষণ কৰা হৈছে।",
+      issues_by_department: "বিভাগ অনুসৰি সমস্যা",
+      issues_by_department_description: "নিযুক্ত বিভাগ অনুসৰি সকলো প্রতিবেদন কৰা সমস্যাৰ বিভাজন।",
     }
   }
 };

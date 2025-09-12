@@ -1,12 +1,15 @@
 
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, CheckCircle2, AlertTriangle, Clock } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { TrendingUp, CheckCircle2, AlertTriangle, Clock, Building } from "lucide-react";
 import { IssuesTable } from "./issues-table";
 import { mockIssues } from "@/lib/placeholder-data";
 import { useLanguage } from "@/context/language-context";
 import { TranslationKey } from "@/lib/translations";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import Link from "next/link";
+
 
 export function AdminDashboard() {
   const { t } = useLanguage();
@@ -14,6 +17,14 @@ export function AdminDashboard() {
   const resolvedReports = mockIssues.filter(i => i.status === 'Resolved').length;
   const pendingReports = mockIssues.filter(i => i.status === 'Pending').length;
   const inProgressReports = mockIssues.filter(i => i.status === 'In Progress').length;
+
+  const issuesByDept = mockIssues.reduce((acc, issue) => {
+    acc[issue.department] = (acc[issue.department] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const deptData = Object.entries(issuesByDept).map(([name, issues]) => ({ name, issues }));
+
 
   return (
     <div className="space-y-6">
@@ -36,7 +47,7 @@ export function AdminDashboard() {
           <CardContent>
             <div className="text-2xl font-bold">{resolvedReports}</div>
             <p className="text-xs text-muted-foreground">
-                {Math.round((resolvedReports/totalReports) * 100)}% {t('resolution_rate')}
+                {totalReports > 0 ? Math.round((resolvedReports/totalReports) * 100) : 0}% {t('resolution_rate')}
             </p>
           </CardContent>
         </Card>
@@ -61,9 +72,43 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
-      <div>
-        <IssuesTable issues={mockIssues} title={t("Issue Reports" as TranslationKey)}/>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline flex items-center gap-2">
+                    <Building className="h-5 w-5" />
+                    <span>{t('issues_by_department')}</span>
+                </CardTitle>
+                <CardDescription>{t('issues_by_department_description')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={deptData} layout="vertical" margin={{ left: 20, right: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" />
+                        <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 12 }} />
+                        <Tooltip
+                            contentStyle={{
+                                background: "hsl(var(--background))",
+                                borderColor: "hsl(var(--border))",
+                            }}
+                        />
+                        <Bar dataKey="issues" fill="hsl(var(--primary))" barSize={20}>
+                            {deptData.map((entry) => (
+                                <Link key={`link-${entry.name}`} href={`/admin/departments/${encodeURIComponent(entry.name)}`}>
+                                </Link>
+                            ))}
+                        </Bar>
+                    </BarChart>
+                </ResponsiveContainer>
+            </CardContent>
+        </Card>
+         <div className="md:col-span-2">
+            <IssuesTable issues={mockIssues} title={t("Issue Reports" as TranslationKey)}/>
+        </div>
       </div>
     </div>
   );
 }
+
