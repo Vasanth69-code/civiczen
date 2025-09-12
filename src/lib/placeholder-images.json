@@ -1,76 +1,77 @@
+
 {
   "placeholderImages": [
     {
       "id": "user-1",
       "description": "User avatar 1",
-      "imageUrl": "https://picsum.photos/seed/user1/100/100",
-      "imageHint": "person face"
+      "imageUrl": "https://picsum.photos/seed/indianuser1/100/100",
+      "imageHint": "Indian man"
     },
     {
       "id": "user-2",
       "description": "User avatar 2",
-      "imageUrl": "https://picsum.photos/seed/user2/100/100",
-      "imageHint": "woman smiling"
+      "imageUrl": "https://picsum.photos/seed/indianuser2/100/100",
+      "imageHint": "Indian woman"
     },
     {
       "id": "user-3",
       "description": "User avatar 3",
-      "imageUrl": "https://picsum.photos/seed/user3/100/100",
-      "imageHint": "man portrait"
+      "imageUrl": "https://picsum.photos/seed/indianuser3/100/100",
+      "imageHint": "Indian man"
     },
     {
       "id": "user-4",
       "description": "User avatar 4",
-      "imageUrl": "https://picsum.photos/seed/user4/100/100",
-      "imageHint": "person glasses"
+      "imageUrl": "https://picsum.photos/seed/indianuser4/100/100",
+      "imageHint": "Indian woman"
     },
     {
       "id": "user-5",
       "description": "User avatar 5",
-      "imageUrl": "https://picsum.photos/seed/user5/100/100",
-      "imageHint": "woman portrait"
+      "imageUrl": "https://picsum.photos/seed/indianuser5/100/100",
+      "imageHint": "Indian woman"
     },
     {
       "id": "issue-pothole",
-      "description": "A pothole in a road",
-      "imageUrl": "https://picsum.photos/seed/pothole/600/400",
+      "description": "A pothole in a road in India",
+      "imageUrl": "https://picsum.photos/seed/indianpothole/600/400",
       "imageHint": "pothole road"
     },
     {
       "id": "issue-trash",
-      "description": "Overflowing trash can on a street",
-      "imageUrl": "https://picsum.photos/seed/trash/600/400",
+      "description": "Overflowing trash can on a street in India",
+      "imageUrl": "https://picsum.photos/seed/indiantrash/600/400",
       "imageHint": "trash can"
     },
     {
       "id": "issue-streetlight",
-      "description": "A broken streetlight",
-      "imageUrl": "https://picsum.photos/seed/streetlight/600/400",
+      "description": "A broken streetlight in India",
+      "imageUrl": "https://picsum.photos/seed/indianstreetlight/600/400",
       "imageHint": "streetlight broken"
     },
     {
       "id": "issue-graffiti",
-      "description": "Graffiti on a wall",
-      "imageUrl": "https://picsum.photos/seed/graffiti/600/400",
+      "description": "Graffiti on a wall in India",
+      "imageUrl": "https://picsum.photos/seed/indiangraffiti/600/400",
       "imageHint": "graffiti wall"
     },
     {
         "id": "home-hero",
-        "description": "A vibrant city street with happy people",
-        "imageUrl": "https://picsum.photos/seed/homehero/1280/720",
-        "imageHint": "city street"
+        "description": "A vibrant Indian city street with happy people",
+        "imageUrl": "https://picsum.photos/seed/indianhomehero/1280/720",
+        "imageHint": "Indian city"
     },
     {
         "id": "home-feature-1",
         "description": "Abstract representation of AI and data",
-        "imageUrl": "https://picsum.photos/seed/feature1/600/600",
+        "imageUrl": "https://picsum.photos/seed/indianfeature1/600/600",
         "imageHint": "abstract data"
     },
     {
         "id": "home-feature-2",
-        "description": "A diverse group of people collaborating",
-        "imageUrl": "https://picsum.photos/seed/feature2/600/600",
-        "imageHint": "community collaboration"
+        "description": "A diverse group of Indian people collaborating",
+        "imageUrl": "https://picsum.photos/seed/indianfeature2/600/600",
+        "imageHint": "Indian community"
     }
   ]
 }

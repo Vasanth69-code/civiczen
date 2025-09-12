@@ -126,7 +126,7 @@ export function AdminSidebar() {
                     <SidebarMenuButton asChild size="lg" className="h-auto py-2">
                         <Link href="/settings">
                             <Avatar className="size-8">
-                                <AvatarImage src="https://picsum.photos/seed/admin/100/100" data-ai-hint="admin user" alt="Admin" />
+                                <AvatarImage src="https://picsum.photos/seed/admin/100/100" data-ai-hint="Indian admin" alt="Admin" />
                                 <AvatarFallback>A</AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col">
