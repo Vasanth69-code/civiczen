@@ -42,9 +42,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
-        const token = await user.getIdTokenResult();
-        const isAdminClaim = !!token.claims.admin;
-        setIsAdmin(isAdminClaim);
+        try {
+            const token = await user.getIdTokenResult();
+            const isAdminClaim = !!token.claims.admin;
+            setIsAdmin(isAdminClaim);
+        } catch (error) {
+            console.error("Error getting user token:", error);
+            setIsAdmin(false);
+        }
       } else {
         setIsAdmin(false);
       }
@@ -57,13 +62,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (loading) return;
 
-    const isPublic = publicRoutes.includes(pathname);
+    const isPublic = publicRoutes.some(route => pathname.startsWith(route));
     const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route));
     
     if (!user && !isPublic) {
       router.push('/login');
     } else if (user && isPublic) {
-        router.push('/report');
+        if (isAdmin) {
+            router.push('/admin');
+        } else {
+            router.push('/report');
+        }
     } else if (user && isAdminRoute && !isAdmin) {
         router.push('/report'); // Redirect non-admins from admin routes
     } else if (user && !isAdminRoute && isAdmin) {
@@ -98,18 +107,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const value = { user, loading, isAdmin, signup, login, loginAsAdmin, logout, resetPassword };
 
-  if (loading) {
+  const isPublic = publicRoutes.some(route => pathname.startsWith(route));
+  if (loading || (!user && !isPublic)) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  const isPublic = publicRoutes.includes(pathname);
-  if (!user && !isPublic) {
-    return (
-       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
