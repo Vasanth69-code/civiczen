@@ -47,7 +47,7 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
     // This ensures we have the latest issue state from the context
     const issue = issues.find(i => i.id === initialIssue.id) || initialIssue;
     
-    const issueUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const issueUrl = typeof window !== 'undefined' ? `${window.location.origin}/issues/${issue.id}` : '';
     const shareText = `${t('share_issue_title')}: ${issue.title}\n${issueUrl}`;
 
     const handleCopyToClipboard = () => {
@@ -215,7 +215,7 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
                                 </a>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                 <a href={`sms:?&body=${encodeURIComponent(shareText)}`}>
+                                 <a href={`sms:?body=${encodeURIComponent(shareText)}`}>
                                     <MessageSquare className="mr-2 h-4 w-4" />
                                     <span>SMS</span>
                                 </a>

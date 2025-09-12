@@ -200,7 +200,7 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
           type="text"
           value={otp}
           onChange={(e) => setOtp(e.target.value)}
-          placeholder={isDemoFlow ? `Enter demo OTP: ${DEMO_OTP}` : "Enter 6-digit code"}
+          placeholder="Enter 6-digit code"
         />
         {error && (
           <p className="text-sm font-medium text-destructive">{error.message}</p>

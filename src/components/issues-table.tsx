@@ -134,7 +134,7 @@ export function IssuesTable({ issues, title }: IssuesTableProps) {
     if (navigator.share) {
       navigator.share({
         title: `${t('share_issue_title')}: ${issueTitle}`,
-        text: t('share_issue_text'),
+        text: shareText,
         url: url,
       }).catch(err => {
         console.error("Share failed", err);
@@ -143,7 +143,7 @@ export function IssuesTable({ issues, title }: IssuesTableProps) {
         toast({ title: t('link_copied'), description: t('link_copied_description') });
       });
     } else {
-        // Fallback for desktop browsers
+        // Fallback for desktop browsers that don't support navigator.share
         navigator.clipboard.writeText(url);
         toast({
             title: t('link_copied'),
@@ -178,5 +178,3 @@ export function IssuesTable({ issues, title }: IssuesTableProps) {
     </Card>
   );
 }
-
-    
