@@ -6,7 +6,6 @@ import { useEffect } from 'react';
 import 'leaflet.heat';
 import { LatLngExpression, LatLngTuple } from 'leaflet';
 import { Issue } from '@/lib/types';
-import 'leaflet/dist/leaflet.css';
 
 // We have to create a custom component to use leaflet.heat, as it's a leaflet plugin
 const HeatmapLayer = ({ points }: { points: (LatLngExpression | number[])[] }) => {
@@ -36,11 +35,6 @@ interface IssueHeatmapProps {
 }
 
 export function IssueHeatmap({ issues }: IssueHeatmapProps) {
-  
-  useEffect(() => {
-      require('leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css');
-      require("leaflet-defaulticon-compatibility");
-  }, []);
 
   if (!issues || issues.length === 0) {
     return <div>No issue data available for the heatmap.</div>;
@@ -62,5 +56,3 @@ export function IssueHeatmap({ issues }: IssueHeatmapProps) {
     </div>
   );
 }
-
-    

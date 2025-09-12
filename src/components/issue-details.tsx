@@ -34,12 +34,6 @@ const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ss
 
 
 const DetailsMap = ({ issue }: { issue: Issue }) => {
-    useEffect(() => {
-        require('leaflet/dist/leaflet.css');
-        require('leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css');
-        require("leaflet-defaulticon-compatibility");
-    }, []);
-
     return (
         <div className="h-80 w-full rounded-md overflow-hidden z-0">
             <MapContainer center={[issue.location.lat, issue.location.lng]} zoom={16} scrollWheelZoom={false} className="h-full w-full">
@@ -255,5 +249,3 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
         </div>
     );
 }
-
-    

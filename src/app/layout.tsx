@@ -4,6 +4,9 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { LanguageProvider } from "@/context/language-context";
 import { UserProvider } from "@/context/user-context";
 import { IssueProvider } from "@/context/issue-context";
+import "leaflet/dist/leaflet.css";
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
+
 
 export default function RootLayout({
   children,

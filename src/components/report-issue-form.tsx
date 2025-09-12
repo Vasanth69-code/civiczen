@@ -67,13 +67,6 @@ type Geolocation = {
 }
 
 const ReportMap = ({ geolocation }: { geolocation: Geolocation | null }) => {
-    useEffect(() => {
-        // These imports are only done on the client side
-        require('leaflet/dist/leaflet.css');
-        require('leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css');
-        require("leaflet-defaulticon-compatibility");
-    }, []);
-
     if (!geolocation) {
         return <Skeleton className="h-48 w-full" />;
     }
