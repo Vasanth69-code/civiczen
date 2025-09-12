@@ -54,6 +54,7 @@ export function ReportIssueForm() {
   const { t } = useLanguage();
   const { addIssue, updateIssue } = useIssues();
   const { user } = useUser();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -202,6 +203,8 @@ export function ReportIssueForm() {
             title: "AI Routing Failed",
             description: `Could not automatically route issue #${newIssueId}. It will be manually reviewed.`,
         })
+    } finally {
+        setIsSubmitting(false);
     }
   }
 
@@ -215,6 +218,8 @@ export function ReportIssueForm() {
         toast({ variant: "destructive", title: t('media_required'), description: t('media_required_description') });
         return;
     }
+    
+    setIsSubmitting(true);
 
     const newIssue: Omit<Issue, 'id' | 'createdAt'> = {
         title: values.title,
@@ -238,6 +243,7 @@ export function ReportIssueForm() {
 
     if (!newIssueId) {
       // Error is handled in addIssue context function
+      setIsSubmitting(false);
       return;
     }
     
@@ -413,8 +419,8 @@ export function ReportIssueForm() {
                 </FormItem>
             </div>
             
-            <Button type="submit" size="lg" className="w-full" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('submitting')}</> : t('submit_report')}
+            <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('submitting')}</> : t('submit_report')}
             </Button>
           </form>
         </Form>
@@ -422,7 +428,3 @@ export function ReportIssueForm() {
     </Card>
   );
 }
-
-    
-
-    
