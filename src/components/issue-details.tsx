@@ -11,7 +11,7 @@ import { ArrowUp, ArrowDown, Calendar, MapPin, Share2, Copy, MessageSquare, Chev
 import { useLanguage } from "@/context/language-context";
 import { TranslationKey } from "@/lib/translations";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,9 +21,6 @@ import {
 import { useIssues } from "@/context/issue-context";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
-import "leaflet-defaulticon-compatibility";
 import { Skeleton } from "./ui/skeleton";
 
 
@@ -35,6 +32,30 @@ const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLaye
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
+
+const DetailsMap = ({ issue }: { issue: Issue }) => {
+    useEffect(() => {
+        require('leaflet/dist/leaflet.css');
+        require('leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css');
+        require("leaflet-defaulticon-compatibility");
+    }, []);
+
+    return (
+        <div className="h-80 w-full rounded-md overflow-hidden z-0">
+            <MapContainer center={[issue.location.lat, issue.location.lng]} zoom={16} scrollWheelZoom={false} className="h-full w-full">
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <Marker position={[issue.location.lat, issue.location.lng]}>
+                    <Popup>
+                        {issue.title}
+                    </Popup>
+                </Marker>
+            </MapContainer>
+        </div>
+    );
+};
 
 type IssueDetailsProps = {
     issue: Issue;
@@ -190,19 +211,7 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
                             {t('location')}
                         </h3>
                         <p className="text-muted-foreground mb-4">{issue.address}</p>
-                        <div className="h-80 w-full rounded-md overflow-hidden z-0">
-                           <MapContainer center={[issue.location.lat, issue.location.lng]} zoom={16} scrollWheelZoom={false} className="h-full w-full">
-                                <TileLayer
-                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                />
-                                <Marker position={[issue.location.lat, issue.location.lng]}>
-                                    <Popup>
-                                        {issue.title}
-                                    </Popup>
-                                </Marker>
-                            </MapContainer>
-                        </div>
+                        <DetailsMap issue={issue} />
                     </div>
                 </CardContent>
                 <CardFooter className="flex justify-end gap-2">

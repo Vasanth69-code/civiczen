@@ -29,9 +29,6 @@ import { useUser } from "@/context/user-context";
 import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import dynamic from 'next/dynamic';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
-import "leaflet-defaulticon-compatibility";
 import { Skeleton } from "./ui/skeleton";
 
 
@@ -41,7 +38,6 @@ const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapCo
 });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
-
 
 const issueTypes = [
     "Pothole",
@@ -68,6 +64,31 @@ const formSchema = z.object({
 type Geolocation = {
   latitude: number;
   longitude: number;
+}
+
+const ReportMap = ({ geolocation }: { geolocation: Geolocation | null }) => {
+    useEffect(() => {
+        // These imports are only done on the client side
+        require('leaflet/dist/leaflet.css');
+        require('leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css');
+        require("leaflet-defaulticon-compatibility");
+    }, []);
+
+    if (!geolocation) {
+        return <Skeleton className="h-48 w-full" />;
+    }
+
+    return (
+        <div className="h-48 w-full rounded-md mt-2 overflow-hidden z-0">
+            <MapContainer center={[geolocation.latitude, geolocation.longitude]} zoom={16} scrollWheelZoom={false} className="h-full w-full">
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <Marker position={[geolocation.latitude, geolocation.longitude]} />
+            </MapContainer>
+        </div>
+    )
 }
 
 export function ReportIssueForm() {
@@ -416,17 +437,7 @@ export function ReportIssueForm() {
                                 </Button>
                             )}
                         </div>
-                         {geolocation && (
-                             <div className="h-48 w-full rounded-md mt-2 overflow-hidden z-0">
-                                <MapContainer center={[geolocation.latitude, geolocation.longitude]} zoom={16} scrollWheelZoom={false} className="h-full w-full">
-                                    <TileLayer
-                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                    />
-                                    <Marker position={[geolocation.latitude, geolocation.longitude]} />
-                                </MapContainer>
-                            </div>
-                        )}
+                        <ReportMap geolocation={geolocation} />
                     </div>
                      {!isLocating && !geolocation && (
                         <Alert variant="destructive">

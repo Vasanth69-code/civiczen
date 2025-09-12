@@ -1,17 +1,12 @@
 
 "use client";
 
-import { useMap } from 'react-leaflet';
+import { useMap, MapContainer, TileLayer } from 'react-leaflet';
 import { useEffect } from 'react';
 import 'leaflet.heat';
-import { LatLngExpression } from 'leaflet';
+import { LatLngExpression, LatLngTuple } from 'leaflet';
 import { Issue } from '@/lib/types';
-import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
-import "leaflet-defaulticon-compatibility";
-import { LatLngTuple } from 'leaflet';
-
 
 // We have to create a custom component to use leaflet.heat, as it's a leaflet plugin
 const HeatmapLayer = ({ points }: { points: (LatLngExpression | number[])[] }) => {
@@ -19,7 +14,7 @@ const HeatmapLayer = ({ points }: { points: (LatLngExpression | number[])[] }) =
 
   useEffect(() => {
     if (!map || !points || points.length === 0) return;
-
+    
     // The type for leaflet.heat is not perfectly compatible with leaflet, so we cast to any
     const heat = (L as any).heatLayer(points, { 
         radius: 25,
@@ -42,6 +37,11 @@ interface IssueHeatmapProps {
 
 export function IssueHeatmap({ issues }: IssueHeatmapProps) {
   
+  useEffect(() => {
+      require('leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css');
+      require("leaflet-defaulticon-compatibility");
+  }, []);
+
   if (!issues || issues.length === 0) {
     return <div>No issue data available for the heatmap.</div>;
   }
@@ -62,3 +62,5 @@ export function IssueHeatmap({ issues }: IssueHeatmapProps) {
     </div>
   );
 }
+
+    

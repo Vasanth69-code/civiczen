@@ -4,11 +4,10 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { TrendingUp, CheckCircle2, AlertTriangle, Clock, Building } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import Link from "next/link";
 import { useIssues } from "@/context/issue-context";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { Skeleton } from "./ui/skeleton";
 
 const IssueHeatmap = dynamic(() => import("./issue-heatmap").then(mod => mod.IssueHeatmap), {
@@ -183,3 +182,5 @@ export function AnalyticsDashboard() {
     </div>
   );
 }
+
+    
