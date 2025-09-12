@@ -53,6 +53,7 @@ export function ReportIssueForm() {
   const { addIssue, updateIssue } = useIssues();
   const { user } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -146,35 +147,42 @@ export function ReportIssueForm() {
   
   const processAIInBackground = (newIssueId: string, values: z.infer<typeof formSchema>) => {
     if (!mediaPreview || !geolocation) {
+        console.error("Cannot process AI without media and geolocation.");
         return;
     }
     
     // This runs in the background and does not block the UI
-    autoRouteIssueReport({
-        photoDataUri: mediaPreview,
-        description: values.description,
-        location: `${geolocation.latitude}, ${geolocation.longitude}`
-    }).then(routingResult => {
-        // Once AI processing is done, update the issue in Firestore
-        updateIssue(newIssueId, {
-            category: routingResult.issueType,
-            priority: routingResult.priority,
-            department: routingResult.department,
+    const runAITask = async () => {
+      try {
+        const routingResult = await autoRouteIssueReport({
+          photoDataUri: mediaPreview,
+          description: values.description,
+          location: `${geolocation.latitude}, ${geolocation.longitude}`
         });
 
-        // Optionally, show a second toast to indicate completion
-        toast({
-            title: "Report Analysis Complete",
-            description: `Issue #${newIssueId.substring(0,5)} routed to ${routingResult.department}.`,
+        await updateIssue(newIssueId, {
+          category: routingResult.issueType,
+          priority: routingResult.priority,
+          department: routingResult.department,
         });
-    }).catch(error => {
+
+        toast({
+          title: "Report Analysis Complete",
+          description: `Issue #${newIssueId.substring(0,5)} routed to ${routingResult.department}.`,
+        });
+
+      } catch (error) {
         console.error("Background AI Submission Error:", error);
         toast({
-            variant: 'destructive',
-            title: "AI Routing Failed",
-            description: `Could not auto-route issue #${newIssueId.substring(0,5)}. It will be manually reviewed.`,
-        })
-    });
+          variant: 'destructive',
+          title: "AI Routing Failed",
+          description: `Could not auto-route issue #${newIssueId.substring(0,5)}. It will be manually reviewed.`,
+        });
+      }
+    };
+    
+    // Fire and forget
+    runAITask();
   }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -198,7 +206,7 @@ export function ReportIssueForm() {
         priority: 'Medium',
         department: 'Pending Assignment',
         location: { lat: geolocation.latitude, lng: geolocation.longitude },
-        address: 'Fetching address...', // This could be resolved via a geocoding API
+        address: 'Fetching address...',
         imageUrl: mediaPreview,
         imageHint: "reported issue",
         reporter: {
@@ -212,19 +220,21 @@ export function ReportIssueForm() {
         const newIssueId = await addIssue(newIssue);
         
         // This is the success path: give instant feedback
-        if (newIssueId) {
-          toast({
-              title: t('report_submitted_successfully'),
-              description: `${t('tracking_id')}: #${newIssueId.substring(0,5)}. AI analysis is running in the background.`,
-          });
-          
-          // Start the slow AI process in the background. DO NOT await it.
-          processAIInBackground(newIssueId, values);
-          
-          form.reset();
-          setMediaPreview(null);
-          setMediaType(null);
+        toast({
+            title: t('report_submitted_successfully'),
+            description: `${t('tracking_id')}: #${newIssueId.substring(0,5)}. AI analysis is running in the background.`,
+        });
+        
+        // Start the slow AI process in the background. DO NOT await it.
+        processAIInBackground(newIssueId, values);
+        
+        form.reset();
+        setMediaPreview(null);
+        setMediaType(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
         }
+
     } catch (error) {
         // Handle cases where the initial submission fails
         toast({
@@ -248,74 +258,81 @@ export function ReportIssueForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-4">
-                <FormField
+              <FormField
                 control={form.control}
                 name="media"
                 render={({ field }) => (
-                    <FormItem className="text-center">
-                        <FormControl>
-                            <div className="space-y-4">
-                               <Card className="p-2 border-dashed hover:border-primary transition-colors aspect-video flex justify-center items-center">
-                                  {mediaPreview ? (
-                                    <>
-                                      {mediaType === 'image' && <Image src={mediaPreview} alt="Media preview" width={400} height={225} className="rounded-md object-contain max-h-[250px] w-auto"/>}
-                                      {mediaType === 'video' && <video src={mediaPreview} controls className="rounded-md object-contain max-h-[250px] w-auto" />}
-                                    </>
-                                  ) : (
-                                    <div className="relative w-full aspect-video">
-                                      <video ref={videoRef} className="w-full aspect-video rounded-md bg-secondary" autoPlay muted playsInline />
-                                      {hasCameraPermission === false && (
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white p-4 rounded-md">
-                                            <Video className="w-12 h-12 mb-2"/>
-                                            <p className="font-semibold">{t('camera_not_available')}</p>
-                                            <p className="text-xs text-center">{t('camera_permission_prompt')}</p>
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-                                </Card>
-
-                                {!mediaPreview ? (
-                                  <Button type="button" onClick={handleCapture} disabled={!hasCameraPermission} className="w-full">
-                                      <Camera className="mr-2"/> {t('capture_photo')}
-                                  </Button>
-                                ) : (
-                                  <Button type="button" variant="outline" onClick={() => {setMediaPreview(null); setMediaType(null); form.setValue('media', null);}} className="w-full">
-                                      {t('retake_or_upload_new')}
-                                  </Button>
-                                )}
-                                <canvas ref={canvasRef} className="hidden" />
-
-                                <div className="relative">
-                                    <div className="absolute inset-0 flex items-center">
-                                        <span className="w-full border-t" />
-                                    </div>
-                                    <div className="relative flex justify-center text-xs uppercase">
-                                        <span className="bg-background px-2 text-muted-foreground">
-                                        {t('or')}
-                                        </span>
-                                    </div>
+                  <FormItem>
+                    <FormControl>
+                      <div className="space-y-4 text-center">
+                        <Card className="p-2 border-dashed hover:border-primary transition-colors aspect-video flex justify-center items-center">
+                          {mediaPreview ? (
+                            <>
+                              {mediaType === 'image' && <Image src={mediaPreview} alt="Media preview" width={400} height={225} className="rounded-md object-contain max-h-[250px] w-auto"/>}
+                              {mediaType === 'video' && <video src={mediaPreview} controls className="rounded-md object-contain max-h-[250px] w-auto" />}
+                            </>
+                          ) : (
+                            <div className="relative w-full aspect-video">
+                              <video ref={videoRef} className="w-full aspect-video rounded-md bg-secondary" autoPlay muted playsInline />
+                              {hasCameraPermission === false && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white p-4 rounded-md">
+                                    <Video className="w-12 h-12 mb-2"/>
+                                    <p className="font-semibold">{t('camera_not_available')}</p>
+                                    <p className="text-xs text-center">{t('camera_permission_prompt')}</p>
                                 </div>
-                                <>
-                                    <label htmlFor="media-upload" className="cursor-pointer text-sm font-medium text-primary hover:underline">
-                                        {t('upload_from_device')}
-                                    </label>
-                                    <Input id="media-upload" type="file" accept="image/*,video/*" className="sr-only" onChange={handleMediaChange} />
-                                </>
+                              )}
                             </div>
-                        </FormControl>
-                         {hasCameraPermission === false && !mediaPreview && (
-                            <Alert variant="destructive" className="mt-4">
-                                <AlertTitle>{t('camera_access_required')}</AlertTitle>
-                                <AlertDescription>
-                                {t('camera_access_required_description')}
-                                </AlertDescription>
-                            </Alert>
-                         )}
-                        <FormMessage />
-                    </FormItem>
+                          )}
+                        </Card>
+
+                        {!mediaPreview ? (
+                          <Button type="button" onClick={handleCapture} disabled={!hasCameraPermission} className="w-full">
+                              <Camera className="mr-2"/> {t('capture_photo')}
+                          </Button>
+                        ) : (
+                          <Button type="button" variant="outline" onClick={() => {setMediaPreview(null); setMediaType(null); form.setValue('media', null); if (fileInputRef.current) fileInputRef.current.value = "";}} className="w-full">
+                              {t('retake_or_upload_new')}
+                          </Button>
+                        )}
+                        <canvas ref={canvasRef} className="hidden" />
+
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t" />
+                            </div>
+                            <div className="relative flex justify-center text-xs uppercase">
+                                <span className="bg-background px-2 text-muted-foreground">
+                                {t('or')}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <Button asChild variant="link" className="cursor-pointer">
+                            <label htmlFor="media-upload">{t('upload_from_device')}</label>
+                        </Button>
+                        <Input 
+                            id="media-upload"
+                            type="file" 
+                            accept="image/*,video/*" 
+                            className="sr-only" 
+                            ref={fileInputRef}
+                            onChange={handleMediaChange}
+                        />
+
+                      </div>
+                    </FormControl>
+                      {hasCameraPermission === false && !mediaPreview && (
+                        <Alert variant="destructive" className="mt-4">
+                            <AlertTitle>{t('camera_access_required')}</AlertTitle>
+                            <AlertDescription>
+                            {t('camera_access_required_description')}
+                            </AlertDescription>
+                        </Alert>
+                      )}
+                    <FormMessage />
+                  </FormItem>
                 )}
-                />
+              />
                 
                 <FormField
                     control={form.control}
@@ -403,5 +420,3 @@ export function ReportIssueForm() {
     </Card>
   );
 }
-
-    
