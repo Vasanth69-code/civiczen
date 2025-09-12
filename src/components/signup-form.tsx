@@ -12,11 +12,13 @@ import { useAuth } from '@/context/auth-context';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export function SignupForm() {
   const { t } = useLanguage();
   const { signup } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -37,6 +39,7 @@ export function SignupForm() {
       toast({
         title: t('sign_up_successful'),
       });
+      router.push('/report');
     } catch (error: any) {
       toast({
         variant: 'destructive',

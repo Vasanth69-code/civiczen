@@ -25,32 +25,26 @@ interface FirebaseContextType {
 const FirebaseContext = createContext<FirebaseContextType | undefined>(undefined);
 
 export const FirebaseProvider = ({ children }: { children: ReactNode }) => {
-  const app = useMemo(() => {
-    if (!firebaseConfig.apiKey) {
-      // Return a dummy app object or handle appropriately if config is not set
-      // This avoids crashing on server-side rendering or build time if env vars are not available
-      return {} as FirebaseApp; 
+  const services = useMemo(() => {
+    if (typeof window === "undefined" || !firebaseConfig.apiKey) {
+      // On the server or if config is not set, return dummy objects
+      return { app: {} as FirebaseApp, auth: {} as Auth, db: {} as Firestore };
     }
-    return !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    return { app, auth, db };
   }, []);
-
-  const auth = useMemo(() => {
-    if (!app || !app.options) return {} as Auth;
-    return getAuth(app)
-  }, [app]);
-
-  const db = useMemo(() => {
-    if (!app || !app.options) return {} as Firestore;
-    return getFirestore(app);
-  }, [app]);
   
   if (!firebaseConfig.apiKey) {
+    // If there's no config, just render children without the provider.
+    // AuthProvider will then redirect to login, but Firebase won't be called.
     return <>{children}</>;
   }
 
 
   return (
-    <FirebaseContext.Provider value={{ app, auth, db }}>
+    <FirebaseContext.Provider value={services}>
       {children}
     </FirebaseContext.Provider>
   );

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from '@/components/ui/button';
@@ -11,17 +12,19 @@ import { useAuth } from '@/context/auth-context';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export function LoginForm() {
   const { t } = useLanguage();
   const { login, loginAsAdmin } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [adminLoading, setAdminLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent, isAdmin: boolean) => {
+  const handleLogin = async (e: React.MouseEvent<HTMLButtonElement>, isAdmin: boolean) => {
     e.preventDefault();
     if (isAdmin) {
       setAdminLoading(true);
@@ -32,10 +35,13 @@ export function LoginForm() {
     try {
       if (isAdmin) {
         await loginAsAdmin(email, password);
+        toast({ title: t('sign_in_successful') });
+        router.push('/admin');
       } else {
         await login(email, password);
+        toast({ title: t('sign_in_successful') });
+        router.push('/report');
       }
-      toast({ title: t('sign_in_successful') });
     } catch (error: any) {
       console.error(error);
       toast({
@@ -68,7 +74,7 @@ export function LoginForm() {
             <CardDescription>{t('sign_in_description')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4">
+          <div className="space-y-4">
             <div className="space-y-2">
                 <Label htmlFor="email">{t('email_address')}</Label>
                 <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -98,7 +104,7 @@ export function LoginForm() {
             <div className="text-center text-sm text-muted-foreground pt-4">
                 {t('dont_have_account')} <Link href="/signup" className="text-primary underline">{t('sign_up')}</Link>
             </div>
-          </form>
+          </div>
         </CardContent>
       </Card>
     </div>

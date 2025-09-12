@@ -19,16 +19,19 @@ export function ForgotPasswordForm() {
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setIsSubmitted(false);
     try {
       await resetPassword(email);
       toast({
         title: t('password_reset_sent'),
         description: t('password_reset_sent_description'),
       });
+      setIsSubmitted(true);
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -54,21 +57,27 @@ export function ForgotPasswordForm() {
             <CardDescription>{t('reset_password_description')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleResetPassword} className="space-y-4">
-            <div className="space-y-2">
-                <Label htmlFor="email">{t('email_address')}</Label>
-                <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            </div>
-            <div className="pt-4">
-                 <Button type="submit" className="w-full" disabled={loading}>
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
-                    {t('send_reset_link')}
-                </Button>
-            </div>
-            <div className="text-center text-sm text-muted-foreground pt-4">
+            {isSubmitted ? (
+                <div className="text-center text-sm text-muted-foreground">
+                    <p>{t('password_reset_sent_description')}</p>
+                </div>
+            ) : (
+                <form onSubmit={handleResetPassword} className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="email">{t('email_address')}</Label>
+                        <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                    </div>
+                    <div className="pt-4">
+                        <Button type="submit" className="w-full" disabled={loading}>
+                            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+                            {t('send_reset_link')}
+                        </Button>
+                    </div>
+                </form>
+            )}
+            <div className="text-center text-sm text-muted-foreground pt-4 mt-4 border-t">
                 <Link href="/login" className="text-primary underline">{t('back_to_login')}</Link>
             </div>
-          </form>
         </CardContent>
       </Card>
     </div>
