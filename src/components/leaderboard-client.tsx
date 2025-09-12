@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Crown, Trophy, Medal, Star } from 'lucide-react';
+import { Trophy, Medal, Star } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { useUser } from '@/context/user-context';
 

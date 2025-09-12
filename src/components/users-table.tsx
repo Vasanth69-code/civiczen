@@ -16,12 +16,13 @@ import { useLanguage } from "@/context/language-context";
 import { useState, useMemo } from "react";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "./ui/button";
+import { Skeleton } from "./ui/skeleton";
 
 type UsersTableProps = {
   users: User[];
 };
 
-type SortKey = keyof User;
+type SortKey = keyof User | 'name' | 'points' | 'rank';
 type SortDirection = "asc" | "desc";
 
 export function UsersTable({ users }: UsersTableProps) {
@@ -30,9 +31,13 @@ export function UsersTable({ users }: UsersTableProps) {
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   const sortedUsers = useMemo(() => {
+    if (!users) return [];
     const sorted = [...users].sort((a, b) => {
-      if (a[sortKey] < b[sortKey]) return sortDirection === "asc" ? -1 : 1;
-      if (a[sortKey] > b[sortKey]) return sortDirection === "asc" ? 1 : -1;
+      const aValue = a[sortKey as keyof User];
+      const bValue = b[sortKey as keyof User];
+      
+      if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
       return 0;
     });
     return sorted;
@@ -50,11 +55,28 @@ export function UsersTable({ users }: UsersTableProps) {
   const getSortIcon = (key: SortKey) => {
     if (sortKey !== key) return <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />;
     return sortDirection === "asc" ? (
-      <ArrowUpDown className="ml-2 h-4 w-4" />
-    ) : (
       <ArrowUpDown className="ml-2 h-4 w-4" /> // Could use different icons for up/down
+    ) : (
+      <ArrowUpDown className="ml-2 h-4 w-4" /> 
     );
   };
+
+  if (!users.length) {
+      return (
+          <Card>
+              <CardHeader><CardTitle className="font-headline">{t('users')}</CardTitle></CardHeader>
+              <CardContent className="space-y-2">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="flex items-center gap-4 p-2">
+                        <Skeleton className="size-10 rounded-full" />
+                        <Skeleton className="h-6 flex-1" />
+                        <Skeleton className="h-6 w-16" />
+                    </div>
+                  ))}
+              </CardContent>
+          </Card>
+      )
+  }
 
   return (
     <Card>

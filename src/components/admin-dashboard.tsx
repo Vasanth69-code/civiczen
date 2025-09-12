@@ -6,14 +6,16 @@ import { TrendingUp, CheckCircle2, AlertTriangle, Clock, Building } from "lucide
 import { IssuesTable } from "./issues-table";
 import { useLanguage } from "@/context/language-context";
 import { TranslationKey } from "@/lib/translations";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import Link from "next/link";
 import { useIssues } from "@/context/issue-context";
+import { useRouter } from "next/navigation";
 
 
 export function AdminDashboard() {
   const { t } = useLanguage();
   const { issues } = useIssues();
+  const router = useRouter();
   const totalReports = issues.length;
   const resolvedReports = issues.filter(i => i.status === 'Resolved').length;
   const pendingReports = issues.filter(i => i.status === 'Pending').length;
@@ -26,6 +28,11 @@ export function AdminDashboard() {
 
   const deptData = Object.entries(issuesByDept).map(([name, issues]) => ({ name, issues }));
 
+  const handleBarClick = (data: any) => {
+    if (data && data.name) {
+      router.push(`/admin/departments/${encodeURIComponent(data.name)}`);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -90,17 +97,13 @@ export function AdminDashboard() {
                         <XAxis type="number" />
                         <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 12 }} />
                         <Tooltip
+                            cursor={{fill: 'hsl(var(--accent))'}}
                             contentStyle={{
                                 background: "hsl(var(--background))",
                                 borderColor: "hsl(var(--border))",
                             }}
                         />
-                        <Bar dataKey="issues" fill="hsl(var(--primary))" barSize={20}>
-                            {deptData.map((entry) => (
-                                <Link key={`link-${entry.name}`} href={`/admin/departments/${encodeURIComponent(entry.name)}`}>
-                                </Link>
-                            ))}
-                        </Bar>
+                        <Bar dataKey="issues" fill="hsl(var(--primary))" barSize={20} onClick={handleBarClick} className="cursor-pointer" />
                     </BarChart>
                 </ResponsiveContainer>
             </CardContent>
@@ -112,4 +115,3 @@ export function AdminDashboard() {
     </div>
   );
 }
-

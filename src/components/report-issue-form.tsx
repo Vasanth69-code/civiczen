@@ -124,7 +124,7 @@ export function ReportIssueForm() {
         const newMediaType = file.type.startsWith('video') ? 'video' : 'image';
         setMediaType(newMediaType);
       };
-      reader.readAsDataURL(file);
+      reader.readDataURL(file);
     }
   };
 
@@ -146,7 +146,7 @@ export function ReportIssueForm() {
   
   const processAIInBackground = (newIssueId: string, values: z.infer<typeof formSchema>) => {
     if (!mediaPreview || !geolocation) {
-        setIsSubmitting(false);
+        setIsSubmitting(false); // Stop loading indicator if required data is missing
         return;
     }
     
@@ -166,14 +166,14 @@ export function ReportIssueForm() {
             description: `Issue #${newIssueId} routed to ${routingResult.department}.`,
         });
     }).catch(error => {
-        console.error("Background Submission Error:", error);
+        console.error("Background AI Submission Error:", error);
         toast({
             variant: 'destructive',
             title: "AI Routing Failed",
             description: `Could not auto-route issue #${newIssueId}. It will be manually reviewed.`,
         })
     }).finally(() => {
-        setIsSubmitting(false);
+        setIsSubmitting(false); // Stop loading indicator once everything is done
     });
   }
 
@@ -210,7 +210,7 @@ export function ReportIssueForm() {
     const newIssueId = await addIssue(newIssue);
 
     if (!newIssueId) {
-      setIsSubmitting(false);
+      setIsSubmitting(false); // Stop loading if issue creation failed
       return;
     }
     
@@ -223,6 +223,7 @@ export function ReportIssueForm() {
     setMediaPreview(null);
     setMediaType(null);
     
+    // This now runs in the background and will handle setting isSubmitting to false.
     processAIInBackground(newIssueId, values);
   }
 

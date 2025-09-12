@@ -80,7 +80,7 @@ export const IssueProvider = ({ children }: { children: ReactNode }) => {
       await updateDoc(issueDocRef, updates);
       setIssues(prevIssues =>
         prevIssues.map(issue =>
-          issue.id === issueId ? { ...issue, ...updates } : issue
+          issue.id === issueId ? { ...issue, ...updates, id: issue.id, createdAt: issue.createdAt } as Issue : issue
         )
       );
     } catch (error) {

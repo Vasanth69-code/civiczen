@@ -34,10 +34,11 @@ export function AdminSidebar() {
   const { issues } = useIssues();
 
   const isActive = (path: string) => {
+    if (path === "/admin/issues") return pathname === path;
     return pathname.startsWith(path);
   };
 
-  const departments = [...new Set(issues.map(issue => issue.department))];
+  const departments = [...new Set(issues.map(issue => issue.department))].sort();
 
   return (
     <Sidebar>
@@ -114,8 +115,8 @@ export function AdminSidebar() {
         <SidebarGroup>
             <SidebarMenu>
                 <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isActive('/admin/settings')} tooltip={{children: t('settings')}}>
-                        <Link href="#">
+                    <SidebarMenuButton asChild isActive={isActive('/settings')} tooltip={{children: t('settings')}}>
+                        <Link href="/settings">
                             <Settings />
                             <span>{t('settings')}</span>
                         </Link>
@@ -123,7 +124,7 @@ export function AdminSidebar() {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                     <SidebarMenuButton asChild size="lg" className="h-auto py-2">
-                        <Link href="#">
+                        <Link href="/settings">
                             <Avatar className="size-8">
                                 <AvatarImage src="https://picsum.photos/seed/admin/100/100" data-ai-hint="admin user" alt="Admin" />
                                 <AvatarFallback>A</AvatarFallback>
