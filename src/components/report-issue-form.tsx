@@ -17,11 +17,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Camera, MapPin, Loader2, Video, Wand2, ExternalLink } from "lucide-react";
+import { Camera, MapPin, Loader2, Video, ExternalLink } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
-import { suggestReportTitles } from "@/ai/flows/suggest-report-titles";
 import { autoRouteIssueReport } from "@/ai/flows/auto-route-issue-reports";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
@@ -46,7 +45,6 @@ export function ReportIssueForm() {
   const [isLocating, setIsLocating] = useState(true);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [mediaType, setMediaType] = useState<'image' | 'video' | null>(null);
-  const [isSuggesting, setIsSuggesting] = useState(false);
   const { toast } = useToast();
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -55,7 +53,6 @@ export function ReportIssueForm() {
   const { addIssue, updateIssue } = useIssues();
   const { user } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [suggestedTitle, setSuggestedTitle] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -116,9 +113,6 @@ export function ReportIssueForm() {
     }
   }, [toast, t]);
   
-  const triggerAITitle = (description: string, mediaData: string) => {
-    handleTitleSuggestion(description, mediaData);
-  }
 
   const handleMediaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -129,9 +123,6 @@ export function ReportIssueForm() {
         setMediaPreview(result);
         const newMediaType = file.type.startsWith('video') ? 'video' : 'image';
         setMediaType(newMediaType);
-        if (descriptionRef.current?.value) {
-            triggerAITitle(descriptionRef.current.value, result);
-        }
       };
       reader.readAsDataURL(file);
     }
@@ -149,35 +140,16 @@ export function ReportIssueForm() {
         const dataUrl = canvas.toDataURL('image/png');
         setMediaPreview(dataUrl);
         setMediaType('image');
-        if (descriptionRef.current?.value) {
-            triggerAITitle(descriptionRef.current.value, dataUrl);
-        }
       }
     }
   };
   
-  const handleTitleSuggestion = async (description: string, mediaDataUri?: string) => {
-    if(description.length < 15) return;
-    setIsSuggesting(true);
-    setSuggestedTitle(null);
-    try {
-      const result = await suggestReportTitles({ description, mediaDataUri });
-      if (result.suggestedTitle) {
-        setSuggestedTitle(result.suggestedTitle);
-      }
-    } catch (error) {
-      console.error("AI Title Suggestion Error:", error);
-    } finally {
-      setIsSuggesting(false);
-    }
-  };
-
   const processAIInBackground = (newIssueId: string, values: z.infer<typeof formSchema>) => {
     if (!mediaPreview || !geolocation) {
+        setIsSubmitting(false);
         return;
     }
     
-    // Don't await this, let it run in the background
     autoRouteIssueReport({
         photoDataUri: mediaPreview,
         description: values.description,
@@ -237,7 +209,6 @@ export function ReportIssueForm() {
 
     const newIssueId = await addIssue(newIssue);
 
-    // If addIssue fails, it returns null. Stop processing.
     if (!newIssueId) {
       setIsSubmitting(false);
       return;
@@ -247,14 +218,11 @@ export function ReportIssueForm() {
         title: t('report_submitted_successfully'),
         description: `${t('tracking_id')}: #${newIssueId}`,
     });
-
-    // Reset form for the next submission
+    
     form.reset();
     setMediaPreview(null);
     setMediaType(null);
-    setSuggestedTitle(null);
-
-    // Start background processing, don't wait for it
+    
     processAIInBackground(newIssueId, values);
   }
 
@@ -348,7 +316,6 @@ export function ReportIssueForm() {
                                 {...field}
                                 rows={5}
                                 ref={descriptionRef}
-                                onBlur={(e) => { if(mediaPreview) { triggerAITitle(e.target.value, mediaPreview) }}}
                             />
                         </FormControl>
                         <FormMessage />
@@ -367,22 +334,6 @@ export function ReportIssueForm() {
                             <FormControl>
                                 <Input placeholder={t('title_placeholder')} {...field} />
                             </FormControl>
-                             {isSuggesting && <p className="text-sm text-muted-foreground flex items-center pt-2"><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Suggesting a title...</p>}
-                            {suggestedTitle && (
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    className="mt-2"
-                                    onClick={() => {
-                                        form.setValue("title", suggestedTitle);
-                                        setSuggestedTitle(null);
-                                    }}
-                                >
-                                    <Wand2 className="mr-2 h-4 w-4" />
-                                    Use suggestion: <span className="ml-1 italic">"{suggestedTitle}"</span>
-                                </Button>
-                            )}
                             <FormDescription>{t('title_description')}</FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -440,6 +391,3 @@ export function ReportIssueForm() {
     </Card>
   );
 }
-
-
-    
