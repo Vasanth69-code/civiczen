@@ -44,11 +44,8 @@ export default function HomePage() {
             </Link>
           </nav>
           <div className="flex items-center gap-2">
-            <Button variant="outline" asChild>
-                <Link href="/login">Sign In</Link>
-            </Button>
             <Button asChild>
-                <Link href="/signup">Sign Up <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                <Link href="/all-reports">View All Reports <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
           </div>
         </div>
@@ -64,7 +61,7 @@ export default function HomePage() {
           </p>
           <div className="mt-8 flex justify-center gap-4">
             <Button size="lg" asChild>
-              <Link href="/signup">Get Started <ArrowRight className="ml-2 h-5 w-5" /></Link>
+              <Link href="/report">Get Started <ArrowRight className="ml-2 h-5 w-5" /></Link>
             </Button>
             <Button size="lg" variant="secondary" asChild>
                 <Link href="/all-reports">View Reports</Link>

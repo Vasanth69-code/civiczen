@@ -6,7 +6,6 @@ import {
   VenetianMask,
   Users,
   Settings,
-  LogOut,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -23,13 +22,11 @@ import {
 } from "@/components/ui/sidebar";
 import { currentUser } from "@/lib/placeholder-data";
 import { useLanguage } from "@/context/language-context";
-import { useAuth } from "@/context/auth-context";
 
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const { t } = useLanguage();
-  const { user, logout } = useAuth();
 
   const isActive = (path: string) => {
     return pathname.startsWith(path);
@@ -96,21 +93,15 @@ export function AdminSidebar() {
                         </Link>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
-                 <SidebarMenuItem>
-                    <SidebarMenuButton onClick={logout} tooltip={{children: 'Logout'}}>
-                        <LogOut />
-                        <span>Logout</span>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
                 <SidebarMenuItem>
                     <SidebarMenuButton asChild size="lg" className="h-auto py-2">
                         <Link href="#">
                             <Avatar className="size-8">
                                 <AvatarImage src={currentUser.avatarUrl} data-ai-hint={currentUser.imageHint} alt={currentUser.name} />
-                                <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                                <AvatarFallback>A</AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col">
-                                <span className="font-medium">{user?.email}</span>
+                                <span className="font-medium">Admin User</span>
                                 <span className="text-xs text-muted-foreground">{t('administrator')}</span>
                             </div>
                         </Link>
