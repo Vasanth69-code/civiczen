@@ -98,8 +98,7 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
         });
     };
     
-    // Firestore Timestamps need to be converted to JS Dates
-    const createdAtDate = issue.createdAt?.toDate ? issue.createdAt.toDate() : new Date();
+    const createdAtDate = issue.createdAt;
 
 
     return (
@@ -228,5 +227,3 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
         </div>
     );
 }
-
-    

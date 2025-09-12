@@ -1,4 +1,4 @@
-import type { Timestamp } from "firebase/firestore";
+
 
 export type IssueStatus = 'Pending' | 'In Progress' | 'Resolved' | 'Rejected';
 
@@ -14,12 +14,8 @@ export type Issue = {
   address: string;
   imageUrl?: string;
   imageHint?: string;
-  reporter: {
-    id: string;
-    name: string;
-    avatarUrl: string;
-  };
-  createdAt: Timestamp;
+  reporter: User;
+  createdAt: Date;
 };
 
 export type User = {
