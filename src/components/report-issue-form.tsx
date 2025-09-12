@@ -51,7 +51,7 @@ export function ReportIssueForm() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { t } = useLanguage();
-  const { addIssue } = useIssues();
+  const { addIssue, updateIssue } = useIssues();
   const { user } = useUser();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -183,6 +183,38 @@ export function ReportIssueForm() {
         return;
     }
 
+    const newIssueId = `IS${Date.now()}`;
+    const newIssue = {
+        id: newIssueId,
+        title: values.title,
+        description: values.description,
+        status: 'Pending' as const,
+        category: 'Uncategorized',
+        priority: 'Medium' as const,
+        department: 'Pending Assignment',
+        location: { lat: geolocation.latitude, lng: geolocation.longitude },
+        address: 'Fetching address...',
+        imageUrl: mediaPreview,
+        reporter: {
+          id: user.id,
+          name: user.name,
+          avatarUrl: user.avatarUrl,
+        },
+        createdAt: new Date().toISOString(),
+    };
+
+    addIssue(newIssue);
+    
+    toast({
+        title: t('report_submitted_successfully'),
+        description: `${t('tracking_id')}: #${newIssueId}`,
+    });
+
+    form.reset();
+    setMediaPreview(null);
+    setMediaType(null);
+
+    // AI processing in the background
     try {
         const routingResult = await autoRouteIssueReport({
             photoDataUri: mediaPreview,
@@ -190,47 +222,23 @@ export function ReportIssueForm() {
             location: `${geolocation.latitude}, ${geolocation.longitude}`
         });
 
-        const newIssueId = `IS${Date.now()}`;
-        
-        addIssue({
-            id: newIssueId,
-            title: values.title,
-            description: values.description,
-            status: 'Pending',
+        updateIssue(newIssueId, {
             category: routingResult.issueType,
             priority: routingResult.priority,
             department: routingResult.department,
-            location: { lat: geolocation.latitude, lng: geolocation.longitude },
-            address: 'Fetching address...', // You could implement a reverse geocoding service here
-            imageUrl: mediaPreview,
-            reporter: {
-              id: user.id,
-              name: user.name,
-              avatarUrl: user.avatarUrl,
-            },
-            createdAt: new Date().toISOString(),
-        });
-        
-        toast({
-            title: t('report_submitted_successfully'),
-            description: (
-              <div>
-                <p>{t('report_submitted_description', { department: routingResult.department })}</p>
-                <p>{t('tracking_id')}: #{newIssueId}</p>
-              </div>
-            ),
         });
 
-        form.reset();
-        setMediaPreview(null);
-        setMediaType(null);
+        toast({
+            title: "Report Analysis Complete",
+            description: `Issue #${newIssueId} has been routed to ${routingResult.department}.`,
+        });
 
     } catch (error) {
-        console.error("Submission Error:", error);
+        console.error("Background Submission Error:", error);
         toast({
             variant: 'destructive',
-            title: t('submission_failed'),
-            description: t('submission_failed_description'),
+            title: "AI Routing Failed",
+            description: `Could not automatically route issue #${newIssueId}. It will be manually reviewed.`,
         })
     }
   }
@@ -402,5 +410,7 @@ export function ReportIssueForm() {
     </Card>
   );
 }
+
+    
 
     

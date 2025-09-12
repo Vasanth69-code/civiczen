@@ -9,6 +9,7 @@ type IssueContextType = {
   issues: Issue[];
   addIssue: (issue: Issue) => void;
   updateIssueStatus: (issueId: string, newStatus: IssueStatus) => void;
+  updateIssue: (issueId: string, updates: Partial<Issue>) => void;
 };
 
 const IssueContext = createContext<IssueContextType | undefined>(undefined);
@@ -28,8 +29,16 @@ export const IssueProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const updateIssue = (issueId: string, updates: Partial<Issue>) => {
+    setIssues(prevIssues =>
+      prevIssues.map(issue =>
+        issue.id === issueId ? { ...issue, ...updates } : issue
+      )
+    );
+  };
+
   return (
-    <IssueContext.Provider value={{ issues, addIssue, updateIssueStatus }}>
+    <IssueContext.Provider value={{ issues, addIssue, updateIssueStatus, updateIssue }}>
       {children}
     </IssueContext.Provider>
   );
@@ -42,5 +51,7 @@ export const useIssues = () => {
   }
   return context;
 };
+
+    
 
     
