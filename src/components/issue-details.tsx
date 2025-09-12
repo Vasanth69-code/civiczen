@@ -11,7 +11,7 @@ import { ArrowUp, ArrowDown, Calendar, MapPin, Share2, Copy, MessageSquare, Chev
 import { useLanguage } from "@/context/language-context";
 import { TranslationKey } from "@/lib/translations";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +33,7 @@ const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { 
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
 
-const DetailsMap = ({ issue }: { issue: Issue }) => {
+const DetailsMap = memo(({ issue }: { issue: Issue }) => {
     return (
         <div className="h-80 w-full rounded-md overflow-hidden z-0">
             <MapContainer center={[issue.location.lat, issue.location.lng]} zoom={16} scrollWheelZoom={false} className="h-full w-full">
@@ -49,7 +49,8 @@ const DetailsMap = ({ issue }: { issue: Issue }) => {
             </MapContainer>
         </div>
     );
-};
+});
+DetailsMap.displayName = 'DetailsMap';
 
 type IssueDetailsProps = {
     issue: Issue;
@@ -249,3 +250,5 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
         </div>
     );
 }
+
+    

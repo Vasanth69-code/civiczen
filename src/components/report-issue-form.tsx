@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Camera, MapPin, Loader2, Video, ExternalLink } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
@@ -66,7 +66,7 @@ type Geolocation = {
   longitude: number;
 }
 
-const ReportMap = ({ geolocation }: { geolocation: Geolocation | null }) => {
+const ReportMap = memo(({ geolocation }: { geolocation: Geolocation | null }) => {
     if (!geolocation) {
         return <Skeleton className="h-48 w-full" />;
     }
@@ -82,7 +82,9 @@ const ReportMap = ({ geolocation }: { geolocation: Geolocation | null }) => {
             </MapContainer>
         </div>
     )
-}
+});
+ReportMap.displayName = 'ReportMap';
+
 
 export function ReportIssueForm() {
   const [geolocation, setGeolocation] = useState<Geolocation | null>(null);
@@ -452,5 +454,7 @@ export function ReportIssueForm() {
     </Card>
   );
 }
+
+    
 
     
