@@ -12,7 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Issue } from "@/lib/types";
-import { ArrowUp, MoreHorizontal, Share, ArrowDown } from "lucide-react";
+import { ArrowUp, MoreHorizontal, Copy, MessageSquare, Share2, ArrowDown } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -38,7 +38,7 @@ const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } 
   Rejected: "destructive",
 };
 
-const IssueRow = ({ issue, onShare }: { issue: Issue, onShare: (id: string) => void }) => {
+const IssueRow = ({ issue, onShare }: { issue: Issue, onShare: (issueId: string, title: string) => void }) => {
     const [votes, setVotes] = useState(0);
     const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
     const { t } = useLanguage();
@@ -112,8 +112,8 @@ const IssueRow = ({ issue, onShare }: { issue: Issue, onShare: (id: string) => v
               <DropdownMenuItem asChild>
                 <Link href={`/issues/${issue.id}`}>{t('view_details')}</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onShare(issue.id)}>
-                <Share className="mr-2 h-4 w-4" />
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onShare(issue.id, issue.title); }}>
+                <Share2 className="mr-2 h-4 w-4" />
                 {t('share')}
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -127,20 +127,28 @@ export function IssuesTable({ issues, title }: IssuesTableProps) {
   const { t } = useLanguage();
   const { toast } = useToast();
 
-  const handleShare = (issueId: string) => {
+  const handleShare = (issueId: string, issueTitle: string) => {
     const url = `${window.location.origin}/issues/${issueId}`;
+    const shareText = `${t('share_issue_title')}: ${issueTitle}\n${url}`;
+
     if (navigator.share) {
       navigator.share({
-        title: t('share_issue_title'),
+        title: `${t('share_issue_title')}: ${issueTitle}`,
         text: t('share_issue_text'),
         url: url,
-      }).catch(err => console.error("Share failed", err));
-    } else {
-      navigator.clipboard.writeText(url);
-      toast({
-        title: t('link_copied'),
-        description: t('link_copied_description'),
+      }).catch(err => {
+        console.error("Share failed", err);
+        // Fallback to clipboard if native share fails
+        navigator.clipboard.writeText(url);
+        toast({ title: t('link_copied'), description: t('link_copied_description') });
       });
+    } else {
+        // Fallback for desktop browsers
+        navigator.clipboard.writeText(url);
+        toast({
+            title: t('link_copied'),
+            description: t('link_copied_description'),
+        });
     }
   }
 
@@ -162,7 +170,7 @@ export function IssuesTable({ issues, title }: IssuesTableProps) {
           </TableHeader>
           <TableBody>
             {issues.map((issue) => (
-              <IssueRow key={issue.id} issue={issue} onShare={handleShare} />
+              <IssueRow key={issue.id} issue={issue} onShare={() => handleShare(issue.id, issue.title)} />
             ))}
           </TableBody>
         </Table>
@@ -170,3 +178,5 @@ export function IssuesTable({ issues, title }: IssuesTableProps) {
     </Card>
   );
 }
+
+    
