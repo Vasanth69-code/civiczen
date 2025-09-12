@@ -60,7 +60,7 @@ export const IssueProvider = ({ children }: { children: ReactNode }) => {
       const docRef = await addDoc(issuesCollection, newIssueWithTimestamp);
       
       // Add new issue to the top of the list for immediate UI update
-      setIssues(prevIssues => [{...newIssueWithTimestamp, id: docRef.id}, ...prevIssues]);
+      setIssues(prevIssues => [{ ...newIssueWithTimestamp, id: docRef.id } as Issue, ...prevIssues]);
       
       return docRef.id;
     } catch (error) {
@@ -80,7 +80,7 @@ export const IssueProvider = ({ children }: { children: ReactNode }) => {
       await updateDoc(issueDocRef, updates);
       setIssues(prevIssues =>
         prevIssues.map(issue =>
-          issue.id === issueId ? { ...issue, ...updates, id: issue.id, createdAt: issue.createdAt } as Issue : issue
+          issue.id === issueId ? { ...issue, ...updates } as Issue : issue
         )
       );
     } catch (error) {
@@ -112,3 +112,5 @@ export const useIssues = () => {
   }
   return context;
 };
+
+    

@@ -61,8 +61,6 @@ export function ReportIssueForm() {
       description: "",
     },
   });
-
-  const descriptionRef = useRef<HTMLTextAreaElement>(null);
   
   useEffect(() => {
     const getCameraPermission = async () => {
@@ -123,7 +121,7 @@ export function ReportIssueForm() {
         setMediaPreview(result);
         const newMediaType = file.type.startsWith('video') ? 'video' : 'image';
         setMediaType(newMediaType);
-        form.setValue('media', file); // Set value for the form
+        form.setValue('media', result);
       };
       reader.readAsDataURL(file);
     }
@@ -148,7 +146,6 @@ export function ReportIssueForm() {
   
   const processAIInBackground = (newIssueId: string, values: z.infer<typeof formSchema>) => {
     if (!mediaPreview || !geolocation) {
-        setIsSubmitting(false); // Stop loading indicator if required data is missing
         return;
     }
     
@@ -174,8 +171,6 @@ export function ReportIssueForm() {
             title: "AI Routing Failed",
             description: `Could not auto-route issue #${newIssueId}. It will be manually reviewed.`,
         })
-    }).finally(() => {
-        setIsSubmitting(false); // Stop loading indicator once everything is done
     });
   }
 
@@ -211,22 +206,23 @@ export function ReportIssueForm() {
 
     const newIssueId = await addIssue(newIssue);
 
-    if (!newIssueId) {
-      setIsSubmitting(false); // Stop loading if issue creation failed
-      return;
+    if (newIssueId) {
+      toast({
+          title: t('report_submitted_successfully'),
+          description: `${t('tracking_id')}: #${newIssueId}`,
+      });
+      
+      form.reset();
+      setMediaPreview(null);
+      setMediaType(null);
+      
+      // This now runs in the background and will handle setting isSubmitting to false.
+      processAIInBackground(newIssueId, values);
     }
     
-    toast({
-        title: t('report_submitted_successfully'),
-        description: `${t('tracking_id')}: #${newIssueId}`,
-    });
-    
-    form.reset();
-    setMediaPreview(null);
-    setMediaType(null);
-    
-    // This now runs in the background and will handle setting isSubmitting to false.
-    processAIInBackground(newIssueId, values);
+    // We set submitting to false here to give instant feedback.
+    // The AI runs in the background.
+    setIsSubmitting(false);
   }
 
   return (
@@ -319,7 +315,6 @@ export function ReportIssueForm() {
                                 placeholder={t('description_placeholder')}
                                 {...field}
                                 rows={5}
-                                ref={descriptionRef}
                             />
                         </FormControl>
                         <FormMessage />
