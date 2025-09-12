@@ -33,7 +33,7 @@ const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } 
   Rejected: "destructive",
 };
 
-const availableStatuses: IssueStatus[] = ["Pending", "In Progress", "Resolved", "Rejected"];
+const availableStatuses: IssueStatus[] = ["Pending", "In Progress", "Resolved"];
 
 export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
     const { t } = useLanguage();
