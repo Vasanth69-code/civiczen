@@ -20,10 +20,20 @@ import {
 } from "./ui/dropdown-menu";
 import { useIssues } from "@/context/issue-context";
 import { usePathname } from "next/navigation";
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import dynamic from "next/dynamic";
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
 import "leaflet-defaulticon-compatibility";
+import { Skeleton } from "./ui/skeleton";
+
+
+const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), {
+    ssr: false,
+    loading: () => <Skeleton className="h-full w-full" />,
+});
+const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
+const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
+const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
 
 type IssueDetailsProps = {
@@ -236,3 +246,5 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
         </div>
     );
 }
+
+    

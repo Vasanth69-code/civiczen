@@ -28,10 +28,19 @@ import { useIssues } from "@/context/issue-context";
 import { useUser } from "@/context/user-context";
 import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
 import "leaflet-defaulticon-compatibility";
+import { Skeleton } from "./ui/skeleton";
+
+
+const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), {
+    ssr: false,
+    loading: () => <Skeleton className="h-full w-full" />,
+});
+const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
+const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
 
 
 const issueTypes = [
@@ -439,3 +448,5 @@ export function ReportIssueForm() {
     </Card>
   );
 }
+
+    
