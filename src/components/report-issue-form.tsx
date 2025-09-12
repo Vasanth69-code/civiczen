@@ -123,8 +123,9 @@ export function ReportIssueForm() {
         setMediaPreview(result);
         const newMediaType = file.type.startsWith('video') ? 'video' : 'image';
         setMediaType(newMediaType);
+        form.setValue('media', file); // Set value for the form
       };
-      reader.readDataURL(file);
+      reader.readAsDataURL(file);
     }
   };
 
@@ -140,6 +141,7 @@ export function ReportIssueForm() {
         const dataUrl = canvas.toDataURL('image/png');
         setMediaPreview(dataUrl);
         setMediaType('image');
+        form.setValue('media', dataUrl);
       }
     }
   };
@@ -235,7 +237,7 @@ export function ReportIssueForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-4">
                 <FormField
                 control={form.control}
@@ -269,7 +271,7 @@ export function ReportIssueForm() {
                                       <Camera className="mr-2"/> {t('capture_photo')}
                                   </Button>
                                 ) : (
-                                  <Button type="button" variant="outline" onClick={() => {setMediaPreview(null); setMediaType(null);}} className="w-full">
+                                  <Button type="button" variant="outline" onClick={() => {setMediaPreview(null); setMediaType(null); form.setValue('media', null);}} className="w-full">
                                       {t('retake_or_upload_new')}
                                   </Button>
                                 )}
@@ -285,11 +287,12 @@ export function ReportIssueForm() {
                                         </span>
                                     </div>
                                 </div>
-
-                                <label htmlFor="media-upload" className="cursor-pointer text-sm font-medium text-primary hover:underline">
-                                    {t('upload_from_device')}
+                                <>
+                                    <label htmlFor="media-upload" className="cursor-pointer text-sm font-medium text-primary hover:underline">
+                                        {t('upload_from_device')}
+                                    </label>
                                     <Input id="media-upload" type="file" accept="image/*,video/*" className="sr-only" onChange={handleMediaChange} />
-                                </label>
+                                </>
                             </div>
                         </FormControl>
                          {hasCameraPermission === false && !mediaPreview && (
@@ -392,3 +395,5 @@ export function ReportIssueForm() {
     </Card>
   );
 }
+
+    
