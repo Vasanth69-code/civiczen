@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Bell, Languages, PanelLeft } from "lucide-react";
@@ -12,6 +13,7 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useLanguage } from "@/context/language-context";
 import { languages, TranslationKey } from "@/lib/translations";
+import Link from "next/link";
 
 type HeaderProps = {
   title: string;
@@ -40,9 +42,11 @@ export function Header({ title }: HeaderProps) {
             ))}
           </SelectContent>
         </Select>
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <Bell className="h-5 w-5" />
-          <span className="sr-only">{t('toggle_notifications')}</span>
+        <Button asChild variant="ghost" size="icon" className="rounded-full">
+          <Link href="/notifications">
+            <Bell className="h-5 w-5" />
+            <span className="sr-only">{t('toggle_notifications')}</span>
+          </Link>
         </Button>
       </div>
     </header>
