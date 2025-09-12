@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -71,7 +72,7 @@ export function ReportIssueForm() {
         return;
       }
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({video: true});
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
         setHasCameraPermission(true);
 
         if (videoRef.current) {
@@ -447,3 +448,5 @@ export function ReportIssueForm() {
     </Card>
   );
 }
+
+    
