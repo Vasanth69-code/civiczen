@@ -9,11 +9,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useMemo, useEffect } from "react";
 import { Skeleton } from "./ui/skeleton";
-
-const IssueHeatmap = dynamic(() => import("./issue-heatmap").then(mod => mod.IssueHeatmap), {
-    ssr: false,
-    loading: () => <Skeleton className="h-[400px] w-full" />,
-});
+import { IssueClusterMap } from "./issue-cluster-map";
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
@@ -99,10 +95,10 @@ export function AnalyticsDashboard() {
       <Card>
         <CardHeader>
             <CardTitle className="font-headline">Issue Hotspots</CardTitle>
-            <CardDescription>A heatmap of where issues are being reported across the city.</CardDescription>
+            <CardDescription>A map of where issues are being reported across the city.</CardDescription>
         </CardHeader>
         <CardContent>
-            <IssueHeatmap issues={issues} />
+            <IssueClusterMap issues={issues} />
         </CardContent>
       </Card>
 
