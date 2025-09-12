@@ -61,7 +61,7 @@ export default function HomePage() {
           </p>
           <div className="mt-8 flex justify-center gap-4">
             <Button size="lg" asChild>
-              <Link href="/report">Get Started <ArrowRight className="ml-2 h-5 w-5" /></Link>
+              <Link href="/login">Get Started <ArrowRight className="ml-2 h-5 w-5" /></Link>
             </Button>
             <Button size="lg" variant="secondary" asChild>
                 <Link href="/all-reports">View Reports</Link>
@@ -174,4 +174,6 @@ export default function HomePage() {
     </div>
   );
 }
+    
+
     
