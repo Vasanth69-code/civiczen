@@ -176,7 +176,6 @@ export function ReportIssueForm() {
 
   const processAIInBackground = async (newIssueId: string, values: z.infer<typeof formSchema>) => {
     if (!mediaPreview || !geolocation) {
-        setIsSubmitting(false);
         return;
     }
     
@@ -187,7 +186,6 @@ export function ReportIssueForm() {
             location: `${geolocation.latitude}, ${geolocation.longitude}`
         });
 
-        // Update the issue in firestore with the AI results
         updateIssue(newIssueId, {
             category: routingResult.issueType,
             priority: routingResult.priority,
@@ -241,11 +239,9 @@ export function ReportIssueForm() {
         },
     };
 
-    // Add issue to firestore, get the new ID
     const newIssueId = await addIssue(newIssue);
 
     if (!newIssueId) {
-      // Error is handled in addIssue context function
       setIsSubmitting(false);
       return;
     }
@@ -255,12 +251,10 @@ export function ReportIssueForm() {
         description: `${t('tracking_id')}: #${newIssueId}`,
     });
 
-    // Reset form immediately for a better user experience
     form.reset();
     setMediaPreview(null);
     setMediaType(null);
 
-    // AI processing in the background, without await
     processAIInBackground(newIssueId, values);
   }
 
@@ -431,5 +425,3 @@ export function ReportIssueForm() {
     </Card>
   );
 }
-
-    

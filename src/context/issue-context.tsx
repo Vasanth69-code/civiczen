@@ -59,7 +59,6 @@ export const IssueProvider = ({ children }: { children: ReactNode }) => {
       }
       const docRef = await addDoc(issuesCollection, newIssueWithTimestamp);
       
-      // Add new issue to local state to update UI immediately
       setIssues(prevIssues => [{...newIssueWithTimestamp, id: docRef.id}, ...prevIssues]);
       
       return docRef.id;
