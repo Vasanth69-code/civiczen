@@ -21,12 +21,13 @@ import {
   SidebarMenuButton,
   SidebarGroup,
 } from "@/components/ui/sidebar";
-import { currentUser } from "@/lib/placeholder-data";
 import { useLanguage } from "@/context/language-context";
+import { useUser } from "@/context/user-context";
 
 export function AppSidebar() {
   const pathname = usePathname();
   const { t } = useLanguage();
+  const { user } = useUser();
 
   const isActive = (path: string) => {
     return pathname === path;
@@ -109,11 +110,11 @@ export function AppSidebar() {
                     <SidebarMenuButton asChild size="lg" className="h-auto py-2">
                         <Link href="/settings">
                             <Avatar className="size-8">
-                                <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} data-ai-hint={currentUser.imageHint} />
-                                <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+                                <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint={user.imageHint} />
+                                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col">
-                                <span className="font-medium">{currentUser.name}</span>
+                                <span className="font-medium">{user.name}</span>
                                 <span className="text-xs text-muted-foreground">{t('citizen')}</span>
                             </div>
                         </Link>

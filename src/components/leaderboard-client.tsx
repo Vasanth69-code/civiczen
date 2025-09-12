@@ -4,8 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User } from '@/lib/types';
 import { Crown, Trophy, Medal, Star } from 'lucide-react';
-import { currentUser } from '@/lib/placeholder-data';
 import { useLanguage } from '@/context/language-context';
+import { useUser } from '@/context/user-context';
 
 type LeaderboardClientProps = {
   users: User[];
@@ -19,6 +19,7 @@ const rankIcons = [
 
 export function LeaderboardClient({ users }: LeaderboardClientProps) {
   const { t } = useLanguage();
+  const { user: currentUser } = useUser();
   const sortedUsers = [...users].sort((a, b) => b.points - a.points);
   const topThree = sortedUsers.slice(0, 3);
   const restUsers = sortedUsers.slice(3);

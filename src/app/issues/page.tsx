@@ -1,12 +1,16 @@
 
+"use client";
+
 import { AppSidebar } from "@/components/app-sidebar";
 import { Header } from "@/components/header";
 import { IssuesTable } from "@/components/issues-table";
 import { SidebarInset } from "@/components/ui/sidebar";
-import { mockIssues, currentUser } from "@/lib/placeholder-data";
+import { mockIssues } from "@/lib/placeholder-data";
+import { useUser } from "@/context/user-context";
 
 export default function IssuesPage() {
-  const userIssues = mockIssues.filter(issue => issue.reporter.id === currentUser.id);
+  const { user } = useUser();
+  const userIssues = mockIssues.filter(issue => issue.reporter.id === user.id);
 
   return (
     <>

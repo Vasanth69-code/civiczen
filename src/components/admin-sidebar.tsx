@@ -20,7 +20,6 @@ import {
   SidebarMenuButton,
   SidebarGroup,
 } from "@/components/ui/sidebar";
-import { currentUser } from "@/lib/placeholder-data";
 import { useLanguage } from "@/context/language-context";
 
 
@@ -97,7 +96,7 @@ export function AdminSidebar() {
                     <SidebarMenuButton asChild size="lg" className="h-auto py-2">
                         <Link href="#">
                             <Avatar className="size-8">
-                                <AvatarImage src={currentUser.avatarUrl} data-ai-hint={currentUser.imageHint} alt={currentUser.name} />
+                                <AvatarImage src="https://picsum.photos/seed/admin/100/100" data-ai-hint="admin user" alt="Admin" />
                                 <AvatarFallback>A</AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col">

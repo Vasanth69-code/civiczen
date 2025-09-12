@@ -18,10 +18,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/language-context";
-import { currentUser } from "@/lib/placeholder-data";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Loader2 } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useUser } from "@/context/user-context";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -33,24 +33,31 @@ const formSchema = z.object({
 export function UserSettingsForm() {
   const { toast } = useToast();
   const { t } = useLanguage();
-  const [avatarPreview, setAvatarPreview] = useState(currentUser.avatarUrl);
+  const { user, setUser } = useUser();
+  const [avatarPreview, setAvatarPreview] = useState(user.avatarUrl);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: currentUser.name,
+      name: user.name,
       email: "aarav.sharma@example.com", // Mock email
       phone: "123-456-7890", // Mock phone
     },
   });
+
+  useEffect(() => {
+    form.reset({ name: user.name });
+    setAvatarPreview(user.avatarUrl);
+  }, [user, form]);
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setAvatarPreview(reader.result as string);
+        const newAvatarUrl = reader.result as string;
+        setAvatarPreview(newAvatarUrl);
         form.setValue("avatar", file);
       };
       reader.readAsDataURL(file);
@@ -58,11 +65,15 @@ export function UserSettingsForm() {
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Form submitted with values:", values);
-    
     // Here you would typically upload the avatar to a storage service
     // and update the user's profile in your database.
-    // For this demo, we'll just show a success toast.
+    // For this demo, we'll just update the shared state.
+
+    setUser({
+        ...user,
+        name: values.name,
+        avatarUrl: avatarPreview,
+    });
 
     toast({
       title: t('profile_updated_successfully'),
@@ -81,7 +92,7 @@ export function UserSettingsForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="flex items-center gap-4">
                 <Avatar className="h-20 w-20">
-                    <AvatarImage src={avatarPreview} data-ai-hint={currentUser.imageHint} alt={form.watch('name')} />
+                    <AvatarImage src={avatarPreview} data-ai-hint={user.imageHint} alt={form.watch('name')} />
                     <AvatarFallback>{form.watch('name').charAt(0)}</AvatarFallback>
                 </Avatar>
                 <Input 
