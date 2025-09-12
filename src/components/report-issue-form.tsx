@@ -55,6 +55,7 @@ export function ReportIssueForm() {
   const { addIssue, updateIssue } = useIssues();
   const { user } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [suggestedTitle, setSuggestedTitle] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,7 +66,6 @@ export function ReportIssueForm() {
   });
 
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
-  const titleRef = useRef<HTMLInputElement>(null);
   
   useEffect(() => {
     const getCameraPermission = async () => {
@@ -159,13 +159,11 @@ export function ReportIssueForm() {
   const handleTitleSuggestion = async (description: string, mediaDataUri?: string) => {
     if(description.length < 15) return;
     setIsSuggesting(true);
+    setSuggestedTitle(null);
     try {
       const result = await suggestReportTitles({ description, mediaDataUri });
       if (result.suggestedTitle) {
-        form.setValue("title", result.suggestedTitle);
-        if (titleRef.current) {
-            titleRef.current.focus();
-        }
+        setSuggestedTitle(result.suggestedTitle);
       }
     } catch (error) {
       console.error("AI Title Suggestion Error:", error);
@@ -176,7 +174,6 @@ export function ReportIssueForm() {
 
   const processAIInBackground = (newIssueId: string, values: z.infer<typeof formSchema>) => {
     if (!mediaPreview || !geolocation) {
-        setIsSubmitting(false);
         return;
     }
     
@@ -255,6 +252,7 @@ export function ReportIssueForm() {
     form.reset();
     setMediaPreview(null);
     setMediaType(null);
+    setSuggestedTitle(null);
 
     // Start background processing, don't wait for it
     processAIInBackground(newIssueId, values);
@@ -365,11 +363,26 @@ export function ReportIssueForm() {
                         <FormItem>
                             <FormLabel className="flex items-center gap-2">
                                 {t('title_label')}
-                                {isSuggesting && <Loader2 className="h-4 w-4 animate-spin"/>}
                             </FormLabel>
                             <FormControl>
-                                <Input ref={titleRef} placeholder={t('title_placeholder')} {...field} />
+                                <Input placeholder={t('title_placeholder')} {...field} />
                             </FormControl>
+                             {isSuggesting && <p className="text-sm text-muted-foreground flex items-center pt-2"><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Suggesting a title...</p>}
+                            {suggestedTitle && (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="mt-2"
+                                    onClick={() => {
+                                        form.setValue("title", suggestedTitle);
+                                        setSuggestedTitle(null);
+                                    }}
+                                >
+                                    <Wand2 className="mr-2 h-4 w-4" />
+                                    Use suggestion: <span className="ml-1 italic">"{suggestedTitle}"</span>
+                                </Button>
+                            )}
                             <FormDescription>{t('title_description')}</FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -427,3 +440,6 @@ export function ReportIssueForm() {
     </Card>
   );
 }
+
+
+    
