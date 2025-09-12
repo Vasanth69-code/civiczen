@@ -20,8 +20,7 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { auth } from "@/lib/firebase";
-import { useSignInWithPhoneNumber } from "react-firebase-hooks/auth";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 
@@ -40,9 +39,10 @@ type LoginProps = {
 
 const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userType: 'citizen' | 'admin') => void; userType: 'citizen' | 'admin' }) => {
   const router = useRouter();
-  const [signInWithPhoneNumber, user, loading, error] = useSignInWithPhoneNumber(auth);
-  const [confirmationResult, setConfirmationResult] = useState<any>(null);
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [isOtpSent, setIsOtpSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<any>(null);
   const { toast } = useToast();
 
   const phoneForm = useForm<z.infer<typeof phoneSchema>>({
@@ -56,7 +56,7 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
   });
   
   useEffect(() => {
-    if (!window.recaptchaVerifier) {
+    if (typeof window !== 'undefined' && !window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
         'size': 'invisible',
         'callback': (response: any) => {
@@ -67,6 +67,8 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
   }, []);
 
   const onPhoneSubmit = async (values: z.infer<typeof phoneSchema>) => {
+    setLoading(true);
+    setError(null);
     try {
       const appVerifier = window.recaptchaVerifier;
       // Firebase needs the phone number in E.164 format
@@ -77,14 +79,22 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
       toast({ title: "OTP Sent!", description: "Check your phone for the verification code." });
     } catch (err: any) {
       console.error("Phone sign-in error:", err);
+      setError(err);
       toast({ variant: "destructive", title: "Error", description: err.message });
-      window.recaptchaVerifier.render().then((widgetId: any) => {
-        grecaptcha.reset(widgetId);
-      });
+      if (typeof window !== 'undefined' && window.grecaptcha && window.recaptchaVerifier) {
+        window.recaptchaVerifier.render().then((widgetId: any) => {
+          window.grecaptcha.reset(widgetId);
+        });
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   const onOtpSubmit = async (values: z.infer<typeof otpSchema>) => {
+    if (!confirmationResult) return;
+    setLoading(true);
+    setError(null);
     try {
       const credential = await confirmationResult.confirm(values.otp);
       if (credential.user) {
@@ -93,8 +103,11 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
       }
     } catch (err: any) {
       console.error("OTP confirmation error:", err);
+      setError(err);
       otpForm.setError("otp", { type: "manual", message: "Invalid OTP. Please try again." });
       toast({ variant: "destructive", title: "Login Failed", description: "The OTP you entered was incorrect." });
+    } finally {
+      setLoading(false);
     }
   };
 
