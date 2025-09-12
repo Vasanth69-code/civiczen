@@ -149,17 +149,20 @@ export function ReportIssueForm() {
         return;
     }
     
+    // This runs in the background and does not block the UI
     autoRouteIssueReport({
         photoDataUri: mediaPreview,
         description: values.description,
         location: `${geolocation.latitude}, ${geolocation.longitude}`
     }).then(routingResult => {
+        // Once AI processing is done, update the issue in Firestore
         updateIssue(newIssueId, {
             category: routingResult.issueType,
             priority: routingResult.priority,
             department: routingResult.department,
         });
 
+        // Optionally, show a second toast to indicate completion
         toast({
             title: "Report Analysis Complete",
             description: `Issue #${newIssueId} routed to ${routingResult.department}.`,
@@ -204,25 +207,34 @@ export function ReportIssueForm() {
         },
     };
 
-    const newIssueId = await addIssue(newIssue);
-
-    if (newIssueId) {
-      toast({
-          title: t('report_submitted_successfully'),
-          description: `${t('tracking_id')}: #${newIssueId}`,
-      });
-      
-      form.reset();
-      setMediaPreview(null);
-      setMediaType(null);
-      
-      // This now runs in the background and will handle setting isSubmitting to false.
-      processAIInBackground(newIssueId, values);
+    try {
+        const newIssueId = await addIssue(newIssue);
+        
+        // This is the success path: give instant feedback
+        if (newIssueId) {
+          toast({
+              title: t('report_submitted_successfully'),
+              description: `${t('tracking_id')}: #${newIssueId}. AI analysis is running in the background.`,
+          });
+          
+          // Start the slow AI process in the background. DO NOT await it.
+          processAIInBackground(newIssueId, values);
+          
+          form.reset();
+          setMediaPreview(null);
+          setMediaType(null);
+        }
+    } catch (error) {
+        // Handle cases where the initial submission fails
+        toast({
+            variant: "destructive",
+            title: "Submission Failed",
+            description: "There was an error submitting your report. Please try again."
+        });
+    } finally {
+        // Stop the loading indicator immediately
+        setIsSubmitting(false);
     }
-    
-    // We set submitting to false here to give instant feedback.
-    // The AI runs in the background.
-    setIsSubmitting(false);
   }
 
   return (
