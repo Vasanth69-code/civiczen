@@ -5,10 +5,12 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { 
   onAuthStateChanged, 
   User, 
-  createUserWithEmailAndPassword, 
   signInWithEmailAndPassword,
   signOut,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  ConfirmationResult
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { useFirebase } from './firebase-context';
@@ -19,8 +21,9 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   isAdmin: boolean;
-  signup: (email: string, pass: string) => Promise<any>;
-  login: (email: string, pass: string) => Promise<any>;
+  sendOtp: (phoneNumber: string) => Promise<void>;
+  verifyOtp: (otp: string, name: string) => Promise<any>;
+  login: (email: string, pass: string) => Promise<any>; // Kept for admin login
   loginAsAdmin: (email: string, pass: string) => Promise<any>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -30,19 +33,23 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const adminRoutes = ['/admin'];
 const publicRoutes = ['/login', '/signup', '/forgot-password'];
-const citizenRoutes = ['/report', '/issues', '/all-reports', '/leaderboard', '/settings'];
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { auth, db } = useFirebase();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!auth) {
+    if (!auth || !Object.keys(auth).length) {
         setLoading(false);
+        if (!publicRoutes.some(route => pathname.startsWith(route))) {
+          router.push('/login');
+        }
         return;
     }
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -64,7 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [auth, db]);
+  }, [auth, db, pathname, router]);
 
   useEffect(() => {
     if (loading) return;
@@ -85,13 +92,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user, loading, isAdmin, pathname, router]);
 
-  const signup = async (email: string, pass: string) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+  const sendOtp = async (phoneNumber: string) => {
+    if(!auth) throw new Error("Auth not initialized");
+    const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        'size': 'invisible',
+    });
+    const confirmation = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+    setConfirmationResult(confirmation);
+  };
+  
+  const verifyOtp = async (otp: string, name: string) => {
+    if (!confirmationResult) {
+      throw new Error("No OTP confirmation result found. Please try sending the OTP again.");
+    }
+    const userCredential = await confirmationResult.confirm(otp);
     const user = userCredential.user;
+    
     // Create a new user document in Firestore
     await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
-        email: user.email,
+        name: name,
+        phone: user.phoneNumber,
         role: 'citizen',
         createdAt: serverTimestamp(),
     });
@@ -122,10 +143,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return sendPasswordResetEmail(auth, email);
   }
 
-  const value = { user, loading, isAdmin, signup, login, loginAsAdmin, logout, resetPassword };
+  const value = { user, loading, isAdmin, sendOtp, verifyOtp, login, loginAsAdmin, logout, resetPassword };
   
   const isPublic = publicRoutes.some(route => pathname.startsWith(route));
-  if (loading || (!user && !isPublic)) {
+  if (loading && !isPublic) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

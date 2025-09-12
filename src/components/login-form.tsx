@@ -25,23 +25,22 @@ export function LoginForm() {
   const [citizenLoading, setCitizenLoading] = useState(false);
   const [adminLoading, setAdminLoading] = useState(false);
 
-  const handleLogin = async (isAdmin: boolean) => {
-    if (isAdmin) {
-      setAdminLoading(true);
-    } else {
-      setCitizenLoading(true);
-    }
+  // This is a placeholder for a future implementation of phone number login
+  const handleCitizenLogin = async () => {
+    toast({
+      title: "Feature not available",
+      description: "Please sign up with your phone number. Citizen login will be enabled soon.",
+    });
+  }
+
+  const handleAdminLogin = async () => {
+    setAdminLoading(true);
 
     try {
-      if (isAdmin) {
-        await loginAsAdmin(email, password);
-        toast({ title: t('sign_in_successful') });
-        router.push('/admin/dashboard');
-      } else {
-        await login(email, password);
-        toast({ title: t('sign_in_successful') });
-        router.push('/report');
-      }
+      await loginAsAdmin(email, password);
+      toast({ title: t('sign_in_successful') });
+      router.push('/admin/dashboard');
+      
     } catch (error: any) {
       let description = t('sign_in_failed_description');
        if (error instanceof FirebaseError) {
@@ -67,11 +66,7 @@ export function LoginForm() {
         description: description,
       });
     } finally {
-      if (isAdmin) {
-        setAdminLoading(false);
-      } else {
-        setCitizenLoading(false);
-      }
+      setAdminLoading(false);
     }
   };
 
@@ -91,10 +86,23 @@ export function LoginForm() {
             <CardDescription>{t('sign_in_description')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+          <div className="space-y-4">
+             <div className="text-center text-sm text-muted-foreground pt-4 border-t">
+                New user? <Link href="/signup" className="text-primary underline">{t('sign_up_with_phone')}</Link>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  {t('or')}
+                </span>
+              </div>
+            </div>
             <div className="space-y-2">
-                <Label htmlFor="email">{t('email_address')}</Label>
-                <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Label htmlFor="email">{t('admin_email')}</Label>
+                <Input id="email" type="email" placeholder="admin@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="password">{t('password')}</Label>
@@ -106,11 +114,7 @@ export function LoginForm() {
                 </Link>
             </div>
             <div className="flex flex-col space-y-2 pt-4">
-                 <Button onClick={() => handleLogin(false)} disabled={citizenLoading || adminLoading}>
-                    {citizenLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Users className="mr-2 h-5 w-5" />}
-                    {t('sign_in_as_citizen')}
-                </Button>
-                <Button onClick={() => handleLogin(true)} variant="secondary" disabled={citizenLoading || adminLoading}>
+                <Button onClick={handleAdminLogin} variant="secondary" disabled={adminLoading}>
                     {adminLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Shield className="mr-2 h-5 w-5" />}
                     {t('sign_in_as_admin')}
                 </Button>
@@ -118,10 +122,7 @@ export function LoginForm() {
              <div className="text-center text-sm text-muted-foreground pt-4 border-t">
                 {t('admin_demo_credentials')} <code className="font-code text-xs">demo@example.com</code> / <code className="font-code text-xs">password</code>
             </div>
-            <div className="text-center text-sm text-muted-foreground pt-4">
-                {t('dont_have_account')} <Link href="/signup" className="text-primary underline">{t('sign_up')}</Link>
-            </div>
-          </form>
+          </div>
         </CardContent>
       </Card>
     </div>
