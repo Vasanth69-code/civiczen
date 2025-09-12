@@ -7,6 +7,7 @@ import {
   Award,
   Settings,
   List,
+  LogOut,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -23,10 +24,12 @@ import {
 } from "@/components/ui/sidebar";
 import { currentUser } from "@/lib/placeholder-data";
 import { useLanguage } from "@/context/language-context";
+import { useAuth } from "@/context/auth-context";
 
 export function AppSidebar() {
   const pathname = usePathname();
   const { t } = useLanguage();
+  const { user, logout } = useAuth();
 
   const isActive = (path: string) => {
     return pathname === path;
@@ -106,14 +109,20 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
+                    <SidebarMenuButton onClick={logout} tooltip={{children: 'Logout'}}>
+                        <LogOut />
+                        <span>Logout</span>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
                     <SidebarMenuButton asChild size="lg" className="h-auto py-2">
                         <Link href="/settings">
                             <Avatar className="size-8">
                                 <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} data-ai-hint={currentUser.imageHint} />
-                                <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+                                <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col">
-                                <span className="font-medium">{currentUser.name}</span>
+                                <span className="font-medium">{user?.email}</span>
                                 <span className="text-xs text-muted-foreground">{t('citizen')}</span>
                             </div>
                         </Link>

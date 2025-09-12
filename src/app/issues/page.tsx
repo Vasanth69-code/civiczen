@@ -1,5 +1,8 @@
+
+import { AppSidebar } from "@/components/app-sidebar";
 import { Header } from "@/components/header";
 import { IssuesTable } from "@/components/issues-table";
+import { SidebarInset } from "@/components/ui/sidebar";
 import { mockIssues, currentUser } from "@/lib/placeholder-data";
 
 export default function IssuesPage() {
@@ -7,10 +10,13 @@ export default function IssuesPage() {
 
   return (
     <>
-      <Header title="My Submitted Issues" />
-      <main className="flex-1 p-4 md:p-6">
-        <IssuesTable issues={userIssues} title="My Submitted Issues" />
-      </main>
+      <AppSidebar />
+      <SidebarInset>
+        <Header title="My Submitted Issues" />
+        <main className="flex-1 p-4 md:p-6">
+          <IssuesTable issues={userIssues} title="My Submitted Issues" />
+        </main>
+      </SidebarInset>
     </>
   );
 }

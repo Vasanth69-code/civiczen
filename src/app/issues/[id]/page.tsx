@@ -1,5 +1,8 @@
+
+import { AppSidebar } from "@/components/app-sidebar";
 import { Header } from "@/components/header";
 import { IssueDetails } from "@/components/issue-details";
+import { SidebarInset } from "@/components/ui/sidebar";
 import { mockIssues } from "@/lib/placeholder-data";
 import { notFound } from 'next/navigation';
 
@@ -12,10 +15,13 @@ export default function IssueDetailsPage({ params }: { params: { id: string } })
 
   return (
     <>
-      <Header title="issue_details" />
-      <main className="flex-1 p-4 md:p-6">
-        <IssueDetails issue={issue} />
-      </main>
+      <AppSidebar />
+      <SidebarInset>
+        <Header title="issue_details" />
+        <main className="flex-1 p-4 md:p-6">
+          <IssueDetails issue={issue} />
+        </main>
+      </SidebarInset>
     </>
   );
 }

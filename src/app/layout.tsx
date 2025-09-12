@@ -3,6 +3,8 @@ import './globals.css';
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { LanguageProvider } from "@/context/language-context";
+import { AuthProvider } from "@/context/auth-context";
+import { FirebaseProvider } from "@/context/firebase-context";
 
 export default function RootLayout({
   children,
@@ -17,14 +19,15 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <LanguageProvider>
-          <SidebarProvider>
-              <AppSidebar />
-              <SidebarInset>
+        <FirebaseProvider>
+          <AuthProvider>
+            <LanguageProvider>
+              <SidebarProvider>
                   {children}
-              </SidebarInset>
-          </SidebarProvider>
-        </LanguageProvider>
+              </SidebarProvider>
+            </LanguageProvider>
+          </AuthProvider>
+        </FirebaseProvider>
         <Toaster />
       </body>
     </html>
