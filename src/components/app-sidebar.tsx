@@ -8,6 +8,8 @@ import {
   Award,
   Settings,
   List,
+  MessageCircle,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -81,6 +83,18 @@ export function AppSidebar() {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+             <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={isActive("/community")}
+                tooltip={{ children: t('community') }}
+              >
+                <Link href="/community">
+                  <Users />
+                  <span>{t('community')}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
@@ -90,6 +104,18 @@ export function AppSidebar() {
                 <Link href="/leaderboard">
                   <Award />
                   <span>{t('community_leaderboard')}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={isActive("/chat")}
+                tooltip={{ children: t('community_chat') }}
+              >
+                <Link href="/chat">
+                  <MessageCircle />
+                  <span>{t('community_chat')}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
