@@ -402,5 +402,3 @@ export function ReportIssueForm() {
     </Card>
   );
 }
-
-    
