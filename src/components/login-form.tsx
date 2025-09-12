@@ -62,12 +62,16 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
   
   useEffect(() => {
     if (typeof window !== 'undefined' && !window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'invisible',
-        'callback': (response: any) => {
-          // reCAPTCHA solved, allow signInWithPhoneNumber.
-        }
-      });
+      try {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          'size': 'invisible',
+          'callback': (response: any) => {
+            // reCAPTCHA solved, allow signInWithPhoneNumber.
+          }
+        });
+      } catch (e) {
+        console.error("Error initializing RecaptchaVerifier", e)
+      }
     }
   }, []);
 
@@ -97,7 +101,9 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
       toast({ variant: "destructive", title: "Error", description: err.message });
       if (typeof window !== 'undefined' && window.grecaptcha && window.recaptchaVerifier) {
         window.recaptchaVerifier.render().then((widgetId: any) => {
-          window.grecaptcha.reset(widgetId);
+          if(window.grecaptcha) {
+            window.grecaptcha.reset(widgetId);
+          }
         });
       }
     } finally {
