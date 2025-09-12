@@ -74,7 +74,7 @@ export function ReportIssueForm() {
         return;
       }
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
         setHasCameraPermission(true);
 
         if (videoRef.current) {
@@ -175,7 +175,10 @@ export function ReportIssueForm() {
   };
 
   const processAIInBackground = async (newIssueId: string, values: z.infer<typeof formSchema>) => {
-    if (!mediaPreview || !geolocation) return;
+    if (!mediaPreview || !geolocation) {
+        setIsSubmitting(false);
+        return;
+    }
     
     try {
         const routingResult = await autoRouteIssueReport({
@@ -428,3 +431,5 @@ export function ReportIssueForm() {
     </Card>
   );
 }
+
+    
