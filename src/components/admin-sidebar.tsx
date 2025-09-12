@@ -80,7 +80,7 @@ export function AdminSidebar() {
                 isActive={isActive("/admin/users")}
                 tooltip={{ children: t('users') }}
               >
-                <Link href="#">
+                <Link href="/admin/users">
                   <Users />
                   <span>{t('users')}</span>
                 </Link>
