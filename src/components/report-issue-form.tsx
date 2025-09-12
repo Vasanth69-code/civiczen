@@ -251,7 +251,7 @@ export function ReportIssueForm() {
     setMediaPreview(null);
     setMediaType(null);
 
-    // AI processing in the background
+    // AI processing in the background, without await
     processAIInBackground(newIssueId, values);
   }
 
@@ -422,5 +422,7 @@ export function ReportIssueForm() {
     </Card>
   );
 }
+
+    
 
     
