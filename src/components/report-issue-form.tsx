@@ -174,18 +174,18 @@ export function ReportIssueForm() {
     }
   };
 
-  const processAIInBackground = async (newIssueId: string, values: z.infer<typeof formSchema>) => {
+  const processAIInBackground = (newIssueId: string, values: z.infer<typeof formSchema>) => {
     if (!mediaPreview || !geolocation) {
+        setIsSubmitting(false);
         return;
     }
     
-    try {
-        const routingResult = await autoRouteIssueReport({
-            photoDataUri: mediaPreview,
-            description: values.description,
-            location: `${geolocation.latitude}, ${geolocation.longitude}`
-        });
-
+    // Don't await this, let it run in the background
+    autoRouteIssueReport({
+        photoDataUri: mediaPreview,
+        description: values.description,
+        location: `${geolocation.latitude}, ${geolocation.longitude}`
+    }).then(routingResult => {
         updateIssue(newIssueId, {
             category: routingResult.issueType,
             priority: routingResult.priority,
@@ -194,19 +194,18 @@ export function ReportIssueForm() {
 
         toast({
             title: "Report Analysis Complete",
-            description: `Issue #${newIssueId} has been routed to ${routingResult.department}.`,
+            description: `Issue #${newIssueId} routed to ${routingResult.department}.`,
         });
-
-    } catch (error) {
+    }).catch(error => {
         console.error("Background Submission Error:", error);
         toast({
             variant: 'destructive',
             title: "AI Routing Failed",
-            description: `Could not automatically route issue #${newIssueId}. It will be manually reviewed.`,
+            description: `Could not auto-route issue #${newIssueId}. It will be manually reviewed.`,
         })
-    } finally {
+    }).finally(() => {
         setIsSubmitting(false);
-    }
+    });
   }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -241,6 +240,7 @@ export function ReportIssueForm() {
 
     const newIssueId = await addIssue(newIssue);
 
+    // If addIssue fails, it returns null. Stop processing.
     if (!newIssueId) {
       setIsSubmitting(false);
       return;
@@ -251,10 +251,12 @@ export function ReportIssueForm() {
         description: `${t('tracking_id')}: #${newIssueId}`,
     });
 
+    // Reset form for the next submission
     form.reset();
     setMediaPreview(null);
     setMediaType(null);
 
+    // Start background processing, don't wait for it
     processAIInBackground(newIssueId, values);
   }
 
@@ -425,5 +427,3 @@ export function ReportIssueForm() {
     </Card>
   );
 }
-
-  

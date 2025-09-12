@@ -25,18 +25,24 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         const usersCollection = collection(db, 'users');
         const q = query(usersCollection, orderBy('points', 'desc'));
         const usersSnapshot = await getDocs(q);
-        const usersList = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
+        let usersList: User[] = [];
+        if (usersSnapshot.empty) {
+            // If the collection is empty, use mock data.
+            // This is useful for initial setup or demo purposes.
+            console.warn("User collection is empty. Falling back to mock data.");
+            usersList = [...mockUsers].sort((a,b) => b.points - a.points);
+        } else {
+            usersList = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
+        }
 
         const rankedUsers = usersList.map((user, index) => ({...user, rank: index + 1}));
         setUsers(rankedUsers);
 
-        // Find the current user in the fetched list, if they exist
-        const current = rankedUsers.find(u => u.id === defaultUser.id) || defaultUser;
+        const current = rankedUsers.find(u => u.id === defaultUser.id) || {...defaultUser, rank: rankedUsers.length + 1};
         setUser(current);
 
       } catch (error) {
-        console.error("Error fetching users from Firestore:", error);
-        // On error, use mock data but ensure ranking is correct
+        console.error("Error fetching users from Firestore, falling back to mock data:", error);
         const sortedMockUsers = [...mockUsers].sort((a, b) => b.points - a.points);
         const rankedMockUsers = sortedMockUsers.map((u, i) => ({...u, rank: i + 1}));
         setUsers(rankedMockUsers);
