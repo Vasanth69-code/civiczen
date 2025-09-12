@@ -1,10 +1,12 @@
+
 // This file is intentionally left blank. 
 // It will be replaced by the Firebase config object when the project is created.
 export const firebaseConfig = {
-    "apiKey": "YOUR_API_KEY",
-    "authDomain": "YOUR_AUTH_DOMAIN",
-    "projectId": "YOUR_PROJECT_ID",
-    "storageBucket": "YOUR_STORAGE_BUCKET",
-    "messagingSenderId": "YOUR_MESSAGING_SENDER_ID",
-    "appId": "YOUR_APP_ID"
+  "projectId": "studio-200470893-4474d",
+  "appId": "1:978339002756:web:81a3c02a4e26646ca945d1",
+  "storageBucket": "studio-200470893-4474d.firebasestorage.app",
+  "apiKey": "AIzaSyB_4ugcDEer2rSA6WJftebK57JhrbBAcqM",
+  "authDomain": "studio-200470893-4474d.firebaseapp.com",
+  "measurementId": "",
+  "messagingSenderId": "978339002756"
 };
