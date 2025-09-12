@@ -165,14 +165,14 @@ export function ReportIssueForm() {
         // Optionally, show a second toast to indicate completion
         toast({
             title: "Report Analysis Complete",
-            description: `Issue #${newIssueId} routed to ${routingResult.department}.`,
+            description: `Issue #${newIssueId.substring(0,5)} routed to ${routingResult.department}.`,
         });
     }).catch(error => {
         console.error("Background AI Submission Error:", error);
         toast({
             variant: 'destructive',
             title: "AI Routing Failed",
-            description: `Could not auto-route issue #${newIssueId}. It will be manually reviewed.`,
+            description: `Could not auto-route issue #${newIssueId.substring(0,5)}. It will be manually reviewed.`,
         })
     });
   }
@@ -200,6 +200,7 @@ export function ReportIssueForm() {
         location: { lat: geolocation.latitude, lng: geolocation.longitude },
         address: 'Fetching address...', // This could be resolved via a geocoding API
         imageUrl: mediaPreview,
+        imageHint: "reported issue",
         reporter: {
           id: user.id,
           name: user.name,
@@ -214,7 +215,7 @@ export function ReportIssueForm() {
         if (newIssueId) {
           toast({
               title: t('report_submitted_successfully'),
-              description: `${t('tracking_id')}: #${newIssueId}. AI analysis is running in the background.`,
+              description: `${t('tracking_id')}: #${newIssueId.substring(0,5)}. AI analysis is running in the background.`,
           });
           
           // Start the slow AI process in the background. DO NOT await it.
@@ -402,3 +403,5 @@ export function ReportIssueForm() {
     </Card>
   );
 }
+
+    
