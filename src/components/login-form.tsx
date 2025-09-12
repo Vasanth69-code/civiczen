@@ -17,21 +17,12 @@ import { FirebaseError } from 'firebase/app';
 
 export function LoginForm() {
   const { t } = useLanguage();
-  const { login, loginAsAdmin } = useAuth();
+  const { loginAsAdmin } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const [email, setEmail] = useState('demo@example.com');
   const [password, setPassword] = useState('password');
-  const [citizenLoading, setCitizenLoading] = useState(false);
   const [adminLoading, setAdminLoading] = useState(false);
-
-  // This is a placeholder for a future implementation of phone number login
-  const handleCitizenLogin = async () => {
-    toast({
-      title: "Feature not available",
-      description: "Please sign up with your phone number. Citizen login will be enabled soon.",
-    });
-  }
 
   const handleAdminLogin = async () => {
     setAdminLoading(true);
@@ -88,7 +79,7 @@ export function LoginForm() {
         <CardContent>
           <div className="space-y-4">
              <div className="text-center text-sm text-muted-foreground pt-4 border-t">
-                New user? <Link href="/signup" className="text-primary underline">{t('sign_up_with_phone')}</Link>
+                New user? <Link href="/signup" className="text-primary underline">{t('sign_up')}</Link>
             </div>
             <div className="relative">
               <div className="absolute inset-0 flex items-center">

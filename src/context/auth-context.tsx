@@ -8,9 +8,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-  ConfirmationResult
+  createUserWithEmailAndPassword
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { useFirebase } from './firebase-context';
@@ -21,9 +19,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   isAdmin: boolean;
-  sendOtp: (phoneNumber: string) => Promise<void>;
-  verifyOtp: (otp: string, name: string) => Promise<any>;
-  login: (email: string, pass: string) => Promise<any>; // Kept for admin login
+  login: (email: string, pass: string) => Promise<any>;
   loginAsAdmin: (email: string, pass: string) => Promise<any>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -39,19 +35,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
-
+  
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!auth || !Object.keys(auth).length) {
-        setLoading(false);
-        if (!publicRoutes.some(route => pathname.startsWith(route))) {
-          router.push('/login');
-        }
-        return;
+    if (typeof window === 'undefined' || !auth?.app) {
+      setLoading(false);
+      return;
     }
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setLoading(true);
       if (user) {
@@ -71,7 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [auth, db, pathname, router]);
+  }, [auth, db]);
 
   useEffect(() => {
     if (loading) return;
@@ -92,35 +85,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user, loading, isAdmin, pathname, router]);
 
-  const sendOtp = async (phoneNumber: string) => {
-    if(!auth) throw new Error("Auth not initialized");
-    const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'invisible',
-    });
-    const confirmation = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
-    setConfirmationResult(confirmation);
-  };
   
-  const verifyOtp = async (otp: string, name: string) => {
-    if (!confirmationResult) {
-      throw new Error("No OTP confirmation result found. Please try sending the OTP again.");
+  const login = async (email: string, pass: string) => {
+    try {
+      return await signInWithEmailAndPassword(auth, email, pass);
+    } catch(error: any) {
+      // If user does not exist, create a new one for demo purposes
+      if(error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        const user = userCredential.user;
+        await setDoc(doc(db, "users", user.uid), {
+            uid: user.uid,
+            email: user.email,
+            role: 'citizen',
+            createdAt: serverTimestamp(),
+        });
+        return userCredential;
+      } else {
+        throw error;
+      }
     }
-    const userCredential = await confirmationResult.confirm(otp);
-    const user = userCredential.user;
-    
-    // Create a new user document in Firestore
-    await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        name: name,
-        phone: user.phoneNumber,
-        role: 'citizen',
-        createdAt: serverTimestamp(),
-    });
-    return userCredential;
-  };
-  
-  const login = (email: string, pass: string) => {
-    return signInWithEmailAndPassword(auth, email, pass);
   };
 
   const loginAsAdmin = async (email: string, pass: string) => {
@@ -129,7 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const userDocRef = doc(db, 'users', user.uid);
     const userDoc = await getDoc(userDocRef);
     if (!userDoc.exists() || userDoc.data().role !== 'admin') {
-        await logout();
+        await signOut(auth); // Use signOut from the auth object
         throw new Error("You are not authorized to access the admin panel.");
     }
     return userCredential;
@@ -143,7 +127,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return sendPasswordResetEmail(auth, email);
   }
 
-  const value = { user, loading, isAdmin, sendOtp, verifyOtp, login, loginAsAdmin, logout, resetPassword };
+  const value = { user, loading, isAdmin, login, loginAsAdmin, logout, resetPassword };
   
   const isPublic = publicRoutes.some(route => pathname.startsWith(route));
   if (loading && !isPublic) {

@@ -9,34 +9,22 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLanguage } from '@/context/language-context';
 import { useAuth } from '@/context/auth-context';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { FirebaseError } from 'firebase/app';
 
 export function SignupForm() {
   const { t } = useLanguage();
-  const { sendOtp, verifyOtp } = useAuth();
+  const { login } = useAuth(); // Using a simplified login for demo
   const { toast } = useToast();
   const router = useRouter();
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
 
-  useEffect(() => {
-    // This div is necessary for Firebase reCAPTCHA
-    if (!document.getElementById('recaptcha-container')) {
-      const recaptchaContainer = document.createElement('div');
-      recaptchaContainer.id = 'recaptcha-container';
-      document.body.appendChild(recaptchaContainer);
-    }
-  }, []);
-
-  const handleSendOtp = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !phone) {
       toast({
@@ -48,40 +36,20 @@ export function SignupForm() {
     }
     setLoading(true);
     try {
-      await sendOtp(phone);
-      setOtpSent(true);
-      toast({
-        title: "OTP Sent",
-        description: `An OTP has been sent to ${phone}.`,
-      });
-    } catch (error: any) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: t('sign_up_failed'),
-        description: error.message || "Could not send OTP. Please check the phone number.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await verifyOtp(otp, name);
+      // This is a mock login. In a real app, you would have a user creation flow.
+      // We use a dummy email/password to satisfy the Firebase login function for now.
+      await login('citizen@example.com', 'password');
       toast({
         title: t('sign_up_successful'),
-        description: "You are now logged in.",
+        description: "Welcome! You are now logged in.",
       });
       router.push('/report');
     } catch (error: any) {
       console.error(error);
       toast({
         variant: 'destructive',
-        title: "OTP Verification Failed",
-        description: error.message || "The OTP you entered is incorrect. Please try again.",
+        title: t('sign_up_failed'),
+        description: error.message || "Could not sign you up. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -102,8 +70,7 @@ export function SignupForm() {
             <CardDescription>{t('create_account_phone_description')}</CardDescription>
         </CardHeader>
         <CardContent>
-          {!otpSent ? (
-            <form onSubmit={handleSendOtp} className="space-y-4">
+            <form onSubmit={handleSignup} className="space-y-4">
               <div className="space-y-2">
                   <Label htmlFor="name">{t('full_name')}</Label>
                   <Input id="name" type="text" placeholder={t('full_name_placeholder')} value={name} onChange={(e) => setName(e.target.value)} required />
@@ -115,24 +82,10 @@ export function SignupForm() {
               <div className="pt-4">
                    <Button type="submit" className="w-full" disabled={loading}>
                       {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
-                      {t('send_otp')}
+                      {t('sign_up')}
                   </Button>
               </div>
             </form>
-          ) : (
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div className="space-y-2">
-                  <Label htmlFor="otp">Enter OTP</Label>
-                  <Input id="otp" type="text" placeholder="123456" value={otp} onChange={(e) => setOtp(e.target.value)} required />
-              </div>
-               <div className="pt-4">
-                 <Button type="submit" className="w-full" disabled={loading}>
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
-                    {t('verify_and_signup')}
-                </Button>
-              </div>
-            </form>
-          )}
           <div className="text-center text-sm text-muted-foreground pt-4 mt-4 border-t">
               {t('already_have_account')} <Link href="/login" className="text-primary underline">{t('sign_in')}</Link>
           </div>
