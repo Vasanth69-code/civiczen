@@ -37,12 +37,17 @@ type LoginProps = {
   onLoginSuccess: (userType: 'citizen' | 'admin') => void;
 }
 
+// Demo credentials
+const DEMO_PHONE_NUMBER = '9999999999';
+const DEMO_OTP = '123456';
+
 const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userType: 'citizen' | 'admin') => void; userType: 'citizen' | 'admin' }) => {
   const router = useRouter();
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<any>(null);
+  const [isDemoFlow, setIsDemoFlow] = useState(false);
   const { toast } = useToast();
 
   const phoneForm = useForm<z.infer<typeof phoneSchema>>({
@@ -67,12 +72,21 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
   }, []);
 
   const onPhoneSubmit = async (values: z.infer<typeof phoneSchema>) => {
+    const phoneNumber = values.phoneNumber.replace(/\D/g, '');
+    if (phoneNumber === DEMO_PHONE_NUMBER) {
+        setIsDemoFlow(true);
+        setIsOtpSent(true);
+        toast({ title: "Demo Login", description: "Please enter the demo OTP." });
+        return;
+    }
+
     setLoading(true);
     setError(null);
+    setIsDemoFlow(false);
     try {
       const appVerifier = window.recaptchaVerifier;
       // Firebase needs the phone number in E.164 format
-      const phoneNumberE164 = `+1${values.phoneNumber.replace(/\D/g, '')}`;
+      const phoneNumberE164 = `+1${phoneNumber}`;
       const result = await signInWithPhoneNumber(auth, phoneNumberE164, appVerifier);
       setConfirmationResult(result);
       setIsOtpSent(true);
@@ -92,9 +106,23 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
   };
 
   const onOtpSubmit = async (values: z.infer<typeof otpSchema>) => {
-    if (!confirmationResult) return;
     setLoading(true);
     setError(null);
+    
+    if (isDemoFlow) {
+        if (values.otp === DEMO_OTP) {
+            toast({ title: "Demo Login Successful!", description: "Redirecting..." });
+            onLoginSuccess(userType);
+        } else {
+            setError({ message: "Invalid demo OTP." });
+            otpForm.setError("otp", { type: "manual", message: "Invalid demo OTP. Please try again." });
+            toast({ variant: "destructive", title: "Login Failed", description: "The demo OTP you entered was incorrect." });
+        }
+        setLoading(false);
+        return;
+    }
+
+    if (!confirmationResult) return;
     try {
       const credential = await confirmationResult.confirm(values.otp);
       if (credential.user) {
@@ -111,6 +139,14 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
     }
   };
 
+  const resetLoginFlow = () => {
+    setIsOtpSent(false);
+    setIsDemoFlow(false);
+    setError(null);
+    phoneForm.reset();
+    otpForm.reset();
+  }
+
   if (!isOtpSent) {
     return (
         <Form {...phoneForm}>
@@ -122,7 +158,7 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
                         <FormItem>
                         <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                            <Input type="tel" placeholder="e.g., 555-123-4567" {...field} />
+                            <Input type="tel" placeholder="e.g., 555-123-4567 or 9999999999 for demo" {...field} />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
@@ -153,7 +189,7 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
             <FormItem>
               <FormLabel>Verification Code</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Enter 6-digit code" {...field} />
+                <Input type="text" placeholder={isDemoFlow ? `Enter demo OTP: ${DEMO_OTP}` : "Enter 6-digit code"} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -169,7 +205,7 @@ const PhoneLoginForm = ({ onLoginSuccess, userType }: { onLoginSuccess: (userTyp
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Verify & Login
         </Button>
-         <Button variant="link" size="sm" className="w-full" onClick={() => setIsOtpSent(false)}>
+         <Button variant="link" size="sm" className="w-full" onClick={resetLoginFlow}>
             Use a different phone number
         </Button>
       </form>
