@@ -30,6 +30,7 @@ import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import dynamic from 'next/dynamic';
 import { Skeleton } from "./ui/skeleton";
+import type { Map } from "leaflet";
 
 
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), {
@@ -67,13 +68,21 @@ type Geolocation = {
 }
 
 const ReportMap = memo(({ geolocation }: { geolocation: Geolocation | null }) => {
+    const [map, setMap] = useState<Map | null>(null);
+
+    useEffect(() => {
+        if (map && geolocation) {
+            map.setView([geolocation.latitude, geolocation.longitude], 16);
+        }
+    }, [map, geolocation]);
+    
     if (!geolocation) {
         return <Skeleton className="h-48 w-full" />;
     }
 
     return (
         <div className="h-48 w-full rounded-md mt-2 overflow-hidden z-0">
-            <MapContainer center={[geolocation.latitude, geolocation.longitude]} zoom={16} scrollWheelZoom={false} className="h-full w-full">
+            <MapContainer whenCreated={setMap} center={[geolocation.latitude, geolocation.longitude]} zoom={16} scrollWheelZoom={false} className="h-full w-full">
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

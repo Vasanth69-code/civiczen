@@ -22,6 +22,7 @@ import { useIssues } from "@/context/issue-context";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Skeleton } from "./ui/skeleton";
+import type { Map } from "leaflet";
 
 
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), {
@@ -34,9 +35,17 @@ const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ss
 
 
 const DetailsMap = memo(({ issue }: { issue: Issue }) => {
+    const [map, setMap] = useState<Map | null>(null);
+
+    useEffect(() => {
+        if (map) {
+            map.setView([issue.location.lat, issue.location.lng], 16);
+        }
+    }, [map, issue]);
+
     return (
         <div className="h-80 w-full rounded-md overflow-hidden z-0">
-            <MapContainer center={[issue.location.lat, issue.location.lng]} zoom={16} scrollWheelZoom={false} className="h-full w-full">
+            <MapContainer whenCreated={setMap} center={[issue.location.lat, issue.location.lng]} zoom={16} scrollWheelZoom={false} className="h-full w-full">
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
