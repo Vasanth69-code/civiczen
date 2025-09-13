@@ -28,8 +28,14 @@ import { useIssues } from "@/context/issue-context";
 import { useUser } from "@/context/user-context";
 import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import ReportMap from './report-map';
 import { Skeleton } from "./ui/skeleton";
+import dynamic from 'next/dynamic';
+
+const ReportMap = dynamic(() => import('@/components/report-map'), { 
+    ssr: false,
+    loading: () => <Skeleton className="h-48 w-full" />
+});
+
 
 const issueTypes = [
     "Pothole",
@@ -405,7 +411,9 @@ export function ReportIssueForm() {
                                 </Button>
                             )}
                         </div>
-                        <ReportMap geolocation={geolocation} />
+                        <div className="h-48 w-full rounded-md mt-2 overflow-hidden z-0">
+                            <ReportMap geolocation={geolocation} />
+                        </div>
                     </div>
                      {!isLocating && !geolocation && (
                         <Alert variant="destructive">

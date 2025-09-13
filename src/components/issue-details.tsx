@@ -22,7 +22,11 @@ import { useIssues } from "@/context/issue-context";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Skeleton } from "./ui/skeleton";
-import DetailsMap from './details-map';
+
+const DetailsMap = dynamic(() => import('./details-map'), { 
+    ssr: false,
+    loading: () => <Skeleton className="h-80 w-full" />
+});
 
 
 type IssueDetailsProps = {
@@ -179,7 +183,9 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
                             {t('location')}
                         </h3>
                         <p className="text-muted-foreground mb-4">{issue.address}</p>
-                        <DetailsMap issue={issue} />
+                        <div className="h-80 w-full rounded-md overflow-hidden z-0">
+                           <DetailsMap issue={issue} />
+                        </div>
                     </div>
                 </CardContent>
                 <CardFooter className="flex justify-end gap-2">
