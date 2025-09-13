@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -18,7 +17,7 @@ export default function DetailsMap({ issue }: { issue: Issue }) {
     return (
         <div className="h-80 w-full rounded-md overflow-hidden z-0">
             <MapContainer
-                whenCreated={(mapInstance) => { mapRef.current = mapInstance; }}
+                ref={mapRef}
                 center={[issue.location.lat, issue.location.lng]}
                 zoom={16}
                 scrollWheelZoom={false}

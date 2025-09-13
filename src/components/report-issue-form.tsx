@@ -28,7 +28,7 @@ import { useIssues } from "@/context/issue-context";
 import { useUser } from "@/context/user-context";
 import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import dynamic from 'next/dynamic';
+import ReportMap from './report-map';
 import { Skeleton } from "./ui/skeleton";
 
 const issueTypes = [
@@ -57,11 +57,6 @@ export type Geolocation = {
   latitude: number;
   longitude: number;
 }
-
-const ReportMap = dynamic(() => import('./report-map'), { 
-    ssr: false,
-    loading: () => <Skeleton className="h-48 w-full" />
-});
 
 
 export function ReportIssueForm() {

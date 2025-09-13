@@ -22,12 +22,7 @@ import { useIssues } from "@/context/issue-context";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Skeleton } from "./ui/skeleton";
-
-
-const DetailsMap = dynamic(() => import('./details-map'), { 
-    ssr: false,
-    loading: () => <Skeleton className="h-80 w-full rounded-md" />
-});
+import DetailsMap from './details-map';
 
 
 type IssueDetailsProps = {

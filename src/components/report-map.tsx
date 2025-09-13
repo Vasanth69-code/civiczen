@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -23,7 +22,7 @@ export default function ReportMap({ geolocation }: { geolocation: Geolocation | 
     return (
         <div className="h-48 w-full rounded-md mt-2 overflow-hidden z-0">
             <MapContainer
-                whenCreated={(mapInstance) => { mapRef.current = mapInstance; }}
+                ref={mapRef}
                 center={[geolocation.latitude, geolocation.longitude]}
                 zoom={16}
                 scrollWheelZoom={false}
