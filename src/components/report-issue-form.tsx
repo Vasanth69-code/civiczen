@@ -29,13 +29,7 @@ import { useUser } from "@/context/user-context";
 import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Skeleton } from "./ui/skeleton";
-import dynamic from 'next/dynamic';
-
-const ReportMap = dynamic(() => import('@/components/report-map'), { 
-    ssr: false,
-    loading: () => <Skeleton className="h-48 w-full" />
-});
-
+import OpenStreetMap from "./open-street-map";
 
 const issueTypes = [
     "Pothole",
@@ -130,7 +124,7 @@ export function ReportIssueForm() {
           toast({ variant: "destructive", title: t('error'), description: t('location_error_description') });
           setIsLocating(false);
         },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
       );
     } else {
       toast({ variant: "destructive", title: t('error'), description: t('geolocation_not_supported') });
@@ -412,7 +406,7 @@ export function ReportIssueForm() {
                             )}
                         </div>
                         <div className="h-48 w-full rounded-md mt-2 overflow-hidden z-0">
-                            <ReportMap geolocation={geolocation} />
+                            {isLocating ? <Skeleton className="h-full w-full" /> : <OpenStreetMap location={geolocation} />}
                         </div>
                     </div>
                      {!isLocating && !geolocation && (

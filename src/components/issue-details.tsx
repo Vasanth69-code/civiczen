@@ -20,13 +20,8 @@ import {
 } from "./ui/dropdown-menu";
 import { useIssues } from "@/context/issue-context";
 import { usePathname } from "next/navigation";
-import dynamic from "next/dynamic";
 import { Skeleton } from "./ui/skeleton";
-
-const DetailsMap = dynamic(() => import('./details-map'), { 
-    ssr: false,
-    loading: () => <Skeleton className="h-80 w-full" />
-});
+import OpenStreetMap from "./open-street-map";
 
 
 type IssueDetailsProps = {
@@ -184,7 +179,7 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
                         </h3>
                         <p className="text-muted-foreground mb-4">{issue.address}</p>
                         <div className="h-80 w-full rounded-md overflow-hidden z-0">
-                           <DetailsMap issue={issue} />
+                           <OpenStreetMap location={{latitude: issue.location.lat, longitude: issue.location.lng}} />
                         </div>
                     </div>
                 </CardContent>
