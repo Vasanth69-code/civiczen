@@ -160,7 +160,7 @@ export function ReportIssueForm() {
           toast({ variant: "destructive", title: t('error'), description: t('location_error_description') });
           setIsLocating(false);
         },
-        { enableHighAccuracy: true }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     } else {
       toast({ variant: "destructive", title: t('error'), description: t('geolocation_not_supported') });
@@ -463,7 +463,3 @@ export function ReportIssueForm() {
     </Card>
   );
 }
-
-    
-
-    
