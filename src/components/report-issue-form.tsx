@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Camera, MapPin, Loader2, Video, ExternalLink } from "lucide-react";
-import { useState, useEffect, useRef, memo } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
@@ -30,15 +30,6 @@ import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import dynamic from 'next/dynamic';
 import { Skeleton } from "./ui/skeleton";
-import type { Map } from "leaflet";
-
-
-const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), {
-    ssr: false,
-    loading: () => <Skeleton className="h-full w-full" />,
-});
-const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
-const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
 
 const issueTypes = [
     "Pothole",
@@ -62,37 +53,15 @@ const formSchema = z.object({
   media: z.any().refine(file => file, "Please capture or upload a photo/video."),
 });
 
-type Geolocation = {
+export type Geolocation = {
   latitude: number;
   longitude: number;
 }
 
-const ReportMap = memo(({ geolocation }: { geolocation: Geolocation | null }) => {
-    const [map, setMap] = useState<Map | null>(null);
-
-    useEffect(() => {
-        if (map && geolocation) {
-            map.setView([geolocation.latitude, geolocation.longitude], 16);
-        }
-    }, [map, geolocation]);
-    
-    if (!geolocation) {
-        return <Skeleton className="h-48 w-full" />;
-    }
-
-    return (
-        <div className="h-48 w-full rounded-md mt-2 overflow-hidden z-0">
-            <MapContainer whenCreated={setMap} center={[geolocation.latitude, geolocation.longitude]} zoom={16} scrollWheelZoom={false} className="h-full w-full">
-                <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <Marker position={[geolocation.latitude, geolocation.longitude]} />
-            </MapContainer>
-        </div>
-    )
+const ReportMap = dynamic(() => import('./report-map'), { 
+    ssr: false,
+    loading: () => <Skeleton className="h-48 w-full" />
 });
-ReportMap.displayName = 'ReportMap';
 
 
 export function ReportIssueForm() {

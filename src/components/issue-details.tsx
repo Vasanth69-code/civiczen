@@ -11,7 +11,7 @@ import { ArrowUp, ArrowDown, Calendar, MapPin, Share2, Copy, MessageSquare, Chev
 import { useLanguage } from "@/context/language-context";
 import { TranslationKey } from "@/lib/translations";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect, memo } from "react";
+import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,44 +22,13 @@ import { useIssues } from "@/context/issue-context";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Skeleton } from "./ui/skeleton";
-import type { Map } from "leaflet";
 
 
-const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), {
+const DetailsMap = dynamic(() => import('./details-map'), { 
     ssr: false,
-    loading: () => <Skeleton className="h-full w-full" />,
+    loading: () => <Skeleton className="h-80 w-full rounded-md" />
 });
-const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
-const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
-const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
-
-const DetailsMap = memo(({ issue }: { issue: Issue }) => {
-    const [map, setMap] = useState<Map | null>(null);
-
-    useEffect(() => {
-        if (map) {
-            map.setView([issue.location.lat, issue.location.lng], 16);
-        }
-    }, [map, issue]);
-
-    return (
-        <div className="h-80 w-full rounded-md overflow-hidden z-0">
-            <MapContainer whenCreated={setMap} center={[issue.location.lat, issue.location.lng]} zoom={16} scrollWheelZoom={false} className="h-full w-full">
-                <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <Marker position={[issue.location.lat, issue.location.lng]}>
-                    <Popup>
-                        {issue.title}
-                    </Popup>
-                </Marker>
-            </MapContainer>
-        </div>
-    );
-});
-DetailsMap.displayName = 'DetailsMap';
 
 type IssueDetailsProps = {
     issue: Issue;
@@ -259,5 +228,3 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
         </div>
     );
 }
-
-    
