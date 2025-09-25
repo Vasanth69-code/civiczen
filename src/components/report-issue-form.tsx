@@ -29,7 +29,6 @@ import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Skeleton } from "./ui/skeleton";
 import { analyzeImage } from "@/ai/flows/analyze-image-flow";
-import dynamic from "next/dynamic";
 
 const issueTypes = [
     "Pothole",
@@ -74,11 +73,6 @@ export function ReportIssueForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const OpenStreetMap = useMemo(() => dynamic(() => import('@/components/open-street-map'), { 
-    ssr: false,
-    loading: () => <Skeleton className="h-full w-full" />
-  }), []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -428,38 +422,27 @@ export function ReportIssueForm() {
 
                 <FormItem>
                     <FormLabel>{t('location_label')}</FormLabel>
-                    <div className="flex flex-col items-center gap-2 p-3 rounded-md bg-secondary text-secondary-foreground">
-                        <div className="flex items-center justify-between w-full">
-                            <div className="flex items-center gap-2">
-                                <MapPin className="h-5 w-5"/>
-                                {isLocating ? (
-                                    <span className="text-sm">{t('getting_location')}</span>
-                                ) : geolocation ? (
-                                    <span className="text-sm">{`Lat: ${geolocation.latitude.toFixed(4)}, Lng: ${geolocation.longitude.toFixed(4)}`}</span>
-                                ) : (
-                                    <span className="text-sm">{t('location_not_available')}</span>
-                                )}
-                            </div>
-                            {geolocation && (
-                                <Button asChild variant="ghost" size="sm">
-                                    <Link href={`https://www.openstreetmap.org/?mlat=${geolocation.latitude}&mlon=${geolocation.longitude}#map=16/${geolocation.latitude}/${geolocation.longitude}`} target="_blank">
-                                        {t('view_on_map')} <ExternalLink className="ml-2 h-4 w-4" />
-                                    </Link>
-                                </Button>
+                    <div className="flex flex-col gap-2 p-3 rounded-md border text-sm">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                            <MapPin className="h-5 w-5 text-primary"/>
+                            {isLocating ? (
+                                <span >{t('getting_location')}</span>
+                            ) : geolocation ? (
+                                <span>{`Lat: ${geolocation.latitude.toFixed(4)}, Lng: ${geolocation.longitude.toFixed(4)}`}</span>
+                            ) : (
+                                <span>{t('location_not_available')}</span>
                             )}
                         </div>
-                        <div className="h-80 w-full rounded-md mt-2 overflow-hidden z-0">
-                           {geolocation ? <OpenStreetMap location={geolocation} /> : <Skeleton className="h-full w-full" />}
-                        </div>
+                        
+                         {!isLocating && !geolocation && (
+                            <Alert variant="destructive">
+                                <AlertTitle>{t('location_error')}</AlertTitle>
+                                <AlertDescription>
+                                {t('location_error_fetching_description')}
+                                </AlertDescription>
+                            </Alert>
+                        )}
                     </div>
-                     {!isLocating && !geolocation && (
-                        <Alert variant="destructive">
-                            <AlertTitle>{t('location_error')}</AlertTitle>
-                            <AlertDescription>
-                            {t('location_error_fetching_description')}
-                            </AlertDescription>
-                        </Alert>
-                    )}
                 </FormItem>
             </div>
             
