@@ -28,7 +28,7 @@ type IssueDetailsProps = {
     issue: Issue;
 };
 
-const OpenStreetMap = dynamic(() => import('@/components/open-street-map'), {
+const GoogleMapComponent = dynamic(() => import('@/components/open-street-map'), {
   ssr: false,
   loading: () => <Skeleton className="h-full w-full" />,
 });
@@ -184,7 +184,7 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
                         </h3>
                         <p className="text-muted-foreground mb-4">{issue.address}</p>
                         <div className="h-64 rounded-md border text-sm text-muted-foreground overflow-hidden">
-                            <OpenStreetMap 
+                            <GoogleMapComponent
                                 location={{ latitude: issue.location.lat, longitude: issue.location.lng }} 
                                 popupText={issue.title}
                             />

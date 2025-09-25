@@ -1,107 +1,53 @@
 
 'use client';
 
-import { useEffect, useRef } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-
-// Fix for default icon issue with webpack
-import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
-import iconUrl from 'leaflet/dist/images/marker-icon.png';
-import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
+import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
+import { Skeleton } from './ui/skeleton';
 
 type Geolocation = {
   latitude: number;
   longitude: number;
 };
 
-type OpenStreetMapProps = {
+type GoogleMapProps = {
   location: Geolocation;
   popupText?: string;
   zoom?: number;
 };
 
-const OpenStreetMap = ({ location, popupText, zoom = 16 }: OpenStreetMapProps) => {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<L.Map | null>(null);
-  const markerRef = useRef<L.Marker | null>(null);
-
-  useEffect(() => {
-    // This is the correct way to fix the default icon issue in React Leaflet
-    // when using bundlers like Webpack or Turbopack.
-    // The delete operation is important to reset the prototype.
-    // @ts-ignore
-    delete L.Icon.Default.prototype._getIconUrl;
-
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: iconRetinaUrl.src,
-      iconUrl: iconUrl.src,
-      shadowUrl: shadowUrl.src,
-    });
-
-
-    if (mapContainerRef.current && !mapInstanceRef.current) {
-      // Initialize map only once
-      const map = L.map(mapContainerRef.current).setView([location.latitude, location.longitude], zoom);
-      mapInstanceRef.current = map;
-
-      // Add tile layers
-      const standardLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 18,
-      }).addTo(map);
-
-      const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-         maxZoom: 18,
-      });
-      
-      const terrainLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-	        maxZoom: 17,
-	        attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-      });
-      
-      const baseMaps = {
-          "Standard": standardLayer,
-          "Satellite": satelliteLayer,
-          "Terrain": terrainLayer,
-      };
-
-      L.control.layers(baseMaps).addTo(map);
-
-      // Add initial marker
-      markerRef.current = L.marker([location.latitude, location.longitude]).addTo(map);
-      if (popupText) {
-        markerRef.current.bindPopup(popupText).openPopup();
-      }
-    }
-
-    // Cleanup on unmount
-    return () => {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-    };
-  }, []); // Empty dependency array ensures this runs only once
-
-  useEffect(() => {
-    // Update map view and marker when location changes
-    if (mapInstanceRef.current) {
-      const newLatLng = new L.LatLng(location.latitude, location.longitude);
-      mapInstanceRef.current.setView(newLatLng, zoom);
-      
-      if (markerRef.current) {
-        markerRef.current.setLatLng(newLatLng);
-        if (popupText) {
-            markerRef.current.setPopupContent(popupText);
-        }
-      }
-    }
-  }, [location, popupText, zoom]);
-
-
-  return <div ref={mapContainerRef} className="h-full w-full z-0" />;
+const containerStyle = {
+  width: '100%',
+  height: '100%',
 };
 
-export default OpenStreetMap;
+const GoogleMapComponent = ({ location, popupText, zoom = 16 }: GoogleMapProps) => {
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+  });
+
+  const center = {
+    lat: location.latitude,
+    lng: location.longitude,
+  };
+
+  if (!isLoaded) {
+    return <Skeleton className="h-full w-full" />;
+  }
+
+  return (
+    <GoogleMap
+      mapContainerStyle={containerStyle}
+      center={center}
+      zoom={zoom}
+      options={{
+        streetViewControl: false,
+        mapTypeControl: true,
+      }}
+    >
+      <Marker position={center} title={popupText} />
+    </GoogleMap>
+  );
+};
+
+export default GoogleMapComponent;

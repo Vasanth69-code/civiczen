@@ -58,7 +58,7 @@ export type Geolocation = {
   longitude: number;
 }
 
-const OpenStreetMap = dynamic(() => import('@/components/open-street-map'), {
+const GoogleMapComponent = dynamic(() => import('@/components/open-street-map'), {
   ssr: false,
   loading: () => <Skeleton className="h-full w-full" />,
 });
@@ -447,7 +447,7 @@ export function ReportIssueForm() {
                                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                            </div>
                         ) : geolocation ? (
-                            <OpenStreetMap location={geolocation} popupText="You are here" />
+                            <GoogleMapComponent location={geolocation} popupText="You are here" />
                         ) : (
                            <div className="flex flex-col items-center justify-center h-full text-center p-4">
                              <MapPin className="h-8 w-8 text-destructive mb-2"/>
@@ -470,5 +470,3 @@ export function ReportIssueForm() {
     </Card>
   );
 }
-
-    
