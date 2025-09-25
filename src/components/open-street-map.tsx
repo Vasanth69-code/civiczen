@@ -54,7 +54,7 @@ const OpenStreetMapComponent = ({ location, popupText, zoom = 16 }: OpenStreetMa
         marker.bindPopup(popupText).openPopup();
       }
     }
-  }, []); // Empty dependency array to run only once
+  }, [location, popupText, zoom]); // Ensure dependencies are correctly listed
 
   if (!location) {
       return <Skeleton className="h-full w-full" />;
