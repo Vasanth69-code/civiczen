@@ -13,10 +13,11 @@ import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 
 export const AnalyzeIssueImageInputSchema = z.object({
-  photoDataUri: z
+  photoUrl: z
     .string()
+    .url()
     .describe(
-      "A photo of a potential civic issue, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+      "A public URL to a photo of a potential civic issue."
     ),
   location: z.object({
     lat: z.number().describe("The latitude of the user's location."),
@@ -48,7 +49,7 @@ const prompt = ai.definePrompt({
   3.  **Generate a title**: Create a short, clear title for the issue. For example, "Large Pothole on Road" or "Overflowing Public Dustbin".
   4.  **Generate a description**: Write a neutral, factual description of what is depicted in the image. Start by describing the main issue. Then, explicitly mention that the issue is located at the provided coordinates.
   
-  **Image to analyze**: {{media url=photoDataUri}}
+  **Image to analyze**: {{media url=photoUrl}}
   **Location**: Latitude: {{location.lat}}, Longitude: {{location.lng}}
   
   Provide the output in the structured format requested.`,
@@ -65,5 +66,3 @@ const analyzeIssueImageFlow = ai.defineFlow(
     return output!;
   }
 );
-
-    
