@@ -28,7 +28,7 @@ import { useUser } from "@/context/user-context";
 import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Skeleton } from "./ui/skeleton";
-import { analyzeImage } from "@/ai/flows/analyze-image-flow";
+import { analyzeIssueImage } from "@/ai/flows/analyze-issue-image-flow";
 import dynamic from "next/dynamic";
 
 const issueTypes = [
@@ -58,7 +58,7 @@ export type Geolocation = {
   longitude: number;
 }
 
-const GoogleMapComponent = dynamic(() => import('@/components/open-street-map'), {
+const OpenStreetMapComponent = dynamic(() => import('@/components/open-street-map'), {
   ssr: false,
   loading: () => <Skeleton className="h-full w-full" />,
 });
@@ -152,20 +152,52 @@ export function ReportIssueForm() {
   }, [toast, t]);
 
   const handleAIAnalysis = async (dataUrl: string) => {
+    if (!geolocation) {
+      toast({
+        variant: "destructive",
+        title: "Location Needed",
+        description: "Cannot perform AI analysis without your location. Please enable location services.",
+      });
+      return;
+    }
+
     setIsAnalyzing(true);
     try {
-      const result = await analyzeImage({ photoDataUri: dataUrl });
-      if (result.toLowerCase().includes("pothole")) {
-        form.setValue("title", "Pothole detected");
-        form.setValue("description", "A pothole has been detected at this location.");
-        form.setValue("category", "Pothole");
+      const result = await analyzeIssueImage({ 
+        photoDataUri: dataUrl,
+        location: {
+          lat: geolocation.latitude,
+          lng: geolocation.longitude,
+        }
+       });
+       
+      if (result.isFake) {
         toast({
-          title: "AI Analysis Complete",
-          description: "We've detected a pothole and pre-filled the form for you.",
+          variant: "destructive",
+          title: "Image Not Suitable",
+          description: "This image does not appear to be a real photo of a civic issue. Please capture or upload a different image.",
         });
-      } else {
-         form.setValue("title", `Issue detected: ${result}`);
+        setMediaPreview(null);
+        setMediaType(null);
+        form.setValue('media', null);
+        return;
       }
+
+      form.setValue("title", result.title);
+      form.setValue("description", result.description);
+      
+      const matchingCategory = issueTypes.find(type => result.issueCategory.toLowerCase().includes(type.toLowerCase()));
+      if (matchingCategory) {
+        form.setValue("category", matchingCategory);
+      } else {
+        form.setValue("category", "Other");
+      }
+
+      toast({
+        title: "AI Analysis Complete",
+        description: "We've analyzed the image and pre-filled the form for you.",
+      });
+
     } catch (error) {
       console.error("AI analysis failed:", error);
       toast({
@@ -365,6 +397,7 @@ export function ReportIssueForm() {
                         <FormItem>
                             <FormLabel className="flex items-center gap-2">
                                 {t('title_label')}
+                                {form.getValues('title') && <Sparkles className="size-4 text-primary" />}
                             </FormLabel>
                             <FormControl>
                                 <Input placeholder={t('title_placeholder')} {...field} />
@@ -447,7 +480,7 @@ export function ReportIssueForm() {
                                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                            </div>
                         ) : geolocation ? (
-                            <GoogleMapComponent location={geolocation} popupText="You are here" />
+                            <OpenStreetMapComponent location={geolocation} popupText="You are here" />
                         ) : (
                            <div className="flex flex-col items-center justify-center h-full text-center p-4">
                              <MapPin className="h-8 w-8 text-destructive mb-2"/>
@@ -470,3 +503,5 @@ export function ReportIssueForm() {
     </Card>
   );
 }
+
+    
