@@ -69,23 +69,55 @@
 
 /* Leaflet Marker Cluster Styles */
 .marker-cluster-small {
-	background-color: rgba(110, 204, 57, 0.6);
+	background-color: rgba(181, 226, 140, 0.6);
 }
 .marker-cluster-small div {
 	background-color: rgba(110, 204, 57, 0.6);
 }
+
 .marker-cluster-medium {
 	background-color: rgba(241, 211, 87, 0.6);
 }
 .marker-cluster-medium div {
-	background-color: rgba(241, 211, 87, 0.6);
+	background-color: rgba(240, 194, 12, 0.6);
 }
+
 .marker-cluster-large {
 	background-color: rgba(253, 156, 115, 0.6);
 }
 .marker-cluster-large div {
-	background-color: rgba(253, 156, 115, 0.6);
+	background-color: rgba(241, 128, 23, 0.6);
 }
+
+/* Category-specific cluster colors */
+.marker-cluster-red div {
+    background-color: rgba(239, 68, 68, 0.7); /* red-500 */
+}
+.marker-cluster-red {
+    background-color: rgba(252, 165, 165, 0.6); /* red-300 */
+}
+
+.marker-cluster-blue div {
+    background-color: rgba(59, 130, 246, 0.7); /* blue-500 */
+}
+.marker-cluster-blue {
+    background-color: rgba(147, 197, 253, 0.6); /* blue-300 */
+}
+
+.marker-cluster-green div {
+    background-color: rgba(34, 197, 94, 0.7); /* green-500 */
+}
+.marker-cluster-green {
+    background-color: rgba(134, 239, 172, 0.6); /* green-300 */
+}
+
+.marker-cluster-orange div {
+    background-color: rgba(249, 115, 22, 0.7); /* orange-500 */
+}
+.marker-cluster-orange {
+    background-color: rgba(253, 186, 116, 0.6); /* orange-300 */
+}
+
 .marker-cluster {
 	background-clip: padding-box;
 	border-radius: 20px;
@@ -98,6 +130,8 @@
 	text-align: center;
 	border-radius: 15px;
 	font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+    color: white;
+    font-weight: bold;
 }
 .marker-cluster span {
 	line-height: 30px;

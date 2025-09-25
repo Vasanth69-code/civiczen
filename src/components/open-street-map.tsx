@@ -1,53 +1,65 @@
 
 'use client';
 
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
+import { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { Skeleton } from './ui/skeleton';
+
+// Fix for default icon issue with webpack
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
 type Geolocation = {
   latitude: number;
   longitude: number;
 };
 
-type GoogleMapProps = {
+type OpenStreetMapProps = {
   location: Geolocation;
   popupText?: string;
   zoom?: number;
 };
 
-const containerStyle = {
-  width: '100%',
-  height: '100%',
-};
+const OpenStreetMapComponent = ({ location, popupText, zoom = 16 }: OpenStreetMapProps) => {
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
 
-const GoogleMapComponent = ({ location, popupText, zoom = 16 }: GoogleMapProps) => {
-  const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
-  });
+  useEffect(() => {
+    if (mapContainerRef.current && !mapRef.current) {
+        // @ts-ignore
+        delete L.Icon.Default.prototype._getIconUrl;
+        L.Icon.Default.mergeOptions({
+            iconRetinaUrl: markerIcon2x.src,
+            iconUrl: markerIcon.src,
+            shadowUrl: markerShadow.src,
+        });
 
-  const center = {
-    lat: location.latitude,
-    lng: location.longitude,
-  };
+      const map = L.map(mapContainerRef.current, {
+        center: [location.latitude, location.longitude],
+        zoom: zoom,
+        zoomControl: true,
+        maxZoom: 18,
+      });
+      mapRef.current = map;
 
-  if (!isLoaded) {
-    return <Skeleton className="h-full w-full" />;
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      const marker = L.marker([location.latitude, location.longitude]).addTo(map);
+      if (popupText) {
+        marker.bindPopup(popupText).openPopup();
+      }
+    }
+  }, []); // Empty dependency array to run only once
+
+  if (!location) {
+      return <Skeleton className="h-full w-full" />;
   }
 
-  return (
-    <GoogleMap
-      mapContainerStyle={containerStyle}
-      center={center}
-      zoom={zoom}
-      options={{
-        streetViewControl: false,
-        mapTypeControl: true,
-      }}
-    >
-      <Marker position={center} title={popupText} />
-    </GoogleMap>
-  );
+  return <div ref={mapContainerRef} className="w-full h-full" />;
 };
 
-export default GoogleMapComponent;
+export default OpenStreetMapComponent;
