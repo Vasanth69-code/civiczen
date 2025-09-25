@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Camera, MapPin, Loader2, Video, ExternalLink, Sparkles } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
@@ -29,8 +29,8 @@ import { useUser } from "@/context/user-context";
 import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Skeleton } from "./ui/skeleton";
-import OpenStreetMap from "./open-street-map";
 import { analyzeImage } from "@/ai/flows/analyze-image-flow";
+import dynamic from 'next/dynamic';
 
 const issueTypes = [
     "Pothole",
@@ -75,6 +75,12 @@ export function ReportIssueForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const OpenStreetMap = useMemo(() => dynamic(() => import('@/components/open-street-map'), { 
+    ssr: false,
+    loading: () => <Skeleton className="h-full w-full" />,
+  }), []);
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -140,12 +146,14 @@ export function ReportIssueForm() {
       const result = await analyzeImage({ photoDataUri: dataUrl });
       if (result.toLowerCase().includes("pothole")) {
         form.setValue("title", "Pothole detected");
-        form.setValue("description", "Pothole detected at this location.");
+        form.setValue("description", "A pothole has been detected at this location.");
         form.setValue("category", "Pothole");
         toast({
           title: "AI Analysis Complete",
           description: "We've detected a pothole and pre-filled the form for you.",
         });
+      } else {
+         form.setValue("title", `Issue detected: ${result}`);
       }
     } catch (error) {
       console.error("AI analysis failed:", error);
@@ -442,8 +450,8 @@ export function ReportIssueForm() {
                                 </Button>
                             )}
                         </div>
-                        <div className="h-48 w-full rounded-md mt-2 overflow-hidden z-0">
-                           <OpenStreetMap location={geolocation} />
+                        <div className="h-80 w-full rounded-md mt-2 overflow-hidden z-0">
+                           {geolocation ? <OpenStreetMap location={geolocation} /> : <Skeleton className="h-full w-full" />}
                         </div>
                     </div>
                      {!isLocating && !geolocation && (
