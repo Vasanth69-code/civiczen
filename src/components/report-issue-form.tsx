@@ -17,12 +17,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Camera, MapPin, Loader2, Video, ExternalLink, Sparkles } from "lucide-react";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { Camera, MapPin, Loader2, Video, Sparkles } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import Link from "next/link";
 import { useLanguage } from "@/context/language-context";
 import { useIssues } from "@/context/issue-context";
 import { useUser } from "@/context/user-context";
@@ -127,11 +126,24 @@ export function ReportIssueForm() {
           });
           setIsLocating(false);
         },
-        () => {
-          toast({ variant: "destructive", title: t('error'), description: t('location_error_description') });
+        (error) => {
+          let title = t('error');
+          let description = t('location_error_description');
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              description = "User denied the request for Geolocation.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              description = "Location information is unavailable.";
+              break;
+            case error.TIMEOUT:
+              description = "The request to get user location timed out.";
+              break;
+          }
+          toast({ variant: "destructive", title, description });
           setIsLocating(false);
         },
-        { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 * 60 * 5 }
+        { enableHighAccuracy: true, timeout: 30000, maximumAge: 1000 * 60 * 5 }
       );
     } else {
       toast({ variant: "destructive", title: t('error'), description: t('geolocation_not_supported') });
@@ -435,7 +447,7 @@ export function ReportIssueForm() {
                                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                            </div>
                         ) : geolocation ? (
-                            <OpenStreetMap location={geolocation} />
+                            <OpenStreetMap location={geolocation} popupText="You are here" />
                         ) : (
                            <div className="flex flex-col items-center justify-center h-full text-center p-4">
                              <MapPin className="h-8 w-8 text-destructive mb-2"/>
@@ -458,3 +470,5 @@ export function ReportIssueForm() {
     </Card>
   );
 }
+
+    
