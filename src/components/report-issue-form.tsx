@@ -30,12 +30,7 @@ import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Skeleton } from "./ui/skeleton";
 import { analyzeImage } from "@/ai/flows/analyze-image-flow";
-import dynamic from 'next/dynamic';
-
-const OpenStreetMap = dynamic(() => import('@/components/open-street-map'), {
-  ssr: false,
-  loading: () => <Skeleton className="h-full w-full" />,
-});
+import OpenStreetMap from '@/components/open-street-map';
 
 
 const issueTypes = [
@@ -476,5 +471,3 @@ export function ReportIssueForm() {
     </Card>
   );
 }
-
-    

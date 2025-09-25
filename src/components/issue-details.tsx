@@ -21,13 +21,8 @@ import {
 import { useIssues } from "@/context/issue-context";
 import { usePathname } from "next/navigation";
 import { Skeleton } from "./ui/skeleton";
-import dynamic from "next/dynamic";
+import OpenStreetMap from '@/components/open-street-map';
 
-
-const OpenStreetMap = dynamic(() => import('@/components/open-street-map'), {
-  ssr: false,
-  loading: () => <Skeleton className="h-full w-full" />,
-});
 
 type IssueDetailsProps = {
     issue: Issue;
@@ -229,5 +224,3 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
         </div>
     );
 }
-
-    
