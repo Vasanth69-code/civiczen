@@ -89,11 +89,11 @@ export function AppSidebar() {
               <SidebarMenuButton
                 asChild
                 isActive={isActive("/map")}
-                tooltip={{ children: "Map View" }}
+                tooltip={{ children: "Map" }}
               >
                 <Link href="/map">
                   <Map />
-                  <span>{"Map View"}</span>
+                  <span>{"Map"}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
