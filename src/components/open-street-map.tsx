@@ -27,18 +27,18 @@ const OpenStreetMap = ({ location, popupText, zoom = 16 }: OpenStreetMapProps) =
   const markerRef = useRef<L.Marker | null>(null);
 
   useEffect(() => {
-    // Set up default icon paths
-    const DefaultIcon = L.icon({
-        iconRetinaUrl: iconRetinaUrl.src,
-        iconUrl: iconUrl.src,
-        shadowUrl: shadowUrl.src,
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        tooltipAnchor: [16, -28],
-        shadowSize: [41, 41]
+    // This is the correct way to fix the default icon issue in React Leaflet
+    // when using bundlers like Webpack or Turbopack.
+    // The delete operation is important to reset the prototype.
+    // @ts-ignore
+    delete L.Icon.Default.prototype._getIconUrl;
+
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: iconRetinaUrl.src,
+      iconUrl: iconUrl.src,
+      shadowUrl: shadowUrl.src,
     });
-    L.Marker.prototype.options.icon = DefaultIcon;
+
 
     if (mapContainerRef.current && !mapInstanceRef.current) {
       // Initialize map only once
