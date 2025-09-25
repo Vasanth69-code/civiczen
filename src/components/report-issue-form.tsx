@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,6 +30,7 @@ import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Skeleton } from "./ui/skeleton";
 import { analyzeImage } from "@/ai/flows/analyze-image-flow";
+import dynamic from "next/dynamic";
 
 const issueTypes = [
     "Pothole",
@@ -56,6 +58,11 @@ export type Geolocation = {
   latitude: number;
   longitude: number;
 }
+
+const OpenStreetMap = dynamic(() => import('@/components/open-street-map'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-full w-full" />,
+});
 
 
 export function ReportIssueForm() {
@@ -422,25 +429,19 @@ export function ReportIssueForm() {
 
                 <FormItem>
                     <FormLabel>{t('location_label')}</FormLabel>
-                    <div className="flex flex-col gap-2 p-3 rounded-md border text-sm">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                            <MapPin className="h-5 w-5 text-primary"/>
-                            {isLocating ? (
-                                <span >{t('getting_location')}</span>
-                            ) : geolocation ? (
-                                <span>{`Lat: ${geolocation.latitude.toFixed(4)}, Lng: ${geolocation.longitude.toFixed(4)}`}</span>
-                            ) : (
-                                <span>{t('location_not_available')}</span>
-                            )}
-                        </div>
-                        
-                         {!isLocating && !geolocation && (
-                            <Alert variant="destructive">
-                                <AlertTitle>{t('location_error')}</AlertTitle>
-                                <AlertDescription>
-                                {t('location_error_fetching_description')}
-                                </AlertDescription>
-                            </Alert>
+                    <div className="flex flex-col gap-2 rounded-md border text-sm h-64">
+                         {isLocating ? (
+                           <div className="flex items-center justify-center h-full">
+                               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                           </div>
+                        ) : geolocation ? (
+                            <OpenStreetMap location={geolocation} />
+                        ) : (
+                           <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                             <MapPin className="h-8 w-8 text-destructive mb-2"/>
+                             <p className="font-semibold text-destructive">{t('location_error')}</p>
+                             <p className="text-xs text-muted-foreground">{t('location_error_fetching_description')}</p>
+                           </div>
                         )}
                     </div>
                 </FormItem>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Issue, IssueStatus } from "@/lib/types";
@@ -19,11 +20,18 @@ import {
 } from "./ui/dropdown-menu";
 import { useIssues } from "@/context/issue-context";
 import { usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
+import { Skeleton } from "./ui/skeleton";
 
 
 type IssueDetailsProps = {
     issue: Issue;
 };
+
+const OpenStreetMap = dynamic(() => import('@/components/open-street-map'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-full w-full" />,
+});
 
 const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } = {
   Resolved: "default",
@@ -175,8 +183,11 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
                             {t('location')}
                         </h3>
                         <p className="text-muted-foreground mb-4">{issue.address}</p>
-                        <div className="p-4 rounded-md border text-sm text-muted-foreground">
-                            Map removed. Location: {issue.location.lat}, {issue.location.lng}
+                        <div className="h-64 rounded-md border text-sm text-muted-foreground overflow-hidden">
+                            <OpenStreetMap 
+                                location={{ latitude: issue.location.lat, longitude: issue.location.lng }} 
+                                popupText={issue.title}
+                            />
                         </div>
                     </div>
                 </CardContent>
