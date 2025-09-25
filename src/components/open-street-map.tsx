@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -29,6 +28,7 @@ const OpenStreetMapComponent = ({ location, popupText, zoom = 16 }: OpenStreetMa
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
         // This is the correct way to fix the icon issue in Next.js/Webpack
+        // It MUST be done inside useEffect to run on the client
         // @ts-ignore
         delete L.Icon.Default.prototype._getIconUrl;
         L.Icon.Default.mergeOptions({
