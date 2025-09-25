@@ -29,7 +29,7 @@ import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Skeleton } from "./ui/skeleton";
 import { analyzeIssueImage } from "@/ai/flows/analyze-issue-image-flow";
-import dynamic from "next/dynamic";
+import GoogleMapComponent from "./google-map";
 
 const issueTypes = [
     "Pothole",
@@ -57,12 +57,6 @@ export type Geolocation = {
   latitude: number;
   longitude: number;
 }
-
-const OpenStreetMapComponent = dynamic(() => import('@/components/open-street-map'), {
-  ssr: false,
-  loading: () => <Skeleton className="h-full w-full" />,
-});
-
 
 export function ReportIssueForm() {
   const [geolocation, setGeolocation] = useState<Geolocation | null>(null);
@@ -480,7 +474,7 @@ export function ReportIssueForm() {
                                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                            </div>
                         ) : geolocation ? (
-                            <OpenStreetMapComponent location={geolocation} popupText="You are here" />
+                            <GoogleMapComponent location={{ lat: geolocation.latitude, lng: geolocation.longitude }} infoWindowText="You are here" />
                         ) : (
                            <div className="flex flex-col items-center justify-center h-full text-center p-4">
                              <MapPin className="h-8 w-8 text-destructive mb-2"/>
@@ -503,5 +497,3 @@ export function ReportIssueForm() {
     </Card>
   );
 }
-
-    

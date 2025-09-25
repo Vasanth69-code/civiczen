@@ -11,7 +11,6 @@ import {
   MessageCircle,
   Users,
   LineChart,
-  Map,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -82,18 +81,6 @@ export function AppSidebar() {
                 <Link href="/issues">
                   <FileText />
                   <span>{t('my_submitted_issues')}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-             <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                isActive={isActive("/map")}
-                tooltip={{ children: "Map" }}
-              >
-                <Link href="/map">
-                  <Map />
-                  <span>{"Map"}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
