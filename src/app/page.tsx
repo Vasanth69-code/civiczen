@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { ArrowRight, CheckCircle, Smartphone, MapPin } from 'lucide-react';
+import { ArrowRight, Check, Smartphone, MapPin } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -104,7 +104,7 @@ export default function HomePage() {
                     </div>
                     <div className="flex flex-col items-center text-center">
                         <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
-                            <CheckCircle className="h-8 w-8" />
+                            <div className="h-8 w-8"><Check/></div>
                         </div>
                         <h3 className="text-xl font-bold">3. Track to Resolution</h3>
                         <p className="mt-2 text-muted-foreground">Receive real-time updates as your report is assigned, actioned, and resolved by the city department.</p>
@@ -131,9 +131,9 @@ export default function HomePage() {
                         <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">AI-Powered Routing</h2>
                         <p className="text-muted-foreground">Our intelligent system analyzes your report's image and description to automatically categorize the issue, assess its priority, and route it to the correct city department. No more guessing where to send your concerns.</p>
                         <ul className="space-y-2 text-muted-foreground">
-                            <li className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-primary" /> Automatic Department Assignment</li>
-                            <li className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-primary" /> Smart Priority Recommendation</li>
-                            <li className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-primary" /> Faster Response Times</li>
+                            <li className="flex items-center gap-2"><div className="flex items-center justify-center h-5 w-5 rounded-full border-2 border-primary text-primary"><Check className="h-4 w-4" /></div> Automatic Department Assignment</li>
+                            <li className="flex items-center gap-2"><div className="flex items-center justify-center h-5 w-5 rounded-full border-2 border-primary text-primary"><Check className="h-4 w-4" /></div> Smart Priority Recommendation</li>
+                            <li className="flex items-center gap-2"><div className="flex items-center justify-center h-5 w-5 rounded-full border-2 border-primary text-primary"><Check className="h-4 w-4" /></div> Faster Response Times</li>
                         </ul>
                     </div>
                 </div>
