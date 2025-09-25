@@ -12,7 +12,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 
-export const AnalyzeIssueImageInputSchema = z.object({
+const AnalyzeIssueImageInputSchema = z.object({
   photoUrl: z
     .string()
     .url()
@@ -26,7 +26,7 @@ export const AnalyzeIssueImageInputSchema = z.object({
 });
 export type AnalyzeIssueImageInput = z.infer<typeof AnalyzeIssueImageInputSchema>;
 
-export const AnalyzeIssueImageOutputSchema = z.object({
+const AnalyzeIssueImageOutputSchema = z.object({
     isFake: z.boolean().describe("Whether the image is likely fake, generated, a screenshot, or unrelated to a real-world civic issue."),
     issueCategory: z.string().describe("The category of the issue identified in the image. Examples: 'Pothole', 'Garbage Overflow', 'Graffiti', 'Broken Streetlight', 'Other'."),
     title: z.string().describe("A concise, descriptive title for the issue report, summarizing the problem in a few words."),
@@ -35,6 +35,8 @@ export const AnalyzeIssueImageOutputSchema = z.object({
 export type AnalyzeIssueImageOutput = z.infer<typeof AnalyzeIssueImageOutputSchema>;
 
 export async function analyzeIssueImage(input: AnalyzeIssueImageInput): Promise<AnalyzeIssueImageOutput> {
+  // For `use server` compatibility, we can't export the Genkit flow directly.
+  // We wrap it in a regular async function.
   return analyzeIssueImageFlow(input);
 }
 
