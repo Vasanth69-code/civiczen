@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Camera, MapPin, Loader2, Video, Sparkles } from "lucide-react";
+import { Camera, MapPin, Loader2, Video } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
@@ -28,8 +28,13 @@ import { useUser } from "@/context/user-context";
 import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Skeleton } from "./ui/skeleton";
-import { analyzeIssueImage } from "@/ai/flows/analyze-issue-image-flow";
-import GoogleMapComponent from "./google-map";
+import dynamic from "next/dynamic";
+
+const OpenStreetMapComponent = dynamic(() => import("./open-street-map"), {
+  ssr: false,
+  loading: () => <Skeleton className="h-full w-full" />,
+});
+
 
 const issueTypes = [
     "Pothole",
@@ -71,7 +76,6 @@ export function ReportIssueForm() {
   const { addIssue } = useIssues();
   const { user } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -144,65 +148,6 @@ export function ReportIssueForm() {
       setIsLocating(false);
     }
   }, [toast, t]);
-
-  const handleAIAnalysis = async (dataUrl: string) => {
-    if (!geolocation) {
-      toast({
-        variant: "destructive",
-        title: "Location Needed",
-        description: "Cannot perform AI analysis without your location. Please enable location services.",
-      });
-      return;
-    }
-
-    setIsAnalyzing(true);
-    try {
-      const result = await analyzeIssueImage({ 
-        photoDataUri: dataUrl,
-        location: {
-          lat: geolocation.latitude,
-          lng: geolocation.longitude,
-        }
-       });
-       
-      if (result.isFake) {
-        toast({
-          variant: "destructive",
-          title: "Image Not Suitable",
-          description: "This image does not appear to be a real photo of a civic issue. Please capture or upload a different image.",
-        });
-        setMediaPreview(null);
-        setMediaType(null);
-        form.setValue('media', null);
-        return;
-      }
-
-      form.setValue("title", result.title);
-      form.setValue("description", result.description);
-      
-      const matchingCategory = issueTypes.find(type => result.issueCategory.toLowerCase().includes(type.toLowerCase()));
-      if (matchingCategory) {
-        form.setValue("category", matchingCategory);
-      } else {
-        form.setValue("category", "Other");
-      }
-
-      toast({
-        title: "AI Analysis Complete",
-        description: "We've analyzed the image and pre-filled the form for you.",
-      });
-
-    } catch (error) {
-      console.error("AI analysis failed:", error);
-      toast({
-        variant: "destructive",
-        title: "AI Analysis Failed",
-        description: "Could not analyze the image. Please fill out the form manually.",
-      });
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
   
   const handleMediaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -214,9 +159,6 @@ export function ReportIssueForm() {
         const newMediaType = file.type.startsWith('video') ? 'video' : 'image';
         setMediaType(newMediaType);
         form.setValue('media', result);
-        if (newMediaType === 'image') {
-          handleAIAnalysis(result);
-        }
       };
       reader.readAsDataURL(file);
     }
@@ -235,7 +177,6 @@ export function ReportIssueForm() {
         setMediaPreview(dataUrl);
         setMediaType('image');
         form.setValue('media', dataUrl);
-        handleAIAnalysis(dataUrl);
       }
     }
   };
@@ -311,12 +252,6 @@ export function ReportIssueForm() {
                     <FormControl>
                       <div className="space-y-4 text-center">
                         <Card className="p-2 border-dashed hover:border-primary transition-colors aspect-video flex justify-center items-center relative">
-                          {isAnalyzing && (
-                            <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center z-10">
-                                <Sparkles className="w-10 h-10 text-primary animate-pulse" />
-                                <p className="mt-2 text-sm font-medium">Analyzing image...</p>
-                            </div>
-                          )}
                           {mediaPreview ? (
                             <>
                               {mediaType === 'image' && <Image src={mediaPreview} alt="Media preview" width={400} height={225} className="rounded-md object-contain max-h-[250px] w-auto"/>}
@@ -391,7 +326,6 @@ export function ReportIssueForm() {
                         <FormItem>
                             <FormLabel className="flex items-center gap-2">
                                 {t('title_label')}
-                                {form.getValues('title') && <Sparkles className="size-4 text-primary" />}
                             </FormLabel>
                             <FormControl>
                                 <Input placeholder={t('title_placeholder')} {...field} />
@@ -474,7 +408,7 @@ export function ReportIssueForm() {
                                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                            </div>
                         ) : geolocation ? (
-                            <GoogleMapComponent location={{ lat: geolocation.latitude, lng: geolocation.longitude }} infoWindowText="You are here" />
+                            <OpenStreetMapComponent location={geolocation} popupText="You are here" />
                         ) : (
                            <div className="flex flex-col items-center justify-center h-full text-center p-4">
                              <MapPin className="h-8 w-8 text-destructive mb-2"/>
@@ -486,9 +420,8 @@ export function ReportIssueForm() {
                 </FormItem>
             </div>
             
-            <Button type="submit" size="lg" className="w-full" disabled={isSubmitting || isAnalyzing}>
+            <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('submitting')}</> : 
-               isAnalyzing ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Analyzing...</> :
                t('submit_report')}
             </Button>
           </form>

@@ -22,7 +22,11 @@ import { useIssues } from "@/context/issue-context";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Skeleton } from "./ui/skeleton";
-import GoogleMapComponent from "./google-map";
+
+const OpenStreetMapComponent = dynamic(() => import("./open-street-map"), {
+  ssr: false,
+  loading: () => <Skeleton className="h-full w-full" />,
+});
 
 
 type IssueDetailsProps = {
@@ -180,9 +184,9 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
                         </h3>
                         <p className="text-muted-foreground mb-4">{issue.address}</p>
                         <div className="h-64 rounded-md border text-sm text-muted-foreground overflow-hidden">
-                           <GoogleMapComponent
-                                location={{ lat: issue.location.lat, lng: issue.location.lng }} 
-                                infoWindowText={issue.title}
+                           <OpenStreetMapComponent
+                                location={{ latitude: issue.location.lat, longitude: issue.location.lng }} 
+                                popupText={issue.title}
                             />
                         </div>
                     </div>
