@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Issue, IssueStatus } from "@/lib/types";
@@ -229,5 +228,3 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
         </div>
     );
 }
-
-    
