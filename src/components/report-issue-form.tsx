@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Camera, MapPin, Loader2, Video, ExternalLink, Sparkles } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
@@ -30,8 +30,7 @@ import type { Issue } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Skeleton } from "./ui/skeleton";
 import { analyzeImage } from "@/ai/flows/analyze-image-flow";
-import OpenStreetMap from '@/components/open-street-map';
-
+import dynamic from "next/dynamic";
 
 const issueTypes = [
     "Pothole",
@@ -76,6 +75,11 @@ export function ReportIssueForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const OpenStreetMap = useMemo(() => dynamic(() => import('@/components/open-street-map'), { 
+    ssr: false,
+    loading: () => <Skeleton className="h-full w-full" />
+  }), []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -471,3 +475,5 @@ export function ReportIssueForm() {
     </Card>
   );
 }
+
+    

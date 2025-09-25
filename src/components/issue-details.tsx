@@ -11,7 +11,7 @@ import { ArrowUp, ArrowDown, Calendar, MapPin, Share2, Copy, MessageSquare, Chev
 import { useLanguage } from "@/context/language-context";
 import { TranslationKey } from "@/lib/translations";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +21,7 @@ import {
 import { useIssues } from "@/context/issue-context";
 import { usePathname } from "next/navigation";
 import { Skeleton } from "./ui/skeleton";
-import OpenStreetMap from '@/components/open-street-map';
+import dynamic from 'next/dynamic';
 
 
 type IssueDetailsProps = {
@@ -45,6 +45,11 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
     const { issues, updateIssueStatus } = useIssues();
     const pathname = usePathname();
     const isAdmin = pathname.startsWith('/admin');
+
+    const OpenStreetMap = useMemo(() => dynamic(() => import('@/components/open-street-map'), { 
+      ssr: false,
+      loading: () => <Skeleton className="h-full w-full" />
+    }), []);
 
     // This ensures we have the latest issue state from the context
     const issue = issues.find(i => i.id === initialIssue.id) || initialIssue;
@@ -224,3 +229,5 @@ export function IssueDetails({ issue: initialIssue }: IssueDetailsProps) {
         </div>
     );
 }
+
+    
